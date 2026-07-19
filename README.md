@@ -66,11 +66,12 @@ smoke test. `harness/` is a git submodule used for emulator testing.
 
 Built and tested with [pebble-testpilot](https://github.com/Persitz/pebble-testpilot).
 
-## Source, contributions, and license
+## Source and license
 
 Timers is open source under the [Apache License 2.0](LICENSE). Third-party notices are in
 [NOTICE](NOTICE), with the JetBrains Mono license alongside the font at
 [`app/resources/fonts/OFL.txt`](app/resources/fonts/OFL.txt).
 
-Issues and patches are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) for how public contributions
-are handled.
+Found a bug or have feedback? Please open an issue (bugs, feedback, and feature ideas are all
+welcome). This repository is a source mirror, so I don't take pull requests here. For
+security-sensitive reports, use GitHub's private vulnerability reporting rather than a public issue.
