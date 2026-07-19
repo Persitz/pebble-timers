@@ -1,0 +1,120 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Herman Persitz
+
+#
+# This file is the default set of rules to compile a Pebble application.
+#
+# Feel free to customize this to your needs.
+#
+import os
+import os.path
+
+top = '.'
+out = 'build'
+
+
+def options(ctx):
+    ctx.load('pebble_sdk')
+
+
+def configure(ctx):
+    """
+    This method is used to configure your build. ctx.load(`pebble_sdk`) automatically configures
+    a build for each valid platform in `targetPlatforms`. Platform-specific configuration: add your
+    change after calling ctx.load('pebble_sdk') and make sure to set the correct environment first.
+    Universal configuration: add your change prior to calling ctx.load('pebble_sdk').
+    """
+    ctx.load('pebble_sdk')
+
+
+def build(ctx):
+    ctx.load('pebble_sdk')
+
+    build_worker = os.path.exists('worker_src')
+    binaries = []
+
+    # Screen gallery (inner-loop visual-verification tool; see
+    # src/c/gallery.c): the ENTIRE gallery adapter is wrapped in
+    # `#ifdef GALLERY_MODE` (including its
+    # touch points in the real screens' click_config_providers), so it must
+    # never be compiled into a release build. Toggled by an env var (not a
+    # wscript CLI flag) so `pebble build` stays the normal, undecorated
+    # release command; app/scripts/build-gallery.sh sets this var for the
+    # gallery build. When unset (the default -- every normal `pebble build`),
+    # `defines` is empty and this app_elf compile is byte-for-byte identical
+    # to before this toggle existed.
+    gallery_mode = os.environ.get('PEBBLE_GALLERY_MODE') == '1'
+    app_defines = ['GALLERY_MODE=1'] if gallery_mode else []
+
+    # Emulator test hooks: gates a
+    # ~55-line inbound-AppMessage seam (testlog_am.c's inbox handler +
+    # dictation_am.c's dictation_am_inject()) that lets a harness action
+    # script inject a fake transcript through the REAL dictation deliver()
+    # funnel, since the emulator's own system dictation UI never resolves on
+    # its own. Same env-var toggle shape as PEBBLE_GALLERY_MODE above -- when
+    # unset (every normal `pebble build`, and CI/release), `defines` gets
+    # nothing added and this app_elf compile is byte-for-byte identical to
+    # before this toggle existed. Set PEBBLE_EMU_TEST_HOOKS=1 in the
+    # environment before invoking `pebble build` to enable it for an
+    # emulator test build.
+    emu_test_hooks = os.environ.get('PEBBLE_EMU_TEST_HOOKS') == '1'
+    if emu_test_hooks:
+        app_defines.append('EMU_TEST_HOOKS=1')
+
+    # A gallery build
+    # adds gallery.c + ~270 gated lines on TOP of a release image that already
+    # sits only a few hundred bytes below the 65535-byte virtual_size uint16
+    # wall (see scripts/size.sh's FAIL threshold) -- with lib/parse_nl.c still in the mix
+    # this reliably overflows the wall (measured: dec 66056; inject_metadata.py
+    # crashes and produces no .pbw at all). lib/parse_nl.c
+    # is the single largest TU (9748 B of .text) and is NOT needed for
+    # rendering-fidelity screenshots: gallery.c's voice scenes build literal
+    # NlParse fixtures instead of calling the live parser (parser correctness
+    # stays covered by app/test/parse_nl_test.c's host corpus) -- so it is
+    # excluded from the gallery source list here. src/c/parse_nl_gallery_stub.c
+    # (itself #ifdef GALLERY_MODE-gated, so it compiles to nothing and changes
+    # nothing in a release build) supplies the parse_nl()/
+    # nl_clock_target_to_duration() symbols dictation_am.c's one call site
+    # still references, so the gallery image still links.
+    app_sources = ctx.path.ant_glob('src/c/**/*.c')
+    if gallery_mode:
+        # Match by PATH, not basename -- a
+        # basename-only compare (`n.name != 'parse_nl.c'`) would silently
+        # exclude any future same-named file anywhere else under src/c/ too.
+        # path_from() is relative to this wscript's own directory ('.'),
+        # joined with '/' (waf's Node.path_from always uses '/', regardless
+        # of OS).
+        app_sources = [n for n in app_sources if n.path_from(ctx.path) != 'src/c/lib/parse_nl.c']
+
+    # Single source of truth for the app version: read package.json's `version`
+    # at build time and inject it as a string-literal compile define, consumed
+    # only in the adapter tier (screen_home.c's empty-state label). Appended to
+    # app_defines unconditionally so it is present in BOTH the normal release
+    # build and the gallery build (PEBBLE_GALLERY_MODE), and travels the same
+    # `defines=` path already proven by GALLERY_MODE above. No shell is involved
+    # (waf spawns gcc directly), so the embedded quotes reach the compiler
+    # verbatim as a valid C string literal.
+    import json
+    _version = json.loads(ctx.path.find_node('package.json').read()).get('version', '0.0.0')
+    app_defines.append('APP_VERSION_STR="{}"'.format(_version))
+
+    cached_env = ctx.env
+    for platform in ctx.env.TARGET_PLATFORMS:
+        ctx.env = ctx.all_envs[platform]
+        ctx.set_group(ctx.env.PLATFORM_NAME)
+        app_elf = '{}/pebble-app.elf'.format(ctx.env.BUILD_DIR)
+        ctx.pbl_build(source=app_sources, target=app_elf, bin_type='app',
+                      defines=app_defines)
+
+        if build_worker:
+            worker_elf = '{}/pebble-worker.elf'.format(ctx.env.BUILD_DIR)
+            binaries.append({'platform': platform, 'app_elf': app_elf, 'worker_elf': worker_elf})
+            ctx.pbl_build(source=ctx.path.ant_glob('worker_src/c/**/*.c'),
+                          target=worker_elf,
+                          bin_type='worker')
+        else:
+            binaries.append({'platform': platform, 'app_elf': app_elf})
+    ctx.env = cached_env
+
+    ctx.set_group('bundle')
+    ctx.pbl_bundle(binaries=binaries)

@@ -1,0 +1,26 @@
+# Evidence run folders (screenshots, logs, transcripts) — never committed
+evidence/
+
+# OS / editor cruft
+.DS_Store
+*.swp
+
+# Pebble SDK (defensive — primary install location is ~/.pebble-sdk, outside the repo)
+.pebble-sdk/
+
+# Debugger / build log output
+*.log
+
+# Defensive: emulator-harness artifacts should never be committed from ANY cwd.
+# They normally land under app/ or harness/ (each has its own .gitignore), but the
+# harness resolves these to the invoking CWD, so a wrong-cwd run could drop them here.
+.emu-libs/
+.ocr/
+emulator-runs/
+__pycache__/
+
+# Root-level dropped images (ad-hoc screenshots, etc.) — not committed.
+/*.png
+/*.jpg
+/*.jpeg
+/*.zip

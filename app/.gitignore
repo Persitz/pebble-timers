@@ -1,0 +1,27 @@
+# Pebble build output
+/build/
+*.pbw
+
+# waf build locks
+.lock-waf_*_build
+
+# Host unit-test build output (test/vendor/ itself IS committed -- the vendored
+# test dependencies are pinned and checksum-verified so the host test build needs
+# no network; see the fetch-unity.sh / fetch-fff.sh scripts)
+/test/build/
+
+# Node
+node_modules/
+
+# Local emulator harness output, landing here under the cwd-default convention
+# (harness commands are invoked with cwd = app/, which the harness resolves as its
+# project root unless overridden via EMU_PROJECT_ROOT).
+.emu-libs/
+# setup-libs.sh's staging + old-aside dirs, used for atomic-promote
+# idempotency -- both are siblings of .emu-libs/,
+# not nested inside it, so they need their own patterns; see harness/.gitignore's
+# fuller comment for what each is for and when it exists.
+.emu-libs.stage.*/
+.emu-libs.old.*/
+.ocr/
+emulator-runs/

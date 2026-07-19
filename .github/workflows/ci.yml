@@ -1,0 +1,101 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Herman Persitz
+#
+# CI for the C-SDK Pebble Time 2 app.
+#
+# Runs host tests, builds the watch app, checks its size, and retains the resulting PBW as a CI
+# artifact.
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  PEBBLE_TOOL_VERSION: "5.0.39"
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  host-tests:
+    name: Host unit tests (gcc -Werror)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: npm run test:c (make -C test test)
+        working-directory: app
+        run: npm run test:c
+
+  watch-build:
+    name: Watch build (pebble build) + size gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Cache uv-managed Python and pebble-tool
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/share/uv
+            ~/.cache/uv
+          key: uv-pebble-tool-${{ env.PEBBLE_TOOL_VERSION }}-${{ runner.os }}
+
+      - name: Cache Pebble SDK
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pebble-sdk
+          key: pebble-sdk-4.17-${{ runner.os }}
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install uv-managed Python
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          uv python install "$PYTHON_VERSION"
+
+      - name: Install pebble-tool
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          uv tool install "pebble-tool==$PEBBLE_TOOL_VERSION" --python "$PYTHON_VERSION" --reinstall
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          pebble --version
+
+      - name: Install Pebble SDK
+        run: |
+          if pebble sdk list 2>/dev/null | grep -q '(active)'; then
+            echo "SDK already installed: $(pebble sdk list 2>/dev/null | grep '(active)')"
+          else
+            pebble sdk install latest
+          fi
+
+      - name: pebble build
+        working-directory: app
+        run: pebble build
+
+      - name: Size gate (npm run size:c)
+        working-directory: app
+        run: npm run size:c
+
+      - name: Upload PBW artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-pbw
+          path: app/build/app.pbw
+          retention-days: 30

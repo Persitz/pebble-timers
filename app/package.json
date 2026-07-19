@@ -1,0 +1,54 @@
+{
+  "name": "pebble-timers",
+  "author": "hermanpersitz",
+  "version": "0.1.14",
+  "keywords": [
+    "pebble-app"
+  ],
+  "private": true,
+  "dependencies": {},
+  "scripts": {
+    "test:c": "make -C test test",
+    "size:c": "./scripts/size.sh"
+  },
+  "pebble": {
+    "displayName": "Timers",
+    "uuid": "a3342ab9-12ce-4273-8d9d-6f4463cc8b46",
+    "sdkVersion": "3",
+    "enableMultiJS": false,
+    "targetPlatforms": [
+      "emery"
+    ],
+    "watchapp": {
+      "watchface": false
+    },
+    "resources": {
+      "media": [
+        {
+          "type": "font",
+          "name": "FONT_JBM_BOLD_42",
+          "file": "fonts/JetBrainsMono-Bold.ttf",
+          "characterRegex": "[0-9:+ ]"
+        },
+        {
+          "type": "font",
+          "name": "FONT_JBM_BOLD_32",
+          "file": "fonts/JetBrainsMono-Bold.ttf",
+          "characterRegex": "[0-9:+ ]"
+        },
+        {
+          "type": "font",
+          "name": "FONT_JBM_BOLD_56",
+          "file": "fonts/JetBrainsMono-Bold.ttf",
+          "characterRegex": "[0-9:+ ]"
+        },
+        {
+          "type": "png",
+          "name": "IMAGE_MENU_ICON",
+          "file": "images/menu-icon-25.png",
+          "menuIcon": true
+        }
+      ]
+    }
+  }
+}
