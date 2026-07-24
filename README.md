@@ -20,13 +20,34 @@ reviewing each other's work.
 
 ## What it does
 
-- Runs several timers at once, with a home screen that keeps their live times visible.
-- Creates countdowns, stopwatch sessions with laps, and repeat intervals.
-- Saves presets for timers you use often.
-- Lets you say a timer, review what the watch heard, and confirm or edit it before it starts.
-- Keeps recent laps on the stopwatch screen and completed rounds on the repeat screen.
-- Keeps timer deadlines while the app is closed and re-alerts, with a snooze option, when one
-  finishes.
+**Across the app**
+
+- Run several at once; the home screen keeps each live time visible.
+- Say a timer by voice, in English or Spanish ("five minutes", "pasta for eight minutes",
+  "every 20 minutes", "at 6:45").
+- Save up to 12 presets and start one with a press.
+- Timers keep their deadline even when the app is closed, and re-alert with snooze when one finishes.
+
+**Countdowns**
+
+- Big digits with a progress bar.
+- Start and end time shown.
+- Hold to pause.
+- Add more time while it runs.
+- Keep counting past zero.
+
+**Stopwatch**
+
+- Laps right on the main screen.
+- Hold to add a lap.
+
+**Repeat timers**
+
+- Repeat on a set interval.
+- Visible round tally.
+- Quick restart.
+
+You can also name any timer and turn a countdown into a repeat.
 
 Timers is for Pebble Time 2 owners who want countdowns, stopwatch sessions, and intervals in one
 place, whether that is for cooking, workout rests, focus blocks, or other everyday timing. It is
