@@ -3,12 +3,14 @@
 
 #include <pebble.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "app_context.h"
 #include "dictation_am.h"
 #include "fonts_adapter.h"
 #include "hold.h"
 #include "lib/app_state.h"
+#include "lib/parse_nl.h"
 #include "lib/store.h"
 #include "lib/timer.h"
 #include "nav.h"
@@ -27,6 +29,51 @@
 #include "wakeup_adapter.h"
 #ifdef GALLERY_MODE
 #include "gallery.h"
+#endif
+
+#ifndef GALLERY_MODE
+static uint8_t *s_nl_vocabulary;
+
+static void nl_vocabulary_init(void) {
+  size_t expected_size = parse_nl_vocabulary_size();
+  ResHandle handle = resource_get_handle(RESOURCE_ID_NL_TABLES);
+  if (handle == NULL) {
+    testlog("voice_data", "missing");
+    return;
+  }
+
+  size_t resource_bytes = resource_size(handle);
+  if (resource_bytes != expected_size) {
+    testlog("voice_data", "size");
+    return;
+  }
+
+  uint8_t *vocabulary = malloc(resource_bytes);
+  if (vocabulary == NULL) {
+    testlog("voice_data", "malloc");
+    return;
+  }
+
+  if (resource_load(handle, vocabulary, resource_bytes) != resource_bytes) {
+    free(vocabulary);
+    testlog("voice_data", "read");
+    return;
+  }
+  if (!parse_nl_vocabulary_set(vocabulary, resource_bytes)) {
+    free(vocabulary);
+    testlog("voice_data", "checksum");
+    return;
+  }
+
+  s_nl_vocabulary = vocabulary;
+  testlog("voice_data", "ready");
+}
+
+static void nl_vocabulary_deinit(void) {
+  parse_nl_vocabulary_set(NULL, 0);
+  free(s_nl_vocabulary);
+  s_nl_vocabulary = NULL;
+}
 #endif
 
 // Marks whichever screens are currently on-stack dirty -- each screen's
@@ -54,14 +101,20 @@ static void redraw_visible_screens(void) {
 
 // Runs on every tick/wakeup/launch, regardless of the current screen.
 // Newly-fired timers get an alarm vibe + take-over (per the interruption
-// model) + a schedule replan.
-static void scan_and_handle_firings(time_t now) {
+// model) + a schedule replan. Returns true iff anything fired (and
+// therefore already replanned) -- callers that would otherwise
+// unconditionally replan right afterward (the cold wakeup-launch path in
+// init(), below) must skip that second replan when this returns true: a
+// second cancel-all+reschedule of every wakeup entry is not just wasted
+// work, it re-opens the exact collision window the retry ladder exists to
+// close.
+static bool scan_and_handle_firings(time_t now) {
   TimerStore *store = app_context_store();
   AppState *app_state = app_context_app_state();
 
   int32_t fired[MAX_TIMERS];
   int n = app_state_scan_firings(app_state, store, now, fired, MAX_TIMERS);
-  if (n == 0) return;
+  if (n == 0) return false;
 
   persist_adapter_save(store);
   wakeup_adapter_replan(store, now);
@@ -77,6 +130,7 @@ static void scan_and_handle_firings(time_t now) {
     app_state->alerted_at = now;
     nav_on_timer_fired(fired[i]);
   }
+  return true;
 }
 
 // Re-alert cadence: only while an alarm-family screen is on top with a
@@ -102,9 +156,13 @@ static void maybe_realert(time_t now) {
   int32_t overrun = timer_overrun_s(t, now);
   if (app_state_should_rebuzz(app_state->alerted_at, now, overrun)) {
     vibes_adapter_alarm(t->kind == KIND_REPEAT);
-    // Pulse the light on every re-alert too, using the same brief
-    // self-timed light behavior as the initial fire.
-    light_enable_interaction();
+    // Pulse the light too, but only within the first REALERT_CAP_S -- past
+    // that, cadence decays to every 60s (app_state_should_rebuzz) and the
+    // buzz alone is the signal; lighting the screen every minute all night
+    // is not (see app_state.h's decaying-cadence rationale).
+    if (app_state_realert_pulses_backlight(overrun)) {
+      light_enable_interaction();
+    }
     app_state->alerted_at = now;
     // Distinguishable from the initial-fire "vibe:countdownAlarm" marker and
     // from every OTHER re-alert -- a per-call counter (rather than a fixed
@@ -125,8 +183,8 @@ static void handle_second_tick(struct tm *tick_time, TimeUnits units_changed) {
   // built deliberately (including already-fired-and-ringing scenes, via
   // gallery.c's own gallery_fire_all_due()) and must stay EXACTLY as built
   // until the next Up/Down press -- a real scan here could fire a
-  // not-yet-due timer out from under a scene mid-capture (a slow capture
-  // step landing past a short countdown's deadline) or re-buzz/re-log an
+  // not-yet-due timer while a scene is on screen (time elapsing past a
+  // short countdown's deadline) or re-buzz/re-log an
   // already-ringing one (re-alert), neither of which the gallery
   // wants. redraw_visible_screens() still runs, so live-derived values
   // (remaining/elapsed, computed from real `now` at DRAW time regardless of
@@ -151,7 +209,9 @@ static void handle_will_focus(bool in_focus) {
 
 static void handle_did_focus(bool in_focus) {
   if (in_focus) {
+#ifndef GALLERY_MODE
     scan_and_handle_firings(time(NULL));
+#endif
     redraw_visible_screens();
   }
 }
@@ -189,6 +249,13 @@ static void init(void) {
   // below creates every window up front) ever draws a number with them.
   fonts_adapter_init();
 
+#ifndef GALLERY_MODE
+  // Load the parser's one raw vocabulary resource once, beside the existing
+  // one-time font loads. parse_nl borrows this buffer until deinit; voice
+  // attempts never perform flash I/O on their user-visible path.
+  nl_vocabulary_init();
+#endif
+
   // Creates the app's one DictationSession before nav_init() creates any
   // window -- no ordering dependency either way (screen_voice_create()
   // doesn't touch dictation_am state), grouped here with the other
@@ -206,20 +273,66 @@ static void init(void) {
   gallery_init();
 #else
   time_t now = time(NULL);
+  bool already_replanned = false;
   if (launch_reason() == APP_LAUNCH_WAKEUP) {
     WakeupId id;
     int32_t cookie;
     if (wakeup_get_launch_event(&id, &cookie)) {
-      // Cold relaunch by our own wakeup: jump straight to that timer's
-      // alarm rather than landing on HOME first.
-      scan_and_handle_firings(now);
-      if (store_find_const(app_context_store(), cookie) != NULL) {
+      // Capture fired-state BEFORE the scan -- distinguishes "this scan is
+      // about to fire it for the first time" (scan_and_handle_firings()
+      // below already calls nav_on_timer_fired() internally for every
+      // cookie it newly fires) from "this timer was already fired and
+      // persisted before this launch even started" (a catch-up cold
+      // launch -- e.g. the process was killed between firing and the user
+      // seeing it; the scan below does nothing for an already-fired timer,
+      // so nothing has routed nav to it yet). Calling nav_on_timer_fired()
+      // unconditionally after the scan double-navigated (and double-logged,
+      // and re-armed the input guard) for the "scan just fired it" case.
+      const Timer *t_before = store_find_const(app_context_store(), cookie);
+      bool was_fired_before = (t_before != NULL && t_before->fired);
+
+      // Run the due scan -- a wakeup delivered at/after T needs this to
+      // actually fire (and persist) the timer, setting t->fired, without
+      // waiting for the per-second tick's first firing (unnecessary
+      // latency on a real, on-time alarm). If anything fired,
+      // scan_and_handle_firings() has ALREADY replanned as part of its own
+      // firing handling, so the unconditional replan
+      // below must be skipped in that case, or every wakeup entry gets
+      // cancelled and rescheduled a second time for no behavioral gain,
+      // re-opening the exact collision window the retry ladder exists to
+      // close.
+      already_replanned = scan_and_handle_firings(now);
+
+      const Timer *t = store_find_const(app_context_store(), cookie);
+      bool is_fired_after = (t != NULL && t->fired);
+      // `already_replanned` doubles as "the scan fired something new this
+      // call" (scan_and_handle_firings() returns true iff n > 0) -- passed
+      // through so app_state_needs_catchup_nav() can establish SINGLE
+      // ownership of the one startup navigation decision, not just this
+      // cookie's own before/after state. Without it, a persisted-fired
+      // launch cookie sitting alongside a newly-due SIBLING that the scan
+      // just fired (and already navigated to internally) would get a
+      // second, wrong navigation call here: `ringing[]` only contains the
+      // sibling, so re-routing to this cookie would show a cookie the app isn't
+      // actually ringing, hiding the real alarm behind it.
+      if (app_state_needs_catchup_nav(was_fired_before, is_fired_after, already_replanned)) {
+        // Catch-up case only -- the scan just above neither touched this
+        // cookie NOR navigated for anything else, so this is the one and
+        // only place that routes nav to it.
         nav_on_timer_fired(cookie);
       }
+      // else: either not fired at all yet (a legitimately early wakeup --
+      // do not navigate, the per-second tick scan will ring it exactly on
+      // time), or the scan above fired THIS cookie itself (already
+      // navigated internally), or the scan fired a DIFFERENT cookie
+      // (already navigated internally, to the right target). All three
+      // cases: do not navigate.
     }
   }
 
-  wakeup_adapter_replan(app_context_store(), now);
+  if (!already_replanned) {
+    wakeup_adapter_replan(app_context_store(), now);
+  }
 #endif
 
   tick_timer_service_subscribe(SECOND_UNIT, handle_second_tick);
@@ -238,6 +351,9 @@ static void deinit(void) {
   wakeup_service_subscribe(NULL);
   nav_deinit();
   dictation_am_deinit();
+#ifndef GALLERY_MODE
+  nl_vocabulary_deinit();
+#endif
   fonts_adapter_deinit();
 }
 

@@ -1,7 +1,7 @@
 {
   "name": "pebble-timers",
   "author": "hermanpersitz",
-  "version": "0.1.14",
+  "version": "0.1.15",
   "keywords": [
     "pebble-app"
   ],
@@ -9,7 +9,8 @@
   "dependencies": {},
   "scripts": {
     "test:c": "make -C test test",
-    "size:c": "./scripts/size.sh"
+    "size:c": "./scripts/size.sh",
+    "check:pbw": "python3 ./scripts/check_pbw_integrity.py build/app.pbw"
   },
   "pebble": {
     "displayName": "Timers",
@@ -47,6 +48,11 @@
           "name": "IMAGE_MENU_ICON",
           "file": "images/menu-icon-25.png",
           "menuIcon": true
+        },
+        {
+          "type": "raw",
+          "name": "NL_TABLES",
+          "file": "generated/nl_tables.bin"
         }
       ]
     }

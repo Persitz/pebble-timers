@@ -10,7 +10,31 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#define TESTLOG_MAX_LINE_LEN 120
+// Line length: sized against the longest test-log line this app has ever
+// emitted (31 chars, "edit_interval_open:hero_up_hold") -- 60 keeps ~2x
+// headroom, not the prior 4x-overprovisioned 120. Measured reclaim: -484 B
+// `.bss` for this half alone.
+//
+// Queue capacity: read the derivation below before changing this number.
+//
+// A single wakeup_adapter_replan() call pushes lines SYNCHRONOUSLY (nothing
+// pops until the first async AppMessage round-trip completes). The honest
+// worst-case burst is 16 (one replan alone, up to MAX_TIMERS candidates,
+// since sched_candidates()'s old 8-cap was removed) or 20 across a full
+// production call chain (a cold wakeup launch that immediately fires --
+// persist(1) + [replan+vibe lines, provably <= MAX_TIMERS combined] +
+// alarm_target(<=2) + app_init(1)). MEASURED cost: 8->16 is +488 B; 8->20
+// exceeds the hard uint16 wall outright (no .pbw).
+//
+// Capacity is 8. Overflow drops AppMessage test-log evidence only -- it
+// never touches timer state, OS scheduling, persistence, vibration, or
+// navigation (grep this codebase's `testlog(...)` call sites: none of their
+// return values gate production behavior). Capacity 16 would still lose the
+// full-chain/pre-existing-backlog case. A future diagnostics increment
+// should aggregate per-replan outcomes or emit an explicit overflow summary
+// rather than scaling a 61-byte-per-line queue toward a bound that still
+// would not be complete.
+#define TESTLOG_MAX_LINE_LEN 60
 #define TESTLOG_QUEUE_CAPACITY 8
 
 // Formats a test-log line into `out` (NUL-terminated, truncated to fit

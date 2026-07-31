@@ -14,7 +14,7 @@
 // This file supplies the two symbols the rest of the gallery image still
 // references so it links: dictation_am.c's one call site (adapter tier,
 // reached only if a real dictation session ever DELIVERS a transcript).
-// That never happens in a gallery capture run -- every voice scene calls the
+// That never happens in gallery mode -- every voice scene calls the
 // real dictation_am_start() via nav_go_voice() but then immediately calls
 // dictation_am_cancel() before any delivery callback can fire (see gallery.c's
 // own comment on that convention) -- so these stub bodies

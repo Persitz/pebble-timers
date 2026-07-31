@@ -64,9 +64,23 @@ typedef struct {
                                      // actually resolved clock.has_clock_target.
 } NlParse;
 
+// Installs one borrowed, immutable vocabulary resource for all subsequent
+// parses. The caller retains ownership and must keep `data` alive until it
+// installs another span or clears it with (NULL, 0). Returns false and leaves
+// the parser unavailable unless both generated size and CRC32 match.
+bool parse_nl_vocabulary_set(const uint8_t *data, size_t size);
+
+// Generated raw-resource size expected by parse_nl_vocabulary_set().
+size_t parse_nl_vocabulary_size(void);
+
+// False until a validated span is installed, or after an invalid/clearing
+// set. Host builds start on a generator-produced byte-identical test span.
+bool parse_nl_vocabulary_available(void);
+
 // Parses one UTF-8 transcript into `*out`. `transcript` may be NULL or
 // empty (=> ok=false, *out zeroed to defaults). Deterministic, no side
-// effects, no allocation. Returns out->ok.
+// effects, no allocation. Returns false at normal defaults when vocabulary
+// is unavailable; the adapter must distinguish that configuration failure.
 bool parse_nl(const char *transcript, NlParse *out);
 
 // Resolves a recognized clock target (`target->has_clock_target` must be true) to a countdown duration -- seconds until its NEXT occurrence from `now_sod` (0..86399, local seconds-of-day; the caller reads the real clock -- lib/ stays pure). A 12h-ambiguous target (hour24_known==false) picks whichever of its AM/PM occurrence is sooner (nearest-future, the standard alarm-clock convention); an exact now==target match resolves to the NEXT occurrence (+24h if hour24_known, else the nearer of +12h/+24h), never a 0-second duration. Writes the chosen target's own seconds-of-day to *out_target_sod (for a confirm-screen "-> HH:MM" annotation; `out_target_sod` may be NULL if the caller doesn't need it). Pure, deterministic, host-testable -- never reads the clock itself, never crashes (hour/minute are clamped into range defensively). Always returns a value in 1..86400.

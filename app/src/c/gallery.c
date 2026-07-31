@@ -14,6 +14,7 @@
 #include "lib/format.h"
 #include "lib/parse_nl.h"
 #include "lib/preset_store.h"
+#include "lib/sched.h"
 #include "lib/store.h"
 #include "lib/timer.h"
 #include "lib/voice_outcome.h"
@@ -28,6 +29,7 @@
 #include "screen_set.h"
 #include "screen_voice.h"
 #include "testlog_am.h"
+#include "wakeup_adapter.h"
 
 // --- shared helpers, reused by several scenes below -------------------------
 
@@ -46,6 +48,15 @@ static void gallery_reset_fixture(void) {
     store_remove(store, store->timers[0].cookie);
   }
   app_state_init(app_context_app_state());
+  // The real adapter's armed set (wakeup_adapter.c's s_accepted) is a
+  // module-level static that outlives any one scene -- gallery_fire_all_due()
+  // and wakeup_adapter_replan() are the only two ways production code ever
+  // touches it, and this fixture builder calls neither (see
+  // gallery_fire_all_due()'s own comment), so nothing else clears it between
+  // scenes. Reset it explicitly here, same leak-guard shape as every other
+  // reset in this function, so a scene that never seeds it starts genuinely
+  // unarmed rather than inheriting whatever an earlier scene armed.
+  wakeup_adapter_gallery_reset_armed();
   hold_debug_force(-1);  // clear any forced hold-fill left by a prior scene
   // Same leak-guard reasoning as the resets above -- hold_debug_force_button
   // defaults to SELECT (hold.h's own doc comment), and the transient
@@ -191,11 +202,34 @@ static void scene_set_build_duration(void) {
 }
 
 // --- RUNNING HEROES ---------------------------------------------------------
+//
+// Every ordinary running countdown/repeat hero scene below seeds itself into
+// wakeup_adapter's real armed set via wakeup_adapter_gallery_seed_armed()
+// (wakeup_adapter.h) -- NOT wakeup_adapter_replan() itself, which the
+// gallery's fixture builder deliberately never calls (see
+// gallery_fire_all_due()'s own comment: replan's real wakeup_schedule()/
+// wakeup_cancel_all() calls are side effects that don't belong in a static,
+// single-process, 100+-scene fixture builder). Without this, screen_hero.c's
+// no-background-alarm indicator (render_no_bg_alarm_indicator, gated on
+// wakeup_adapter_is_armed()) would read the armed set's real, empty-by-
+// omission default and show the glyph on every one of these scenes,
+// regardless of whether a real device's replan would ever leave them
+// unarmed -- it wouldn't: every real mutation path that creates/edits a
+// timer calls wakeup_adapter_replan() before ever reaching the hero screen
+// (screen_set.c, screen_actions.c, etc.), so an ordinary running timer with
+// nothing else competing for firmware's 8-wakeup-per-app cap is armed by
+// the time a real user ever sees this frame. Seeding here makes the fixture
+// truthful to that outcome without the side effects. The one deliberate
+// EXCEPTION is scene_countdown_hero_unarmed_cap (end of this file) -- the
+// gallery's dedicated demonstration of the indicator's real, non-artifact
+// use, where 9 concurrent timers overrun the cap and the 9th is genuinely
+// left unseeded.
 
 static void scene_countdown_hero_running(void) {
   gallery_reset_fixture();
   int32_t cookie;
   store_add(app_context_store(), KIND_COUNTDOWN, 600, time(NULL) - 442, &cookie);  // remaining 2:38
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- a real replan would arm it
   nav_go_hero(cookie);
   mark_scene(6, "countdown_hero_running");
 }
@@ -218,6 +252,7 @@ static void scene_countdown_hero_holdfill(void) {
   gallery_reset_fixture();
   int32_t cookie;
   store_add(app_context_store(), KIND_COUNTDOWN, 600, time(NULL) - 100, &cookie);
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- armed, see section comment above
   nav_go_hero(cookie);
   hold_debug_force(600);  // 60% -- per-mille (RENDER_FRACTION_SCALE), was 0.6f
   screen_hero_mark_dirty();
@@ -259,6 +294,7 @@ static void scene_repeat_hero_running(void) {
   timer_advance_cycle(t, now);
   timer_advance_cycle(t, now);
   timer_advance_cycle(t, now - 8);  // cycles=3, 8s into this cycle -> remaining 4:52
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- armed, see section comment above
   nav_go_hero(cookie);
   mark_scene(11, "repeat_hero_running");
 }
@@ -491,6 +527,7 @@ static void scene_repeat_hero_snoozing(void) {
   timer_advance_cycle(t, now);
   timer_advance_cycle(t, now);  // cycles=3 ("done x3")
   timer_snooze_repeat(t, now);  // real mutation: remaining=1:15, marker set
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running (snoozing) timer -- armed, see section comment above
   nav_go_hero(cookie);
   mark_scene(27, "repeat_hero_snoozing");
 }
@@ -789,6 +826,7 @@ static void scene_countdown_addquarter_resting(void) {
   gallery_reset_fixture();
   int32_t cookie;
   store_add(app_context_store(), KIND_COUNTDOWN, 1200, time(NULL) - 100, &cookie);  // 20:00, running
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- armed, see RUNNING HEROES section comment
   nav_go_hero(cookie);
   mark_scene(43, "countdown_addquarter_resting");
 }
@@ -801,6 +839,7 @@ static void scene_countdown_addquarter_holdfill(void) {
   gallery_reset_fixture();
   int32_t cookie;
   store_add(app_context_store(), KIND_COUNTDOWN, 1200, time(NULL) - 100, &cookie);  // 20:00, running
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- armed, see RUNNING HEROES section comment
   nav_go_hero(cookie);
   hold_debug_force_button(BUTTON_ID_UP);
   hold_debug_force(600);  // 60% -- per-mille (RENDER_FRACTION_SCALE), was 0.6f
@@ -820,6 +859,7 @@ static void scene_countdown_addquarter_gated_off(void) {
   gallery_reset_fixture();
   int32_t cookie;
   store_add(app_context_store(), KIND_COUNTDOWN, 30, time(NULL) - 5, &cookie);  // 0:30, well under the gate
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- armed, see RUNNING HEROES section comment
   nav_go_hero(cookie);
   hold_debug_force_button(BUTTON_ID_UP);
   hold_debug_force(600);  // 60% -- per-mille (RENDER_FRACTION_SCALE), was 0.6f
@@ -844,6 +884,7 @@ static void scene_repeat_hero_restart_holdfill(void) {
   timer_advance_cycle(t, now);
   timer_advance_cycle(t, now);
   timer_advance_cycle(t, now - 8);  // cycles=3, matches #11's own recipe
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- armed, see RUNNING HEROES section comment
   nav_go_hero(cookie);
   hold_debug_force_button(BUTTON_ID_UP);
   hold_debug_force(600);  // 60% -- per-mille (RENDER_FRACTION_SCALE), was 0.6f
@@ -979,11 +1020,10 @@ static void scene_voice_confirm_countdown(void) {
   // kicked off -- consecutive voice scenes never navigate AWAY from
   // VD_VOICE in between, so render_stack()'s own structural per-transition
   // dictation_am_cancel() call never fires here (a no-op diff, zero stack
-  // calls). Without this explicit cancel, each scene's firmware-level
-  // session-setup handshake lingers and keeps retrying in the background
-  // (~8s cadence) for the rest of the capture run, eventually interfering
-  // with this same connection's own AppMessage testlog traffic -- a later
-  // scene's own marker can stop arriving within its assertion timeout.
+  // calls). Without this explicit cancel, the firmware-level session-setup
+  // handshake lingers and keeps retrying in the background (~8s cadence),
+  // eventually interfering with this same connection's own AppMessage
+  // testlog traffic used by later scenes.
   dictation_am_cancel();
   screen_voice_show_parse(transcript, &r, voice_outcome_for_status(0, r.ok));
   mark_scene(52, "voice_confirm_countdown");
@@ -1214,9 +1254,9 @@ static void scene_home_named(void) {
 // seam (never a hand-set NlParse field) -- simulating exactly what
 // dictation_am.c's deliver() calls on a successful NAME-scope re-dictation
 // (the transcript taken VERBATIM, no parse_nl pass). Starts from a
-// NAME-LESS parse ("five minutes") so the row-label flip is visible in the
-// screenshot set: "Add name" -> "Rename" + a name line (this scene), same
-// underlying confirm preview.
+// NAME-LESS parse ("five minutes") so the row-label flip is visible across
+// the two related gallery scenes: "Add name" -> "Rename" + a name line
+// (this scene), same underlying confirm preview.
 static void scene_voice_add_name_result(void) {
   gallery_reset_fixture();
   const char *transcript = "five minutes";
@@ -1363,7 +1403,7 @@ static void scene_library_max_name(void) {
 // shorter-remaining countdown -- store_home_order() sorts running timers by
 // remaining time regardless of kind -- landing at row 1, never selected).
 // Structurally low-risk (Indigo is a no-op for the bright/deep accent
-// split), but a genuinely uncaptured combo until now.
+// split), but a combo no other scene exercises.
 static void scene_home_repeat_cursor(void) {
   gallery_reset_fixture();
   time_t now = time(NULL);
@@ -1508,10 +1548,32 @@ static void scene_voice_preset_save_result(void) {
 // options" state via the GALLERY_MODE debug lever
 // (screen_library_debug_force_hint(), mirroring
 // screen_hero_debug_force_up_hint()'s own contract) so this reads
-// deterministically instead of racing a real 2.2s AppTimer mid-capture.
+// deterministically instead of depending on when a real 2.2s AppTimer
+// happens to fire.
 static void scene_library_hint_active(void) {
   gallery_reset_fixture();
   preset_store_add(app_context_presets(), KIND_COUNTDOWN, 180);  // >=1 preset -- the hint's own gate
+  // nav_go_home() before nav_go_library() -- NOT a no-op, required. Without it,
+  // this scene silently inherited whatever MenuLayer selection/layout the
+  // PRECEDING scene (80, scene_voice_preset_save_result) left behind: that
+  // scene navigates to LIBRARY too (nav_go_library_focus_row), so a bare
+  // nav_go_library() here targets the SAME ViewDesc kind+cookie nav.c's
+  // s_current already holds -- nav.c's render_stack() diffs the breadcrumb
+  // and is a deliberate no-op when it doesn't change (see render_stack's own
+  // doc comment on the nav-crash-fix history), so window_appear -- and with
+  // it, menu_layer_reload_data()/menu_layer_set_selected_index() -- never
+  // fires. This left MenuLayer's cached row layout keyed to scene 80's
+  // fixture (2 presets, cursor on preset row 1) applied against THIS scene's
+  // freshly-reset 1-preset store, producing a stale-cell-geometry artifact
+  // (an extra dark fragment under the "Save new" pill). This is not
+  // reachable in the real app: every real
+  // path that mutates the preset list (Save new/Edit/Delete/voice-save) goes
+  // through a DIFFERENT ViewDesc kind before returning to LIBRARY, so
+  // window_appear always fires there. This nav_go_home() reproduces that
+  // same "kind actually changes" invariant here, matching every other real
+  // navigation path into LIBRARY and giving this scene the same fresh
+  // reload/cursor-reset a genuine user visit always gets.
+  nav_go_home();
   nav_go_library();
   screen_library_debug_force_hint(true);
   mark_scene(81, "library_hint_active");
@@ -1594,7 +1656,7 @@ static void scene_voice_confirm_minutes_trailing_es(void) {
 // its PM occurrence (18:xx, ~9h away), demonstrating the nearest-future
 // AM/PM resolution on real pixels, not just the host math table. These
 // scenes would ideally call the real nl_clock_target_to_duration() against
-// this constant at capture time (exactly the call dictation_am.c's own
+// this constant at scene-build time (exactly the call dictation_am.c's own
 // deliver() makes, with `now` fixed instead of a real device's time(NULL)
 // read, so the gallery stays deterministic); since lib/parse_nl.c is
 // excluded from gallery builds, each scene's duration_s/clock_target_sod are
@@ -1828,6 +1890,7 @@ static int32_t name_option_repeat_fixture(const char *name) {
 static void scene_name_cd_short(void) {
   gallery_reset_fixture();
   int32_t cookie = name_option_countdown_fixture(NAME_OPT_SHORT);
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- armed, see RUNNING HEROES section comment
   nav_go_hero(cookie);
   mark_scene(92, "name_cd_short");
 }
@@ -1835,6 +1898,7 @@ static void scene_name_cd_short(void) {
 static void scene_name_cd_long(void) {
   gallery_reset_fixture();
   int32_t cookie = name_option_countdown_fixture(NAME_OPT_LONG);
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- armed, see RUNNING HEROES section comment
   nav_go_hero(cookie);
   mark_scene(93, "name_cd_long");
 }
@@ -1842,6 +1906,7 @@ static void scene_name_cd_long(void) {
 static void scene_name_rp(void) {
   gallery_reset_fixture();
   int32_t cookie = name_option_repeat_fixture(NAME_OPT_SHORT);
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- armed, see RUNNING HEROES section comment
   nav_go_hero(cookie);
   mark_scene(94, "name_rp");
 }
@@ -1898,6 +1963,7 @@ static void scene_repeat_tally_round1(void) {
   time_t now = time(NULL);
   int32_t cookie;
   store_add(app_context_store(), KIND_REPEAT, 300, now - 8, &cookie);  // cycles=0, 8s in -> remaining 4:52
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- armed, see RUNNING HEROES section comment
   nav_go_hero(cookie);
   mark_scene(97, "repeat_tally_round1");
 }
@@ -1910,6 +1976,7 @@ static void scene_repeat_tally_round3(void) {
   Timer *t = store_find(app_context_store(), cookie);
   timer_advance_cycle(t, now);
   timer_advance_cycle(t, now - 8);  // cycles=2, 8s into round 3 -> remaining 4:52
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- armed, see RUNNING HEROES section comment
   nav_go_hero(cookie);
   mark_scene(98, "repeat_tally_round3");
 }
@@ -1930,6 +1997,7 @@ static void scene_repeat_tally_round7_singlebar(void) {
     timer_advance_cycle(t, now);
   }
   timer_advance_cycle(t, now - 8);  // cycles=6, 8s into round 7 -> single full-width bar, done x6
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- armed, see RUNNING HEROES section comment
   nav_go_hero(cookie);
   mark_scene(99, "repeat_tally_round7_singlebar");
 }
@@ -1963,6 +2031,7 @@ static void scene_countdown_hero_10h(void) {
   gallery_reset_fixture();
   int32_t cookie;
   store_add(app_context_store(), KIND_COUNTDOWN, 36000, time(NULL), &cookie);  // 10:00:00
+  wakeup_adapter_gallery_seed_armed(cookie);  // ordinary running timer -- armed, see RUNNING HEROES section comment
   nav_go_hero(cookie);
   mark_scene(102, "countdown_hero_10h");
 }
@@ -2033,6 +2102,43 @@ static void scene_library_10h_unnamed(void) {
   preset_store_add(app_context_presets(), KIND_COUNTDOWN, 36000);  // 10:00:00, unnamed
   nav_go_library();
   mark_scene(107, "library_10h_unnamed");
+}
+
+// --- Deliberately-unarmed hero: firmware's 8-wakeup cap reached -------------
+//
+// The ONE scene in this gallery that is meant to show
+// render_no_bg_alarm_indicator (screen_hero.c:561, gated on
+// wakeup_adapter_is_armed()) -- every ordinary running-hero scene above this
+// point seeds ITSELF into the armed set (wakeup_adapter_gallery_seed_armed(),
+// see the RUNNING HEROES section comment near the top of this file) precisely
+// so it does NOT show the glyph, matching what a real device's replan would
+// do for an ordinary timer with nothing else competing for a wakeup slot.
+// This scene depicts the genuine reason the indicator exists: 9 concurrently
+// running countdown timers competing for firmware's SCHED_MAX_WAKEUPS(8)
+// -entry-per-app cap (lib/sched.h). All 9 share the same start time and their
+// deadlines are exactly SCHED_MIN_SPACING_S apart. Thus sched_spacing_allows()
+// permits every primary: the deadline-ascending pass 1 in
+// wakeup_adapter_replan() accepts cookies 0..7, then structurally skips
+// cookie 8 only because AcceptedSet is genuinely full. Rank 3 cannot add an
+// insurance entry after those eight primaries. Seeds those first 8 (add order
+// == deadline order) as armed and leaves the 9th unseeded, then shows THAT
+// timer's hero: the glyph here is the truthful cap-exhaustion state this
+// indicator exists to surface.
+static void scene_countdown_hero_unarmed_cap(void) {
+  gallery_reset_fixture();
+  time_t now = time(NULL);
+  int32_t cookies[9];
+  for (int i = 0; i < 9; i++) {
+    // 5:00, 6:00, 7:00, ... 13:00 -- all comfortably running, ascending
+    // legal primary deadlines matching add order.
+    store_add(app_context_store(), KIND_COUNTDOWN, 300 + i * SCHED_MIN_SPACING_S, now, &cookies[i]);
+  }
+  for (int i = 0; i < 8; i++) {
+    wakeup_adapter_gallery_seed_armed(cookies[i]);  // the 8 that would fill the real cap
+  }
+  // cookies[8] (the 9th, longest duration) is deliberately left unseeded.
+  nav_go_hero(cookies[8]);
+  mark_scene(108, "countdown_hero_unarmed_cap");
 }
 
 // --- scene table + navigation -----------------------------------------------
@@ -2156,6 +2262,7 @@ static const GallerySceneBuilder s_scenes[] = {
     scene_library_10h_maxname,              // 105 (named Library preset, 10h + max name)
     scene_multi_alarm_ringing_maxname,       // 106 (ringing list, max name vs caret)
     scene_library_10h_unnamed,               // 107 (unnamed Library preset, 10h, chevron branch)
+    scene_countdown_hero_unarmed_cap,        // 108 (genuinely unarmed: 9 timers, firmware's 8-wakeup cap reached)
 };
 #define GALLERY_SCENE_COUNT ((int)(sizeof(s_scenes) / sizeof(s_scenes[0])))
 

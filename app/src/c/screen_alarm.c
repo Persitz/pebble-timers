@@ -49,9 +49,6 @@
 // layout to reconcile).
 #define ALARM_NAME_CAPTION_Y 72
 
-#define SCROLL_INDICATOR_WIDTH 3
-#define SCROLL_INDICATOR_MARGIN 3
-
 static Window *s_hero_window;
 static Layer *s_hero_root;
 static Window *s_options_window;
@@ -735,66 +732,40 @@ static void options_scroll_indicator_update_proc(Layer *layer, GContext *ctx) {
 }
 
 // MenuLayer created ONCE here, never in a .load handler -- see the same
-// note in screen_actions.c.
+// note in screen_actions.c. NO .select_click in the MenuLayerCallbacks below
+// -- see screen_actions.c's matching fix/comment for why this now-dead field
+// is actively misleading to leave in, not just harmless.
 Window *screen_alarm_options_create(void) {
-  s_options_window = window_create();
-  window_set_background_color(s_options_window, COLOR_PAPER);
-#ifdef GALLERY_MODE
-  // Screen gallery (inner loop, src/c/gallery.c) -- see screen_set.c's
-  // matching comment. Never compiled into a release build.
-  window_set_click_config_provider(s_options_window, gallery_click_config_provider);
-#else
-  window_set_click_config_provider(s_options_window, options_click_config_provider);
-#endif
-  window_set_window_handlers(s_options_window, (WindowHandlers){
-                                                    .appear = options_window_appear,
-                                                });
-
-  Layer *root = window_get_root_layer(s_options_window);
-  GRect bounds = layer_get_bounds(root);
-
-  // Floating colored strip, same pattern as screen_actions.c -- this
-  // window's content is a MenuLayer, whose draw_row can only paint inside
-  // a cell.
-  s_options_strip = layer_create(GRect(0, 0, bounds.size.w, RENDER_STRIP_H));
-  layer_set_update_proc(s_options_strip, options_strip_update_proc);
-  layer_add_child(root, s_options_strip);
-
-  s_options_menu =
-      menu_layer_create(GRect(0, RENDER_STRIP_H, bounds.size.w, bounds.size.h - RENDER_STRIP_H));
-  // See screen_home.c's matching fix -- the SDK's MenuLayer defaults
-  // highlight background to full-cell black; this makes the un-inset
-  // margin around render_menu_row()'s own smaller pill read as paper
-  // instead.
-  menu_layer_set_highlight_colors(s_options_menu, RENDER_COLOR_PAPER, GColorBlack);
-  // NO .select_click here -- see screen_actions.c's matching fix/comment
-  // for why this now-dead field is actively misleading to leave in, not
-  // just harmless.
-  menu_layer_set_callbacks(s_options_menu, NULL,
-                            (MenuLayerCallbacks){
-                                .get_num_rows = options_get_num_rows,
-                                .get_cell_height = options_get_cell_height,
-                                .draw_row = options_draw_row,
-                            });
-  layer_add_child(root, menu_layer_get_layer(s_options_menu));
-
-  s_options_scroll_indicator =
-      layer_create(GRect(bounds.size.w - SCROLL_INDICATOR_WIDTH - SCROLL_INDICATOR_MARGIN,
-                          RENDER_STRIP_H, SCROLL_INDICATOR_WIDTH, bounds.size.h - RENDER_STRIP_H));
-  layer_set_update_proc(s_options_scroll_indicator, options_scroll_indicator_update_proc);
-  layer_add_child(root, s_options_scroll_indicator);
-
+  RenderMenuScreen screen = render_build_menu_screen(&(RenderMenuScreenSpec){
+      .window_bg = COLOR_PAPER,
+      .click_config_provider = options_click_config_provider,
+      .window_handlers = (WindowHandlers){.appear = options_window_appear},
+      // Floating colored strip, same pattern as screen_actions.c -- this
+      // window's content is a MenuLayer, whose draw_row can only paint
+      // inside a cell.
+      .header_height = RENDER_STRIP_H,
+      .header_update_proc = options_strip_update_proc,
+      .get_num_rows = options_get_num_rows,
+      .get_cell_height = options_get_cell_height,
+      .draw_row = options_draw_row,
+      .with_scroll_indicator = true,
+      .scroll_indicator_update_proc = options_scroll_indicator_update_proc,
+  });
+  s_options_window = screen.window;
+  s_options_strip = screen.header;
+  s_options_menu = screen.menu;
+  s_options_scroll_indicator = screen.scroll_indicator;
   return s_options_window;
 }
 
 void screen_alarm_options_destroy(void) {
-  layer_destroy(s_options_scroll_indicator);
+  render_destroy_menu_screen(&(RenderMenuScreen){.window = s_options_window,
+                                                   .header = s_options_strip,
+                                                   .menu = s_options_menu,
+                                                   .scroll_indicator = s_options_scroll_indicator});
   s_options_scroll_indicator = NULL;
-  menu_layer_destroy(s_options_menu);
   s_options_menu = NULL;
-  layer_destroy(s_options_strip);
   s_options_strip = NULL;
-  window_destroy(s_options_window);
   s_options_window = NULL;
 }
 

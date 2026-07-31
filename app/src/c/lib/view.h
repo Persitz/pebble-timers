@@ -12,7 +12,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "sched.h"
+#include "store.h"
 #include "timer.h"
 
 // Takes `is_ringing` as an explicit input rather than reading AppState
@@ -68,9 +68,12 @@ typedef enum {
 
 ViewPrefixKind view_value_prefix(ViewHeroBranch branch);
 
-// True if this timer is in the scheduler's unschedulable set
-// (won't alert in the background if the app is closed now).
-bool view_no_bg_alarm(int32_t cookie, const SchedPlan *plan);
+// The no-background-alarm indicator is driven by wakeup_adapter_is_armed()
+// (wakeup_adapter.h) -- real OS-confirmed state from the most recent
+// replan -- called directly by screen_hero.c. There is no pure-layer
+// predicate for it here: unlike this module's other functions, "is this
+// cookie in the last replan's real armed set" is adapter state, not a pure
+// function of (Timer, bool).
 
 // HOME's populated state uses a real MenuLayer (native scrolling/cursor/
 // select) rather than hand-rolled windowed-scroll math.

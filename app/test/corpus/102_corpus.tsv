@@ -1,0 +1,459 @@
+utterance	lang	engine	expected	actual	class
+five minutes	en	W	CD 300s name=''	COUNTDOWN 300s name=''	CORRECT
+5 minutes	en	W	CD 300s name=''	COUNTDOWN 300s name=''	CORRECT
+pasta for eight minutes	en	P	CD 480s name='pasta'	COUNTDOWN 480s name='pasta'	CORRECT
+pasta 8 minutes	en	W	CD 480s name='pasta'	COUNTDOWN 480s name='pasta'	CORRECT
+boil the eggs for ten minutes	en	P	CD 600s name='boil the eggs'	COUNTDOWN 600s name='boil the eggs'	CORRECT
+eggs 6 minutes	en	W	CD 360s name='eggs'	COUNTDOWN 360s name='eggs'	CORRECT
+soft boiled eggs six minutes	en	P	CD 360s name='soft boiled eggs'	COUNTDOWN 360s name='soft boiled eggs'	CORRECT
+steep the tea for 3 minutes	en	W	CD 180s name='steep the tea'	COUNTDOWN 180s name='steep the tea'	CORRECT
+tea 3 minutes	en	W	CD 180s name='tea'	COUNTDOWN 180s name='tea'	CORRECT
+green tea two minutes	en	P	CD 120s name='green tea'	COUNTDOWN 120s name='green tea'	CORRECT
+oven 45 minutes	en	W	CD 2700s name='oven'	COUNTDOWN 2700s name='oven'	CORRECT
+bake for forty five minutes	en	P	CD 2700s name='bake'	COUNTDOWN 2700s name='bake'	CORRECT
+rice eighteen minutes	en	P	CD 1080s name='rice'	COUNTDOWN 1080s name='rice'	CORRECT
+rice for 20 minutes	en	W	CD 1200s name='rice'	COUNTDOWN 1200s name='rice'	CORRECT
+let the dough rise for an hour	en	P	CD 3600s name='let the dough rise'	FAIL(fail-soft)	FAIL-SOFT-GAP
+dough one hour	en	W	CD 3600s name='dough'	COUNTDOWN 3600s name='dough'	CORRECT
+simmer for an hour and a half	en	P	CD 5400s name='simmer'	COUNTDOWN 5400s name='simmer'	CORRECT
+roast ninety minutes	en	P	CD 5400s name='roast'	COUNTDOWN 5400s name='roast'	CORRECT
+preheat 12 minutes	en	W	CD 720s name='preheat'	COUNTDOWN 720s name='preheat'	CORRECT
+marinate for 2 hours	en	W	CD 7200s name='marinate'	COUNTDOWN 7200s name='marinate'	CORRECT
+pizza 15 minutes	en	W	CD 900s name='pizza'	COUNTDOWN 900s name='pizza'	CORRECT
+cookies for twelve minutes	en	P	CD 720s name='cookies'	COUNTDOWN 720s name='cookies'	CORRECT
+pasta ocho minutos	es	W	CD 480s name='pasta'	COUNTDOWN 480s name='pasta'	CORRECT
+la pasta diez minutos	es	P	CD 600s name='la pasta'	COUNTDOWN 600s name='la pasta'	CORRECT
+hervir los huevos diez minutos	es	P	CD 600s name='hervir los huevos'	COUNTDOWN 600s name='hervir los huevos'	CORRECT
+el te tres minutos	es	W	CD 180s name='el te'	COUNTDOWN 180s name='el te'	CORRECT
+arroz dieciocho minutos	es	P	CD 1080s name='arroz'	COUNTDOWN 1080s name='arroz'	CORRECT
+horno cuarenta y cinco minutos	es	P	CD 2700s name='horno'	COUNTDOWN 2700s name='horno'	CORRECT
+el pollo una hora	es	W	CD 3600s name='el pollo'	COUNTDOWN 3600s name='el pollo'	CORRECT
+dejar reposar media hora	es	P	CD 1800s name='dejar reposar'	COUNTDOWN 1800s name='dejar reposar'	CORRECT
+pizza quince minutos	es	W	CD 900s name='pizza'	COUNTDOWN 900s name='pizza'	CORRECT
+plank for 30 seconds	en	W	CD 30s name='plank'	COUNTDOWN 30s name='plank'	CORRECT
+plank 30 seconds	en	W	CD 30s name='plank'	COUNTDOWN 30s name='plank'	CORRECT
+hold the plank for forty five seconds	en	P	CD 45s name='hold the plank'	COUNTDOWN 45s name='hold the plank'	CORRECT
+rest 30 seconds	en	W	CD 30s name='rest'	COUNTDOWN 30s name='rest'	CORRECT
+rest for one minute	en	P	CD 60s name='rest'	COUNTDOWN 60s name='rest'	CORRECT
+rest fifteen seconds	en	P	CD 15s name='rest'	COUNTDOWN 15s name='rest'	CORRECT
+work for 45 seconds	en	W	CD 45s name='work'	COUNTDOWN 45s name='work'	CORRECT
+round 1 3 minutes	en	W	CD 180s name='round 1'	COUNTDOWN 180s name='round 1'	CORRECT
+round one three minutes	en	P	CD 180s name='round one'	COUNTDOWN 180s name='round one'	CORRECT
+interval 90 seconds	en	W	RP 90s name=''	REPEAT 90s name=''	CORRECT
+every 45 seconds	en	W	RP 45s name=''	REPEAT 45s name=''	CORRECT
+repeat every 30 seconds	en	W	RP 30s name=''	REPEAT 30s name=''	CORRECT
+30 seconds repeat	en	W	RP 30s name=''	REPEAT 30s name=''	CORRECT
+hiit 20 seconds	en	W	CD 20s name='hiit'	COUNTDOWN 20s name='hiit'	CORRECT
+sprint for twenty seconds	en	P	CD 20s name='sprint'	COUNTDOWN 20s name='sprint'	CORRECT
+tabata twenty seconds	en	P	CD 20s name='tabata'	COUNTDOWN 20s name='tabata'	CORRECT
+burpees 40 seconds	en	W	CD 40s name='burpees'	COUNTDOWN 40s name='burpees'	CORRECT
+stretch for 5 minutes	en	W	CD 300s name='stretch'	COUNTDOWN 300s name='stretch'	CORRECT
+warm up ten minutes	en	P	CD 600s name='warm up'	COUNTDOWN 600s name='warm up'	CORRECT
+cool down for five minutes	en	P	CD 300s name='cool down'	COUNTDOWN 300s name='cool down'	CORRECT
+run for 30 minutes	en	W	CD 1800s name='run'	COUNTDOWN 1800s name='run'	CORRECT
+jog 25 minutes	en	W	CD 1500s name='jog'	COUNTDOWN 1500s name='jog'	CORRECT
+wall sit forty five seconds	en	P	CD 45s name='wall sit'	COUNTDOWN 45s name='wall sit'	CORRECT
+plancha treinta segundos	es	W	CD 30s name='plancha'	COUNTDOWN 30s name='plancha'	CORRECT
+descanso de 30 segundos	es	W	CD 30s name='descanso'	COUNTDOWN 30s name='descanso'	CORRECT
+descanso treinta segundos	es	P	CD 30s name='descanso'	COUNTDOWN 30s name='descanso'	CORRECT
+cada 45 segundos	es	W	RP 45s name=''	REPEAT 45s name=''	CORRECT
+corre veinte minutos	es	P	CD 1200s name='corre'	COUNTDOWN 1200s name='corre'	CORRECT
+sprint de veinte segundos	es	P	CD 20s name='sprint'	COUNTDOWN 20s name='sprint'	CORRECT
+estiramiento cinco minutos	es	W	CD 300s name='estiramiento'	COUNTDOWN 300s name='estiramiento'	CORRECT
+ronda uno tres minutos	es	P	CD 180s name='ronda uno'	COUNTDOWN 180s name='ronda uno'	CORRECT
+nap for 20 minutes	en	W	CD 1200s name='nap'	COUNTDOWN 1200s name='nap'	CORRECT
+nap 20 minutes	en	W	CD 1200s name='nap'	COUNTDOWN 1200s name='nap'	CORRECT
+power nap twenty minutes	en	P	CD 1200s name='power nap'	COUNTDOWN 1200s name='power nap'	CORRECT
+nap for 20	en	W	SOFT(ambiguous)	FAIL(fail-soft)	FAIL-SOFT
+wake me in 25 minutes	en	W	CD 1500s name='wake me'	COUNTDOWN 1500s name='wake me'	CORRECT
+sleep for 30 minutes	en	W	CD 1800s name='sleep'	COUNTDOWN 1800s name='sleep'	CORRECT
+nap half an hour	en	P	CD 1800s name='nap'	COUNTDOWN 1800s name='nap'	CORRECT
+rest my eyes for fifteen minutes	en	P	CD 900s name='rest my eyes'	COUNTDOWN 900s name='rest my eyes'	CORRECT
+nap ninety minutes	en	P	CD 5400s name='nap'	COUNTDOWN 5400s name='nap'	CORRECT
+siesta de veinte minutos	es	W	CD 1200s name='siesta'	COUNTDOWN 1200s name='siesta'	CORRECT
+siesta veinte minutos	es	P	CD 1200s name='siesta'	COUNTDOWN 1200s name='siesta'	CORRECT
+dormir media hora	es	P	CD 1800s name='dormir'	COUNTDOWN 1800s name='dormir'	CORRECT
+despiertame en 25 minutos	es	W	CD 1500s name='despiertame'	COUNTDOWN 1500s name='despiertame en'	NAME-POLLUTION
+laundry 45 minutes	en	W	CD 2700s name='laundry'	COUNTDOWN 2700s name='laundry'	CORRECT
+washing machine for 50 minutes	en	W	CD 3000s name='washing machine'	COUNTDOWN 3000s name='washing machine'	CORRECT
+dryer 60 minutes	en	W	CD 3600s name='dryer'	COUNTDOWN 3600s name='dryer'	CORRECT
+dishwasher for an hour	en	P	CD 3600s name='dishwasher'	FAIL(fail-soft)	FAIL-SOFT-GAP
+water the plants in 10 minutes	en	W	CD 600s name='water the plants'	COUNTDOWN 600s name='water the plants'	CORRECT
+lavadora cuarenta y cinco minutos	es	P	CD 2700s name='lavadora'	COUNTDOWN 2700s name='lavadora'	CORRECT
+la ropa 50 minutos	es	W	CD 3000s name='la ropa'	COUNTDOWN 3000s name='la ropa'	CORRECT
+pomodoro 25 minutes	en	W	CD 1500s name='pomodoro'	COUNTDOWN 1500s name='pomodoro'	CORRECT
+pomodoro twenty five minutes	en	P	CD 1500s name='pomodoro'	COUNTDOWN 1500s name='pomodoro'	CORRECT
+focus for 25 minutes	en	W	CD 1500s name='focus'	COUNTDOWN 1500s name='focus'	CORRECT
+break 5 minutes	en	W	CD 300s name='break'	COUNTDOWN 300s name='break'	CORRECT
+short break five minutes	en	P	CD 300s name='short break'	COUNTDOWN 300s name='short break'	CORRECT
+long break 15 minutes	en	W	CD 900s name='long break'	COUNTDOWN 900s name='long break'	CORRECT
+meeting 30 minutes	en	W	CD 1800s name='meeting'	COUNTDOWN 1800s name='meeting'	CORRECT
+standup for 15 minutes	en	W	CD 900s name='standup'	COUNTDOWN 900s name='standup'	CORRECT
+presentation ten minutes	en	P	CD 600s name='presentation'	COUNTDOWN 600s name='presentation'	CORRECT
+deep work 50 minutes	en	W	CD 3000s name='deep work'	COUNTDOWN 3000s name='deep work'	CORRECT
+coffee break for 10 minutes	en	W	CD 600s name='coffee break'	COUNTDOWN 600s name='coffee break'	CORRECT
+descanso de cinco minutos	es	W	CD 300s name='descanso'	COUNTDOWN 300s name='descanso'	CORRECT
+reunion 30 minutos	es	W	CD 1800s name='reunion'	COUNTDOWN 1800s name='reunion'	CORRECT
+concentracion veinticinco minutos	es	P	CD 1500s name='concentracion'	COUNTDOWN 1500s name='concentracion'	CORRECT
+pausa cinco minutos	es	W	CD 300s name='pausa'	COUNTDOWN 300s name='pausa'	CORRECT
+parking 2 hours	en	W	CD 7200s name='parking'	COUNTDOWN 7200s name='parking'	CORRECT
+parking meter for 30 minutes	en	W	CD 1800s name='parking meter'	COUNTDOWN 1800s name='parking meter'	CORRECT
+meter 90 minutes	en	W	CD 5400s name='meter'	COUNTDOWN 5400s name='meter'	CORRECT
+parking one hour	en	P	CD 3600s name='parking'	COUNTDOWN 3600s name='parking'	CORRECT
+parquimetro dos horas	es	P	CD 7200s name='parquimetro'	COUNTDOWN 7200s name='parquimetro'	CORRECT
+parking 45 minutos	es	W	CD 2700s name='parking'	COUNTDOWN 2700s name='parking'	CORRECT
+medication in 8 hours	en	W	CD 28800s name='medication'	COUNTDOWN 28800s name='medication'	CORRECT
+take my pills in 6 hours	en	W	CD 21600s name='take my pills'	COUNTDOWN 21600s name='take my pills'	CORRECT
+antibiotics every 8 hours	en	W	RP 28800s name='antibiotics'	REPEAT 28800s name='antibiotics'	CORRECT
+medicine 12 hours	en	W	CD 43200s name='medicine'	COUNTDOWN 43200s name='medicine'	CORRECT
+pills in four hours	en	P	CD 14400s name='pills'	COUNTDOWN 14400s name='pills'	CORRECT
+medicina cada 8 horas	es	W	RP 28800s name='medicina'	REPEAT 28800s name='medicina'	CORRECT
+pastilla en seis horas	es	P	CD 21600s name='pastilla'	COUNTDOWN 21600s name='pastilla en'	NAME-POLLUTION
+time out for 5 minutes	en	W	CD 300s name='time out'	COUNTDOWN 300s name='time out'	CORRECT
+timeout 5 minutes	en	W	CD 300s name='timeout'	COUNTDOWN 300s name='timeout'	CORRECT
+brush teeth for two minutes	en	P	CD 120s name='brush teeth'	COUNTDOWN 120s name='brush teeth'	CORRECT
+screen time 30 minutes	en	W	CD 1800s name='screen time'	COUNTDOWN 1800s name='screen time'	CORRECT
+bath time 15 minutes	en	W	CD 900s name='bath time'	COUNTDOWN 900s name='bath time'	CORRECT
+clean up in 10 minutes	en	W	CD 600s name='clean up'	COUNTDOWN 600s name='clean up'	CORRECT
+castigo cinco minutos	es	W	CD 300s name='castigo'	COUNTDOWN 300s name='castigo'	CORRECT
+lavarse los dientes dos minutos	es	P	CD 120s name='lavarse los dientes'	COUNTDOWN 120s name='lavarse los dientes'	CORRECT
+turn 30 seconds	en	W	CD 30s name='turn'	COUNTDOWN 30s name='turn'	CORRECT
+your turn one minute	en	P	CD 60s name='your turn'	COUNTDOWN 60s name='your turn'	CORRECT
+chess clock 5 minutes	en	W	CD 300s name='chess clock'	COUNTDOWN 300s name='chess clock'	CORRECT
+each player 60 seconds	en	W	CD 60s name='each player'	COUNTDOWN 60s name='each player'	CORRECT
+charades 90 seconds	en	W	CD 90s name='charades'	COUNTDOWN 90s name='charades'	CORRECT
+boggle three minutes	en	P	CD 180s name='boggle'	COUNTDOWN 180s name='boggle'	CORRECT
+turno de 30 segundos	es	W	CD 30s name='turno'	COUNTDOWN 30s name='turno'	CORRECT
+six forty five	en	P	CD 405s name=''	COUNTDOWN 405s name=''	CORRECT
+6 45	en	P	CD 405s name=''	COUNTDOWN 405s name=''	CORRECT
+6 minutes 45	en	W	CD 405s name=''	COUNTDOWN 405s name=''	CORRECT
+six minutes forty five	en	P	CD 405s name=''	COUNTDOWN 405s name=''	CORRECT
+one hour twenty	en	P	CD 4800s name=''	COUNTDOWN 4800s name=''	CORRECT
+an hour twenty	en	P	CD 4800s name=''	COUNTDOWN 4800s name=''	CORRECT
+1 hour 20 minutes 30 seconds	en	W	CD 4830s name=''	COUNTDOWN 4830s name=''	CORRECT
+two hours thirty minutes	en	P	CD 9000s name=''	COUNTDOWN 9000s name=''	CORRECT
+2 hours 30 minutes	en	W	CD 9000s name=''	COUNTDOWN 9000s name=''	CORRECT
+6:45	en	W	CD 405s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+18:30	en	W	CD 1110s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+1:20:30	en	W	CD 4830s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+6h45	en	P	CD 24300s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+5 min	en	W	CD 300s name=''	COUNTDOWN 300s name=''	CORRECT
+5 mins	en	W	CD 300s name=''	COUNTDOWN 300s name=''	CORRECT
+30 sec	en	W	CD 30s name=''	COUNTDOWN 30s name=''	CORRECT
+45 secs	en	W	CD 45s name=''	COUNTDOWN 45s name=''	CORRECT
+2 hrs	en	W	CD 7200s name=''	COUNTDOWN 7200s name=''	CORRECT
+half an hour	en	W	CD 1800s name=''	COUNTDOWN 1800s name=''	CORRECT
+quarter of an hour	en	W	CD 900s name=''	COUNTDOWN 900s name=''	CORRECT
+three quarters of an hour	en	W	CD 2700s name=''	COUNTDOWN 2700s name=''	CORRECT
+an hour and a half	en	W	CD 5400s name=''	COUNTDOWN 5400s name=''	CORRECT
+two and a half minutes	en	W	CD 150s name=''	COUNTDOWN 150s name=''	CORRECT
+five and a half minutes	en	P	CD 330s name=''	COUNTDOWN 330s name=''	CORRECT
+5 and a half minutes	en	W	CD 330s name=''	COUNTDOWN 330s name=''	CORRECT
+5.5 minutes	en	W	CD 330s name=''	COUNTDOWN 300s name=''	SILENT-WRONG
+2.5 hours	en	W	CD 9000s name=''	COUNTDOWN 18000s name=''	SILENT-WRONG
+a couple of minutes	en	W	CD 120s name=''	COUNTDOWN 120s name=''	CORRECT
+couple minutes	en	P	CD 120s name=''	COUNTDOWN 120s name=''	CORRECT
+about ten minutes	en	W	CD 600s name=''	COUNTDOWN 600s name=''	CORRECT
+around 5 minutes	en	W	CD 300s name=''	COUNTDOWN 300s name=''	CORRECT
+like twenty minutes	en	P	CD 1200s name=''	COUNTDOWN 1200s name=''	CORRECT
+seis cuarenta y cinco	es	P	CD 405s name=''	COUNTDOWN 405s name=''	CORRECT
+6 45	es	P	CD 405s name=''	COUNTDOWN 405s name=''	CORRECT
+seis minutos cuarenta y cinco	es	P	CD 405s name=''	COUNTDOWN 405s name=''	CORRECT
+6 minutos 45	es	W	CD 405s name=''	COUNTDOWN 405s name=''	CORRECT
+una hora veinte	es	P	CD 4800s name=''	COUNTDOWN 4800s name=''	CORRECT
+hora y veinte	es	P	CD 4800s name=''	COUNTDOWN 4800s name=''	CORRECT
+dos horas treinta minutos	es	P	CD 9000s name=''	COUNTDOWN 9000s name=''	CORRECT
+media hora	es	W	CD 1800s name=''	COUNTDOWN 1800s name=''	CORRECT
+un cuarto de hora	es	W	CD 900s name=''	COUNTDOWN 900s name=''	CORRECT
+tres cuartos de hora	es	W	CD 2700s name=''	COUNTDOWN 2700s name=''	CORRECT
+hora y media	es	W	CD 5400s name=''	COUNTDOWN 5400s name=''	CORRECT
+cinco minutos y medio	es	P	CD 330s name=''	COUNTDOWN 330s name=''	CORRECT
+dos minutos y medio	es	P	CD 150s name=''	COUNTDOWN 150s name=''	CORRECT
+5 min	es	W	CD 300s name=''	COUNTDOWN 300s name=''	CORRECT
+30 seg	es	W	CD 30s name=''	COUNTDOWN 30s name=''	CORRECT
+45 segs	es	W	CD 45s name=''	COUNTDOWN 45s name=''	CORRECT
+unos diez minutos	es	W	CD 600s name=''	COUNTDOWN 600s name=''	CORRECT
+como cinco minutos	es	P	CD 300s name=''	COUNTDOWN 300s name=''	CORRECT
+un par de minutos	es	P	SOFT(ambiguous)	FAIL(fail-soft)	FAIL-SOFT
+ciento veinte segundos	es	P	CD 120s name='' [culled-v0.1.13: hundred-composite capability removed for size (1,063B ARM / 10 corpus rows); now REFUSE -- hundred_present guard forces fail-soft]	REFUSE ok=0 dur=0 name='ciento veinte'	FAIL-SOFT (culled-v0.1.13)
+two hundred seconds	en	P	CD 200s name='' [culled-v0.1.13: hundred-composite capability removed for size (1,063B ARM / 10 corpus rows); now REFUSE -- hundred_present guard forces fail-soft]	REFUSE ok=0 dur=0 name='two hundred'	FAIL-SOFT (culled-v0.1.13)
+one hundred twenty minutes	en	P	CD 7200s name='' [culled-v0.1.13: hundred-composite capability removed for size (1,063B ARM / 10 corpus rows); now REFUSE -- hundred_present guard forces fail-soft]	REFUSE ok=0 dur=0 name='one hundred twenty'	FAIL-SOFT (culled-v0.1.13)
+at 6	en	W	CLK 06:00 name=''	CLK 06:00 name='' kind=COUNTDOWN	CORRECT
+at six	en	P	CLK 06:00 name=''	CLK 06:00 name='' kind=COUNTDOWN	CORRECT
+at 6:45	en	W	CLK 06:45 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+at six forty five	en	P	CLK 06:45 name=''	CLK 06:45 name='' kind=COUNTDOWN	CORRECT
+at 6:45 pm	en	W	CLK 18:45 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+at 6 pm	en	W	CLK 18:00 name=''	CLK 18:00 name='' kind=COUNTDOWN	CORRECT
+until 6	en	W	CLK 06:00 name=''	CLK 06:00 name='' kind=COUNTDOWN	CORRECT
+until noon	en	W	CLK 12:00 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+wake me up at 7	en	W	CLK 07:00 name='wake me up'	CLK 07:00 name='wake me up' kind=COUNTDOWN	CORRECT
+wake me at 7 am	en	W	CLK 07:00 name='wake me'	CLK 07:00 name='wake me' kind=COUNTDOWN	CORRECT
+a las seis	es	P	CLK 06:00 name=''	CLK 06:00 name='' kind=COUNTDOWN	CORRECT
+a las 6:45	es	W	CLK 06:45 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+a las seis cuarenta y cinco	es	P	CLK 06:45 name=''	CLK 06:45 name='' kind=COUNTDOWN	CORRECT
+a las seis y media	es	P	CLK 06:30 name=''	CLK 06:30 name='' kind=COUNTDOWN	CORRECT
+a las seis y cuarto	es	P	CLK 06:15 name=''	CLK 06:15 name='' kind=COUNTDOWN	CORRECT
+hasta las seis	es	P	CLK 06:00 name=''	CLK 06:00 name='' kind=COUNTDOWN	CORRECT
+a las 18:30	es	W	CLK 18:30 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+15 minutes	en	W	CD 900s name=''	COUNTDOWN 900s name=''	CORRECT
+ten minutes uh actually fifteen	en	P	CD 900s name=''	COUNTDOWN 600s name='uh actually fifteen'	SILENT-WRONG
+ten minutes actually fifteen	en	P	CD 900s name=''	COUNTDOWN 600s name='actually fifteen'	SILENT-WRONG
+five no ten minutes	en	P	CD 600s name=''	COUNTDOWN 600s name='five no'	NAME-POLLUTION
+uh five minutes	en	P	CD 300s name=''	COUNTDOWN 300s name='uh'	NAME-POLLUTION
+um ten minutes	en	P	CD 600s name=''	COUNTDOWN 600s name='um'	NAME-POLLUTION
+five uh minutes	en	P	CD 300s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+ten uh minutes	en	P	CD 600s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+este cinco minutos	es	P	CD 300s name=''	COUNTDOWN 300s name='este'	NAME-POLLUTION
+eh diez minutos	es	P	CD 600s name=''	COUNTDOWN 600s name='eh'	NAME-POLLUTION
+cinco este minutos	es	P	CD 300s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+diez minutos mejor quince	es	P	CD 900s name=''	COUNTDOWN 600s name='mejor quince'	SILENT-WRONG
+cinco no diez minutos	es	P	CD 600s name=''	COUNTDOWN 600s name='cinco no'	NAME-POLLUTION
+stopwatch	en	W	SW name=''	SW name=''	CORRECT
+start a stopwatch	en	W	SW name=''	SW name='start'	NAME-POLLUTION
+chronometer	en	P	SW name=''	SW name=''	CORRECT
+cronometro	es	W	SW name=''	SW name=''	CORRECT
+start the stopwatch	en	W	SW name=''	SW name='start the'	NAME-POLLUTION
+repeat 20 minutes	en	W	RP 1200s name=''	REPEAT 1200s name=''	CORRECT
+20 minutes repeat	en	W	RP 1200s name=''	REPEAT 1200s name=''	CORRECT
+every 20 minutes	en	W	RP 1200s name=''	REPEAT 1200s name=''	CORRECT
+10 minute interval	en	W	RP 600s name=''	REPEAT 600s name=''	CORRECT
+cada 20 minutos	es	W	RP 1200s name=''	REPEAT 1200s name=''	CORRECT
+intervalo de 10 minutos	es	W	RP 600s name=''	REPEAT 600s name=''	CORRECT
+repite cada 30 segundos	es	W	RP 30s name=''	REPEAT 30s name='repite'	NAME-POLLUTION
+call mom at 5	en	W	REFUSE	CLK 05:00 name='call mom' kind=COUNTDOWN	SILENT-WRONG
+text John at 3	en	W	REFUSE	CLK 03:00 name='text John' kind=COUNTDOWN	SILENT-WRONG
+remind me to call the dentist	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+5 to 10 minutes	en	W	REFUSE	COUNTDOWN 600s name='5 to'	SILENT-WRONG
+5 or 10 minutes	en	P	REFUSE	COUNTDOWN 600s name='5 or'	SILENT-WRONG
+between 5 and 10 minutes	en	W	REFUSE	COUNTDOWN 600s name='between 5'	SILENT-WRONG
+every other day	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+every day at 8	en	W	REFUSE	CLK 08:00 name='day' kind=COUNTDOWN	SILENT-WRONG
+what time is it	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+set an alarm	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+hello there	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+play some music	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+timer	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+set a timer	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+start a timer please	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+llama a mama a las cinco	es	W	REFUSE	CLK 05:00 name='llama mama' kind=COUNTDOWN	SILENT-WRONG
+de 5 a 10 minutos	es	W	REFUSE	COUNTDOWN 600s name=''	SILENT-WRONG
+todos los dias a las ocho	es	W	REFUSE	CLK 08:00 name='todos los dias' kind=COUNTDOWN	SILENT-WRONG
+pon una alarma	es	W	REFUSE	FAIL(fail-soft)	CORRECT
+que hora es	es	W	REFUSE	FAIL(fail-soft)	CORRECT
+in 5 minutes	en	W	CD 300s name=''	COUNTDOWN 300s name=''	CORRECT
+within ten minutes	en	W	CD 600s name=''	COUNTDOWN 600s name=''	CORRECT
+for 5 minutes	en	W	CD 300s name=''	COUNTDOWN 300s name=''	CORRECT
+set it for 10 minutes	en	W	CD 600s name=''	COUNTDOWN 600s name='it'	NAME-POLLUTION
+give me 15 minutes	en	W	CD 900s name=''	COUNTDOWN 900s name='give me'	NAME-POLLUTION
+just 5 minutes	en	W	CD 300s name=''	COUNTDOWN 300s name='just'	NAME-POLLUTION
+en cinco minutos	es	P	CD 300s name=''	COUNTDOWN 300s name='en'	NAME-POLLUTION
+dentro de cinco minutos	es	P	CD 300s name=''	COUNTDOWN 300s name='dentro'	NAME-POLLUTION
+ponme cinco minutos	es	W	CD 300s name=''	COUNTDOWN 300s name=''	CORRECT
+dame quince minutos	es	W	CD 900s name=''	COUNTDOWN 900s name='dame'	NAME-POLLUTION
+Five minutes.	en	P	CD 300s name=''	COUNTDOWN 300s name=''	CORRECT
+Twenty minutes.	en	P	CD 1200s name=''	COUNTDOWN 1200s name=''	CORRECT
+Ten minutes, uh, actually fifteen.	en	P	CD 900s name=''	COUNTDOWN 600s name='uh actually fifteen'	SILENT-WRONG
+6 minutos.	es	P	CD 360s name=''	COUNTDOWN 360s name=''	CORRECT
+Cinco minutos.	es	P	CD 300s name=''	COUNTDOWN 300s name=''	CORRECT
+plank, 30 seconds	en	P	CD 30s name='plank'	COUNTDOWN 30s name='plank'	CORRECT
+set a timer for 5 minutes.	en	W	CD 300s name=''	COUNTDOWN 300s name=''	CORRECT
+1 minutes	en	W	CD 60s name=''	COUNTDOWN 60s name=''	CORRECT
+2 minutes	en	W	CD 120s name=''	COUNTDOWN 120s name=''	CORRECT
+3 minutes	en	W	CD 180s name=''	COUNTDOWN 180s name=''	CORRECT
+4 minutes	en	W	CD 240s name=''	COUNTDOWN 240s name=''	CORRECT
+7 minutes	en	W	CD 420s name=''	COUNTDOWN 420s name=''	CORRECT
+10 minutes	en	W	CD 600s name=''	COUNTDOWN 600s name=''	CORRECT
+12 minutes	en	W	CD 720s name=''	COUNTDOWN 720s name=''	CORRECT
+20 minutes	en	W	CD 1200s name=''	COUNTDOWN 1200s name=''	CORRECT
+25 minutes	en	W	CD 1500s name=''	COUNTDOWN 1500s name=''	CORRECT
+40 minutes	en	W	CD 2400s name=''	COUNTDOWN 2400s name=''	CORRECT
+90 minutes	en	W	CD 5400s name=''	COUNTDOWN 5400s name=''	CORRECT
+one minutes	en	P	CD 60s name=''	COUNTDOWN 60s name=''	CORRECT
+two minutes	en	P	CD 120s name=''	COUNTDOWN 120s name=''	CORRECT
+three minutes	en	P	CD 180s name=''	COUNTDOWN 180s name=''	CORRECT
+seven minutes	en	P	CD 420s name=''	COUNTDOWN 420s name=''	CORRECT
+eleven minutes	en	P	CD 660s name=''	COUNTDOWN 660s name=''	CORRECT
+thirteen minutes	en	P	CD 780s name=''	COUNTDOWN 780s name=''	CORRECT
+fourteen minutes	en	P	CD 840s name=''	COUNTDOWN 840s name=''	CORRECT
+sixteen minutes	en	P	CD 960s name=''	COUNTDOWN 960s name=''	CORRECT
+seventeen minutes	en	P	CD 1020s name=''	COUNTDOWN 1020s name=''	CORRECT
+nineteen minutes	en	P	CD 1140s name=''	COUNTDOWN 1140s name=''	CORRECT
+thirty minutes	en	P	CD 1800s name=''	COUNTDOWN 1800s name=''	CORRECT
+forty minutes	en	P	CD 2400s name=''	COUNTDOWN 2400s name=''	CORRECT
+fifty minutes	en	P	CD 3000s name=''	COUNTDOWN 3000s name=''	CORRECT
+5 seconds	en	W	CD 5s name=''	COUNTDOWN 5s name=''	CORRECT
+10 seconds	en	W	CD 10s name=''	COUNTDOWN 10s name=''	CORRECT
+15 seconds	en	W	CD 15s name=''	COUNTDOWN 15s name=''	CORRECT
+20 seconds	en	W	CD 20s name=''	COUNTDOWN 20s name=''	CORRECT
+30 seconds	en	W	CD 30s name=''	COUNTDOWN 30s name=''	CORRECT
+40 seconds	en	W	CD 40s name=''	COUNTDOWN 40s name=''	CORRECT
+50 seconds	en	W	CD 50s name=''	COUNTDOWN 50s name=''	CORRECT
+90 seconds	en	W	CD 90s name=''	COUNTDOWN 90s name=''	CORRECT
+five seconds	en	P	CD 5s name=''	COUNTDOWN 5s name=''	CORRECT
+fifteen seconds	en	P	CD 15s name=''	COUNTDOWN 15s name=''	CORRECT
+twenty seconds	en	P	CD 20s name=''	COUNTDOWN 20s name=''	CORRECT
+forty five seconds	en	P	CD 45s name=''	COUNTDOWN 45s name=''	CORRECT
+ninety seconds	en	P	CD 90s name=''	COUNTDOWN 90s name=''	CORRECT
+1 hour	en	W	CD 3600s name=''	COUNTDOWN 3600s name=''	CORRECT
+2 hours	en	W	CD 7200s name=''	COUNTDOWN 7200s name=''	CORRECT
+3 hours	en	W	CD 10800s name=''	COUNTDOWN 10800s name=''	CORRECT
+4 hours	en	W	CD 14400s name=''	COUNTDOWN 14400s name=''	CORRECT
+8 hours	en	W	CD 28800s name=''	COUNTDOWN 28800s name=''	CORRECT
+12 hours	en	W	CD 43200s name=''	COUNTDOWN 43200s name=''	CORRECT
+24 hours	en	W	CD 86400s name=''	COUNTDOWN 86400s name=''	CORRECT
+un minuto	es	P	CD 60s name=''	COUNTDOWN 60s name=''	CORRECT
+dos minutos	es	P	CD 120s name=''	COUNTDOWN 120s name=''	CORRECT
+tres minutos	es	P	CD 180s name=''	COUNTDOWN 180s name=''	CORRECT
+cuatro minutos	es	P	CD 240s name=''	COUNTDOWN 240s name=''	CORRECT
+siete minutos	es	P	CD 420s name=''	COUNTDOWN 420s name=''	CORRECT
+once minutos	es	P	CD 660s name=''	COUNTDOWN 660s name=''	CORRECT
+trece minutos	es	P	CD 780s name=''	COUNTDOWN 780s name=''	CORRECT
+catorce minutos	es	P	CD 840s name=''	COUNTDOWN 840s name=''	CORRECT
+dieciseis minutos	es	P	CD 960s name=''	COUNTDOWN 960s name=''	CORRECT
+veinte minutos	es	P	CD 1200s name=''	COUNTDOWN 1200s name=''	CORRECT
+treinta minutos	es	P	CD 1800s name=''	COUNTDOWN 1800s name=''	CORRECT
+cuarenta minutos	es	P	CD 2400s name=''	COUNTDOWN 2400s name=''	CORRECT
+cincuenta minutos	es	P	CD 3000s name=''	COUNTDOWN 3000s name=''	CORRECT
+cinco segundos	es	P	CD 5s name=''	COUNTDOWN 5s name=''	CORRECT
+quince segundos	es	P	CD 15s name=''	COUNTDOWN 15s name=''	CORRECT
+veinte segundos	es	P	CD 20s name=''	COUNTDOWN 20s name=''	CORRECT
+cuarenta y cinco segundos	es	P	CD 45s name=''	COUNTDOWN 45s name=''	CORRECT
+noventa segundos	es	P	CD 90s name=''	COUNTDOWN 90s name=''	CORRECT
+una hora	es	W	CD 3600s name=''	COUNTDOWN 3600s name=''	CORRECT
+dos horas	es	W	CD 7200s name=''	COUNTDOWN 7200s name=''	CORRECT
+tres horas	es	W	CD 10800s name=''	COUNTDOWN 10800s name=''	CORRECT
+cuatro horas	es	W	CD 14400s name=''	COUNTDOWN 14400s name=''	CORRECT
+ocho horas	es	W	CD 28800s name=''	COUNTDOWN 28800s name=''	CORRECT
+doce horas	es	W	CD 43200s name=''	COUNTDOWN 43200s name=''	CORRECT
+2:30	en	W	CD 150s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+0:30	en	W	CD 30s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+10:00	en	W	CD 600s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+12:00	en	W	CD 720s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+20:00	en	W	CD 1200s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+25:00	en	W	CD 1500s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+45:00	en	W	CD 2700s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+1:30	en	W	CD 90s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+3:15	en	W	CD 195s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+15:00	en	W	CD 900s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+90:00	en	W	CD 5400s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+1:00:00	en	W	CD 3600s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+2:15:00	en	W	CD 8100s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+0:05:00	en	W	CD 300s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+1:30:00	en	W	CD 5400s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+at 7	en	W	CLK 07:00 name=''	CLK 07:00 name='' kind=COUNTDOWN	CORRECT
+at 8	en	W	CLK 08:00 name=''	CLK 08:00 name='' kind=COUNTDOWN	CORRECT
+at 9:30	en	W	CLK 09:30 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+at 10:15	en	W	CLK 10:15 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+at noon	en	W	CLK 12:00 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+at midnight	en	W	CLK 00:00 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+until 5	en	W	CLK 05:00 name=''	CLK 05:00 name='' kind=COUNTDOWN	CORRECT
+until 9	en	W	CLK 09:00 name=''	CLK 09:00 name='' kind=COUNTDOWN	CORRECT
+at 3 pm	en	W	CLK 15:00 name=''	CLK 15:00 name='' kind=COUNTDOWN	CORRECT
+at 9 am	en	W	CLK 09:00 name=''	CLK 09:00 name='' kind=COUNTDOWN	CORRECT
+at 7:30 pm	en	W	CLK 19:30 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+at 10:45 am	en	W	CLK 10:45 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+at 8 pm	en	W	CLK 20:00 name=''	CLK 20:00 name='' kind=COUNTDOWN	CORRECT
+at 12:30 pm	en	W	CLK 12:30 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+a las siete	es	P	CLK 07:00 name=''	CLK 07:00 name='' kind=COUNTDOWN	CORRECT
+a las ocho	es	P	CLK 08:00 name=''	CLK 08:00 name='' kind=COUNTDOWN	CORRECT
+a las nueve y media	es	P	CLK 09:30 name=''	CLK 09:30 name='' kind=COUNTDOWN	CORRECT
+a las diez y cuarto	es	P	CLK 10:15 name=''	CLK 10:15 name='' kind=COUNTDOWN	CORRECT
+a las doce	es	P	CLK 12:00 name=''	CLK 12:00 name='' kind=COUNTDOWN	CORRECT
+hasta las cinco	es	P	CLK 05:00 name=''	CLK 05:00 name='' kind=COUNTDOWN	CORRECT
+a las 9:30	es	P	CLK 09:30 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+a las 20:00	es	P	CLK 20:00 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+a las tres de la tarde	es	P	CLK 15:00 name=''	CLK 15:00 name='' kind=COUNTDOWN	CORRECT
+so like ten minutes	en	P	CD 600s name=''	COUNTDOWN 600s name='so'	NAME-POLLUTION
+okay five minutes	en	P	CD 300s name=''	COUNTDOWN 300s name='okay'	NAME-POLLUTION
+hmm twenty minutes	en	P	CD 1200s name=''	COUNTDOWN 1200s name='hmm'	NAME-POLLUTION
+let's see fifteen minutes	en	P	CD 900s name=''	COUNTDOWN 900s name='let's see'	NAME-POLLUTION
+uh set a timer for ten minutes	en	P	CD 600s name=''	COUNTDOWN 600s name='uh'	NAME-POLLUTION
+thirty minutes no wait twenty	en	P	CD 1200s name=''	COUNTDOWN 1800s name='no wait twenty'	SILENT-WRONG
+twenty minutes I mean thirty	en	P	CD 1800s name=''	COUNTDOWN 1200s name='I mean thirty'	SILENT-WRONG
+make it ten minutes actually twenty	en	P	CD 1200s name=''	COUNTDOWN 600s name='make it actually twenty'	SILENT-WRONG
+five minutes wait no ten	en	P	CD 600s name=''	COUNTDOWN 300s name='wait no ten'	SILENT-WRONG
+pues cinco minutos	es	P	CD 300s name=''	COUNTDOWN 300s name='pues'	NAME-POLLUTION
+a ver diez minutos	es	P	CD 600s name=''	COUNTDOWN 600s name='ver'	NAME-POLLUTION
+bueno quince minutos	es	P	CD 900s name=''	COUNTDOWN 900s name='bueno'	NAME-POLLUTION
+veinte minutos no mejor treinta	es	P	CD 1800s name=''	COUNTDOWN 1200s name='no mejor treinta'	SILENT-WRONG
+treinta minutos digo veinte	es	P	CD 1200s name=''	COUNTDOWN 1800s name='digo veinte'	SILENT-WRONG
+brisket for twelve hours	en	P	CD 43200s name='brisket'	COUNTDOWN 43200s name='brisket'	CORRECT
+cold brew twelve hours	en	P	CD 43200s name='cold brew'	COUNTDOWN 43200s name='cold brew'	CORRECT
+french press four minutes	en	P	CD 240s name='french press'	COUNTDOWN 240s name='french press'	CORRECT
+noodles 4 minutes	en	W	CD 240s name='noodles'	COUNTDOWN 240s name='noodles'	CORRECT
+popcorn 3 minutes	en	W	CD 180s name='popcorn'	COUNTDOWN 180s name='popcorn'	CORRECT
+toast 2 minutes	en	W	CD 120s name='toast'	COUNTDOWN 120s name='toast'	CORRECT
+meditation 10 minutes	en	W	CD 600s name='meditation'	COUNTDOWN 600s name='meditation'	CORRECT
+breathing exercise 5 minutes	en	W	CD 300s name='breathing exercise'	COUNTDOWN 300s name='breathing exercise'	CORRECT
+ice bath for 3 minutes	en	P	CD 180s name='ice bath'	COUNTDOWN 180s name='ice bath'	CORRECT
+sauna 15 minutes	en	W	CD 900s name='sauna'	COUNTDOWN 900s name='sauna'	CORRECT
+face mask 20 minutes	en	W	CD 1200s name='face mask'	COUNTDOWN 1200s name='face mask'	CORRECT
+hair dye 30 minutes	en	W	CD 1800s name='hair dye'	COUNTDOWN 1800s name='hair dye'	CORRECT
+meditacion diez minutos	es	W	CD 600s name='meditacion'	COUNTDOWN 600s name='meditacion'	CORRECT
+sauna quince minutos	es	W	CD 900s name='sauna'	COUNTDOWN 900s name='sauna'	CORRECT
+mascarilla veinte minutos	es	P	CD 1200s name='mascarilla'	COUNTDOWN 1200s name='mascarilla'	CORRECT
+cafe cuatro minutos	es	P	CD 240s name='cafe'	COUNTDOWN 240s name='cafe'	CORRECT
+palomitas tres minutos	es	W	CD 180s name='palomitas'	COUNTDOWN 180s name='palomitas'	CORRECT
+emom every minute	en	P	SOFT(ambiguous)	FAIL(fail-soft)	FAIL-SOFT
+amrap 12 minutes	en	W	CD 720s name='amrap'	COUNTDOWN 720s name='amrap'	CORRECT
+row for 500 meters	en	P	REFUSE	FAIL(fail-soft)	CORRECT
+30 seconds on 30 seconds off	en	P	SOFT(ambiguous)	COUNTDOWN 30s name='on 30 off'	SOFT-ACCEPTED
+rest between sets 90 seconds	en	W	CD 90s name='rest between sets'	COUNTDOWN 90s name='rest between sets'	CORRECT
+dead hang 45 seconds	en	W	CD 45s name='dead hang'	COUNTDOWN 45s name='dead hang'	CORRECT
+box breathing four minutes	en	P	CD 240s name='box breathing'	COUNTDOWN 240s name='box breathing'	CORRECT
+call me at 5	en	W	REFUSE	CLK 05:00 name='call me' kind=COUNTDOWN	SILENT-WRONG
+email the team at 2	en	W	REFUSE	CLK 02:00 name='email the team' kind=COUNTDOWN	SILENT-WRONG
+pick up the kids at 3	en	W	REFUSE	CLK 03:00 name='pick up the kids' kind=COUNTDOWN	SILENT-WRONG
+weather today	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+turn on the lights	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+no	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+cancel	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+nevermind	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+thanks	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+start	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+pause	en	W	REFUSE	FAIL(fail-soft)	CORRECT
+cuentame un chiste	es	W	REFUSE	FAIL(fail-soft)	CORRECT
+llama al doctor a las tres	es	W	REFUSE	CLK 03:00 name='llama al doctor' kind=COUNTDOWN	SILENT-WRONG
+recuerdame comprar leche	es	W	REFUSE	FAIL(fail-soft)	CORRECT
+cancelar	es	W	REFUSE	FAIL(fail-soft)	CORRECT
+could you set a timer for 20 minutes	en	W	CD 1200s name=''	COUNTDOWN 1200s name='could you'	NAME-POLLUTION
+please give me ten minutes	en	W	CD 600s name=''	COUNTDOWN 600s name='please give me'	NAME-POLLUTION
+I need 5 minutes	en	P	CD 300s name=''	COUNTDOWN 300s name='I need'	NAME-POLLUTION
+let me have 15 minutes	en	P	CD 900s name=''	COUNTDOWN 900s name='let me have'	NAME-POLLUTION
+start a 25 minute timer	en	W	CD 1500s name=''	COUNTDOWN 1500s name='start'	NAME-POLLUTION
+set timer 10 minutes	en	W	CD 600s name=''	COUNTDOWN 600s name=''	CORRECT
+necesito cinco minutos	es	P	CD 300s name=''	COUNTDOWN 300s name='necesito'	NAME-POLLUTION
+pon un temporizador de diez minutos	es	W	CD 600s name=''	COUNTDOWN 600s name=''	CORRECT
+quiero quince minutos	es	P	CD 900s name=''	COUNTDOWN 900s name='quiero'	NAME-POLLUTION
+roughly 20 minutes	en	W	CD 1200s name=''	COUNTDOWN 1200s name=''	CORRECT
+maybe ten minutes	en	P	CD 600s name=''	COUNTDOWN 600s name='maybe'	NAME-POLLUTION
+about half an hour	en	W	CD 1800s name=''	COUNTDOWN 1800s name=''	CORRECT
+a quarter of an hour	en	W	CD 900s name=''	COUNTDOWN 900s name=''	CORRECT
+three and a half hours	en	W	CD 12600s name=''	COUNTDOWN 12600s name=''	CORRECT
+half a minute	en	P	CD 30s name=''	COUNTDOWN 30s name=''	CORRECT
+media hora mas	es	P	CD 1800s name='mas'	COUNTDOWN 1800s name='mas'	CORRECT
+como media hora	es	P	CD 1800s name=''	COUNTDOWN 1800s name=''	CORRECT
+mas o menos diez minutos	es	P	CD 600s name=''	COUNTDOWN 600s name='mas o menos'	NAME-POLLUTION
+1.5 hours	en	W	CD 5400s name=''	COUNTDOWN 18000s name=''	SILENT-WRONG
+10.5 minutes	en	W	CD 630s name=''	COUNTDOWN 300s name=''	SILENT-WRONG
+7.5 minutes	en	P	CD 450s name=''	COUNTDOWN 300s name=''	SILENT-WRONG
+3.5 hours	en	W	CD 12600s name=''	COUNTDOWN 18000s name=''	SILENT-WRONG
+noon	en	W	CLK 12:00 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+midnight	en	W	CLK 00:00 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+8pm	en	W	CLK 20:00 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+quarter to six	en	P	CLK 05:45 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+half past six	en	P	CLK 06:30 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+mediodia	es	W	CLK 12:00 name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+y media	es	P	SOFT(ambiguous)	FAIL(fail-soft)	FAIL-SOFT
+an hour	en	W	CD 3600s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+a minute	en	W	CD 60s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+a second	en	P	CD 1s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+give me a minute	en	P	CD 60s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+wait a minute	en	P	CD 60s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+in a minute	en	W	CD 60s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP
+coffee for a minute	en	P	CD 60s name='coffee'	FAIL(fail-soft)	FAIL-SOFT-GAP
+run for an hour	en	P	CD 3600s name='run'	FAIL(fail-soft)	FAIL-SOFT-GAP
+nap for an hour	en	W	CD 3600s name='nap'	FAIL(fail-soft)	FAIL-SOFT-GAP
+cook for an hour	en	P	CD 3600s name='cook'	FAIL(fail-soft)	FAIL-SOFT-GAP
+dishwasher an hour	en	W	CD 3600s name='dishwasher'	FAIL(fail-soft)	FAIL-SOFT-GAP
+just a minute	en	W	CD 60s name=''	FAIL(fail-soft)	FAIL-SOFT-GAP

@@ -50,6 +50,21 @@ int app_state_scan_firings(AppState *a, TimerStore *store, time_t now, int32_t *
 }
 
 bool app_state_should_rebuzz(time_t alerted_at, time_t now, int32_t overrun_s) {
-  if (overrun_s >= APP_STATE_REALERT_CAP_S) return false;
-  return (now - alerted_at) >= APP_STATE_REALERT_S;
+  int32_t interval =
+      (overrun_s >= APP_STATE_REALERT_CAP_S) ? APP_STATE_REALERT_DECAY_S : APP_STATE_REALERT_S;
+  return (now - alerted_at) >= interval;
+}
+
+bool app_state_realert_pulses_backlight(int32_t overrun_s) {
+  return overrun_s < APP_STATE_REALERT_CAP_S;
+}
+
+bool app_state_needs_catchup_nav(bool was_fired_before_scan, bool is_fired_after_scan,
+                                  bool scan_fired_any_new) {
+  // Single-ownership check FIRST, unconditionally -- if the scan already
+  // routed navigation for anything this call (possibly a different
+  // cookie), that navigation already owns the one startup nav decision; a
+  // second call here would silently override it.
+  if (scan_fired_any_new) return false;
+  return is_fired_after_scan && was_fired_before_scan;
 }

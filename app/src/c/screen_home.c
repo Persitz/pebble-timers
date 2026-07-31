@@ -12,9 +12,6 @@
 #include "nav.h"
 #include "render.h"
 #include "vibes_adapter.h"
-#ifdef GALLERY_MODE
-#include "gallery.h"
-#endif
 
 // Kind/paper palette -- paper background #EFECE4, ink text #2A2620.
 // Aliased onto the shared constant (render.h, already included) instead of
@@ -92,9 +89,8 @@
 // (draw_row can only paint inside a cell, so the indicator needs its own
 // sibling Layer) and a clock-strip Layer above the menu.
 #define MAX_VISIBLE_ROWS 4  // header + 4 rows visible before the list scrolls
-#define SCROLL_INDICATOR_WIDTH 3
-// The indicator sits at x=194 (200-3-3=194), not x=195 (200-3-2).
-#define SCROLL_INDICATOR_MARGIN 3
+// The indicator sits at x=194 (200-3-3=194), not x=195 (200-3-2) -- see
+// render.h's RENDER_SCROLL_INDICATOR_WIDTH/_MARGIN.
 
 static Window *s_window;
 static Layer *s_clock_strip;    // top clock strip above the menu, always visible
@@ -304,6 +300,10 @@ static void draw_row(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_ind
     if (cell_index->row == n) {
       render_group_divider(ctx, bounds);
       // Driven by the REAL store->count, never a debug lever.
+      // The "16" below is a literal, not MAX_TIMERS itself (there's no
+      // string-building at this call site) -- the _Static_assert right after
+      // this function pins it, so a future change to MAX_TIMERS fails the
+      // build loudly here instead of leaving this label silently stale.
       if (n >= MAX_TIMERS) {
         render_action_row_disabled(ctx, bounds, highlighted, "All 16 timers in use",
                                     "Delete one to add more", false);
@@ -321,12 +321,21 @@ static void draw_row(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_ind
       // that "+ New timer"'s message directly above it already covered the
       // whole ADD-class block -- but that reads as an unexplained silent
       // buzz to a user who reaches this row first (it's one Down-press from
-      // the newest timer, the default landing spot). Now mirrors
-      // "+ New timer"'s own disabled treatment/explanation EXACTLY, same
-      // render_action_row_disabled pattern, same two messages.
+      // the newest timer, the default landing spot). So the HIGHLIGHTED
+      // state still mirrors "+ New timer"'s own disabled explanation
+      // ("Delete one to add more") -- a user who lands directly on this row
+      // still gets the reason. The QUIET state, however, keeps this row's
+      // own plain label ("Say a timer", muted/disabled-styled) rather than
+      // repeating "+ New timer"'s "All 16 timers in use" verbatim -- when
+      // BOTH footer rows are quiet at once (cursor elsewhere, e.g. resting
+      // on the last timer row), repeating the identical sentence on two
+      // consecutive rows reads as a duplicated/broken row, not
+      // reinforcement. "+ New timer" (row n, checked
+      // first above) remains the one row that states the reason while
+      // quiet.
       if (n >= MAX_TIMERS) {
-        render_action_row_disabled(ctx, bounds, highlighted, "All 16 timers in use",
-                                    "Delete one to add more", false);
+        render_action_row_disabled(ctx, bounds, highlighted, "Say a timer", "Delete one to add more",
+                                    false);
       } else {
         render_action_row_mic(ctx, bounds, highlighted, "Say a timer", false);
       }
@@ -344,8 +353,8 @@ static void draw_row(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_ind
 
   // Pause-aware ordering (lib/store's 3-group rule) -- recomputed per draw
   // rather than cached, matching the codebase's established "cheap enough at
-  // MAX_TIMERS=16" pattern (screen_hero.c recomputes sched_plan() the same
-  // way every redraw).
+  // MAX_TIMERS=16" pattern used elsewhere for other per-redraw
+  // recomputations (e.g. view_home_value_size(), lib/view.c).
   int32_t order[MAX_TIMERS];
   store_home_order(store, time(NULL), order, MAX_TIMERS);
   const Timer *t = store_find_const(store, order[cell_index->row]);
@@ -406,6 +415,13 @@ static void draw_row(GContext *ctx, const Layer *cell_layer, MenuIndex *cell_ind
   };
   render_row(ctx, bounds, &spec);
 }
+
+// Pins the "16" hardcoded into draw_row()'s "All 16 timers in use" label
+// (above) to the real MAX_TIMERS constant -- cheaper than building the
+// string with snprintf (zero image bytes, no runtime formatting) and, unlike
+// a comment alone, breaks the build loudly if MAX_TIMERS ever changes
+// instead of leaving the label to go stale silently.
+_Static_assert(MAX_TIMERS == 16, "update the \"All 16 timers in use\" label in draw_row() above");
 
 // Never reached under GALLERY_MODE (screen_home_create() below wires
 // gallery_click_config_provider onto the window itself in that build,
@@ -668,76 +684,57 @@ static void window_appear(Window *window) {
 }
 
 Window *screen_home_create(void) {
-  s_window = window_create();
-  window_set_background_color(s_window, COLOR_PAPER);
-  window_set_window_handlers(s_window, (WindowHandlers){.appear = window_appear});
-
-  Layer *root = window_get_root_layer(s_window);
-  GRect bounds = layer_get_bounds(root);
-
-  s_clock_strip = layer_create(GRect(0, 0, bounds.size.w, HOME_HEADER_H));
-  layer_set_update_proc(s_clock_strip, home_header_update_proc);
-  layer_add_child(root, s_clock_strip);
-
-  s_menu = menu_layer_create(
-      GRect(0, HOME_HEADER_H, bounds.size.w, bounds.size.h - HOME_HEADER_H));
-  // MenuLayer's default pad_bottom adds bottom padding to the scroll content,
-  // letting the offset over-scroll past the real content bottom. At HOME's
-  // structural max-scroll that clips the top row's numeral to a mangled
-  // bottom sliver. HOME's last row ("Clear all") already bottom-anchors via
-  // get_cell_height's stretch, so no bottom padding is wanted here.
-  //
-  // The mangled numeral this avoids is a correctly-rendered row that gets
-  // clipped by the over-scroll, not stale/dirty framebuffer ink left over
-  // from a previous redraw -- so no backdrop-erase layer is needed here;
-  // there is nothing to erase, only the clip to prevent.
-  menu_layer_pad_bottom_enable(s_menu, false);
-  // The SDK's own MenuLayer defaults highlight_colors to {GColorBlack,
-  // GColorWhite} (pebble.h's doc comment on menu_layer_set_highlight_colors)
-  // and fills the CELL'S FULL BOUNDS with that background before draw_row
-  // ever runs -- render_row()'s own smaller 13px-inset pill was drawing
-  // correctly all along, but the SDK's full-cell black fill showed through
-  // as a full-bleed square around it. Matching this screen's own paper
-  // background here makes the un-inset margin read as paper (like a quiet
-  // row), not black.
-  menu_layer_set_highlight_colors(s_menu, RENDER_COLOR_PAPER, GColorBlack);
-  menu_layer_set_callbacks(s_menu, NULL,
-                            (MenuLayerCallbacks){
-                                .get_num_rows = get_num_rows,
-                                .get_cell_height = get_cell_height,
-                                .draw_row = draw_row,
-                            });
-  layer_add_child(root, menu_layer_get_layer(s_menu));
-#ifdef GALLERY_MODE
-  // Screen gallery (inner loop, src/c/gallery.c): HOME is the one screen
-  // that normally has NO custom click_config_provider at all (see the
-  // comment below) -- gallery mode needs one anyway, to rebind Up/Down to
-  // scene-cycling instead of menu_layer_set_click_config_onto_window()'s
-  // real menu navigation. Never compiled into a release build.
-  window_set_click_config_provider(s_window, gallery_click_config_provider);
-#else
+  // HOME is the one screen that normally has NO custom click_config_provider
+  // at all under GALLERY_MODE -- render_build_menu_screen's own internal
+  // GALLERY_MODE swap covers that uniformly now (see its doc comment).
   // Hand-rolled like Library so Select-long can open ACTIONS; the explicit
   // Back subscription preserves HOME's exit-to-watchface behavior.
-  window_set_click_config_provider(s_window, click_config_provider);
-#endif
-
-  s_scroll_indicator =
-      layer_create(GRect(bounds.size.w - SCROLL_INDICATOR_WIDTH - SCROLL_INDICATOR_MARGIN,
-                          HOME_HEADER_H, SCROLL_INDICATOR_WIDTH, bounds.size.h - HOME_HEADER_H));
-  layer_set_update_proc(s_scroll_indicator, scroll_indicator_update_proc);
-  layer_add_child(root, s_scroll_indicator);
-
+  RenderMenuScreen screen = render_build_menu_screen(&(RenderMenuScreenSpec){
+      .window_bg = COLOR_PAPER,
+      // HOME is the one screen whose click_config_provider is wired via this
+      // shared builder BEFORE its MenuLayer/header layers are constructed
+      // (render_build_menu_screen calls window_set_click_config_provider()
+      // right after window_create(), then builds screen.menu/screen.header
+      // afterwards -- see render.c's render_build_menu_screen()), rather
+      // than after, which is how HOME wired it before adopting the shared
+      // builder. This is safe and does not need "fixing": the SDK only
+      // STORES the provider pointer at window_set_click_config_provider()
+      // time and INVOKES it later, when the window is shown (on the
+      // ClickManager reconfigure that happens on window appear) -- by then
+      // every layer this window needs already exists, regardless of which
+      // order the two calls happened in at create() time.
+      .click_config_provider = click_config_provider,
+      .window_handlers = (WindowHandlers){.appear = window_appear},
+      .header_height = HOME_HEADER_H,
+      .header_update_proc = home_header_update_proc,
+      // MenuLayer's default pad_bottom adds bottom padding to the scroll
+      // content, letting the offset over-scroll past the real content
+      // bottom. At HOME's structural max-scroll that clips the top row's
+      // numeral to a mangled bottom sliver. HOME's last row ("Clear all")
+      // already bottom-anchors via get_cell_height's stretch, so no bottom
+      // padding is wanted here.
+      .pad_bottom_disable = true,
+      .get_num_rows = get_num_rows,
+      .get_cell_height = get_cell_height,
+      .draw_row = draw_row,
+      .with_scroll_indicator = true,
+      .scroll_indicator_update_proc = scroll_indicator_update_proc,
+  });
+  s_window = screen.window;
+  s_clock_strip = screen.header;
+  s_menu = screen.menu;
+  s_scroll_indicator = screen.scroll_indicator;
   return s_window;
 }
 
 void screen_home_destroy(void) {
-  layer_destroy(s_scroll_indicator);
+  render_destroy_menu_screen(&(RenderMenuScreen){.window = s_window,
+                                                   .header = s_clock_strip,
+                                                   .menu = s_menu,
+                                                   .scroll_indicator = s_scroll_indicator});
   s_scroll_indicator = NULL;
-  menu_layer_destroy(s_menu);
   s_menu = NULL;
-  layer_destroy(s_clock_strip);
   s_clock_strip = NULL;
-  window_destroy(s_window);
   s_window = NULL;
 }
 

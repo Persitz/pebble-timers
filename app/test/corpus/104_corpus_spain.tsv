@@ -1,0 +1,238 @@
+id	utterance	engine	expected	actual	class	note
+BASE01	Pon un temporizador de veinte minutos.	wispr	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name=""	CORRECT	
+BASE02	pon un temporizador de veinte minutos eh	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="eh"	NAME-POLLUTION	
+BASE03	Timer de 5 minutos.	wispr	COUNTDOWN 300s	ok=1 COUNTDOWN dur=300 name=""	CORRECT	
+BASE04	timer de cinco minutos	parakeet	COUNTDOWN 300s	ok=1 COUNTDOWN dur=300 name=""	CORRECT	
+BASE05	Necesito 45 segundos.	wispr	COUNTDOWN 45s	ok=1 COUNTDOWN dur=45 name="Necesito"	NAME-POLLUTION	
+BASE06	necesito cuarenta y cinco segundos	parakeet	COUNTDOWN 45s	ok=1 COUNTDOWN dur=45 name="necesito"	NAME-POLLUTION	
+BASE07	Ponme diez minutos, porfa.	wispr	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="porfa"	NAME-POLLUTION	
+BASE08	ponme diez minutos porfa	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="porfa"	NAME-POLLUTION	
+BASE09	Un minuto y medio, por favor.	wispr	COUNTDOWN 90s	ok=1 COUNTDOWN dur=90 name="favor"	NAME-POLLUTION	
+BASE10	un minuto y medio por favor	parakeet	COUNTDOWN 90s	ok=1 COUNTDOWN dur=90 name="favor"	NAME-POLLUTION	
+BASE11	2 horas.	wispr	COUNTDOWN 7200s	ok=1 COUNTDOWN dur=7200 name=""	CORRECT	
+BASE12	dos horas	parakeet	COUNTDOWN 7200s	ok=1 COUNTDOWN dur=7200 name=""	CORRECT	
+BASE13	Ocho minutos.	wispr	COUNTDOWN 480s	ok=1 COUNTDOWN dur=480 name=""	CORRECT	
+BASE14	ocho minutos eh	parakeet	COUNTDOWN 480s	ok=1 COUNTDOWN dur=480 name="eh"	NAME-POLLUTION	
+BASE15	Tres minutos y cuarto.	wispr	COUNTDOWN 195s	ok=1 COUNTDOWN dur=180 name="cuarto"	SILENT-WRONG	3 min 15s ("y cuarto" trailing-quarter add NOT implemented, only trailing-HALF is)
+BASE16	tres minutos y cuarto	parakeet	COUNTDOWN 195s	ok=1 COUNTDOWN dur=180 name="cuarto"	SILENT-WRONG	3 min 15s ("y cuarto" trailing-quarter add NOT implemented, only trailing-HALF is)
+FRAC01	Media hora.	wispr	COUNTDOWN 1800s	ok=1 COUNTDOWN dur=1800 name=""	CORRECT	
+FRAC02	media hora	parakeet	COUNTDOWN 1800s	ok=1 COUNTDOWN dur=1800 name=""	CORRECT	
+FRAC03	Un cuarto de hora.	wispr	COUNTDOWN 900s	ok=1 COUNTDOWN dur=900 name=""	CORRECT	
+FRAC04	un cuarto de hora	parakeet	COUNTDOWN 900s	ok=1 COUNTDOWN dur=900 name=""	CORRECT	
+FRAC05	Tres cuartos de hora.	wispr	COUNTDOWN 2700s	ok=1 COUNTDOWN dur=2700 name=""	CORRECT	
+FRAC06	tres cuartos de hora	parakeet	COUNTDOWN 2700s	ok=1 COUNTDOWN dur=2700 name=""	CORRECT	
+FRAC07	Hora y cuarto.	wispr	COUNTDOWN 5400s	ok=0 COUNTDOWN dur=0 name="cuarto"	FAIL-SOFT	"hora y cuarto" (bare unit + trailing cuarto, implicit N=1) -- only the HALF-word sibling pattern is implemented
+FRAC08	hora y cuarto	parakeet	COUNTDOWN 5400s	ok=0 COUNTDOWN dur=0 name="cuarto"	FAIL-SOFT	"hora y cuarto" (bare unit + trailing cuarto, implicit N=1) -- only the HALF-word sibling pattern is implemented
+FRAC09	Hora y media.	wispr	COUNTDOWN 5400s	ok=1 COUNTDOWN dur=5400 name=""	CORRECT	
+FRAC10	hora y media	parakeet	COUNTDOWN 5400s	ok=1 COUNTDOWN dur=5400 name=""	CORRECT	
+FRAC11	Cinco minutos y medio.	wispr	COUNTDOWN 330s	ok=1 COUNTDOWN dur=330 name=""	CORRECT	
+FRAC12	cinco minutos y medio	parakeet	COUNTDOWN 330s	ok=1 COUNTDOWN dur=330 name=""	CORRECT	
+FRAC13	Un cuartito de hora.	wispr	COUNTDOWN 900s	ok=0 COUNTDOWN dur=0 name="Un cuartito"	GAP	"cuartito" (diminutive of the fraction word itself) not in QUARTER_WORDS
+FRAC14	un cuartito de hora	parakeet	COUNTDOWN 900s	ok=0 COUNTDOWN dur=0 name="un cuartito"	GAP	"cuartito" (diminutive of the fraction word itself) not in QUARTER_WORDS
+DIMI01	Pon quince minutitos.	wispr	COUNTDOWN 900s	ok=1 COUNTDOWN dur=900 name=""	CORRECT	
+DIMI02	pon quince minutitos	parakeet	COUNTDOWN 900s	ok=1 COUNTDOWN dur=900 name=""	CORRECT	
+DIMI03	Una horita.	wispr	COUNTDOWN 3600s	ok=1 COUNTDOWN dur=3600 name=""	CORRECT	
+DIMI04	una horita	parakeet	COUNTDOWN 3600s	ok=1 COUNTDOWN dur=3600 name=""	CORRECT	
+DIMI05	Media horita.	wispr	COUNTDOWN 1800s	ok=1 COUNTDOWN dur=1800 name=""	CORRECT	
+DIMI06	media horita	parakeet	COUNTDOWN 1800s	ok=1 COUNTDOWN dur=1800 name=""	CORRECT	
+DIMI07	Diez segunditos.	wispr	COUNTDOWN 10s	ok=1 COUNTDOWN dur=10 name=""	CORRECT	
+DIMI08	diez segunditos	parakeet	COUNTDOWN 10s	ok=1 COUNTDOWN dur=10 name=""	CORRECT	
+DIMI09	Un minutito.	wispr	COUNTDOWN 60s	ok=1 COUNTDOWN dur=60 name=""	CORRECT	
+DIMI10	un minutito	parakeet	COUNTDOWN 60s	ok=1 COUNTDOWN dur=60 name=""	CORRECT	
+ILLO01	Pon quince minutillos.	wispr	COUNTDOWN 900s	ok=0 COUNTDOWN dur=0 name="quince minutillos"	GAP	-illo unit diminutive not in UNIT_WORDS (only -ito forms are)
+ILLO02	pon quince minutillos	parakeet	COUNTDOWN 900s	ok=0 COUNTDOWN dur=0 name="quince minutillos"	GAP	-illo unit diminutive not in UNIT_WORDS (only -ito forms are)
+ILLO03	Una horilla.	wispr	COUNTDOWN 3600s	ok=0 COUNTDOWN dur=0 name="Una horilla"	GAP	-illo unit diminutive gap
+ILLO04	una horilla	parakeet	COUNTDOWN 3600s	ok=0 COUNTDOWN dur=0 name="una horilla"	GAP	-illo unit diminutive gap
+ILLO05	Diez segundillos.	wispr	COUNTDOWN 10s	ok=0 COUNTDOWN dur=0 name="Diez segundillos"	GAP	-illo unit diminutive gap
+ILLO06	diez segundillos	parakeet	COUNTDOWN 10s	ok=0 COUNTDOWN dur=0 name="diez segundillos"	GAP	-illo unit diminutive gap
+ILLO07	Un ratillo, veinte minutillos.	wispr	COUNTDOWN 1200s	ok=0 COUNTDOWN dur=0 name="Un ratillo veinte minut"	GAP	-illo unit diminutive gap (+ "ratillo" filler noun)
+ILLO08	un ratillo veinte minutillos	parakeet	COUNTDOWN 1200s	ok=0 COUNTDOWN dur=0 name="un ratillo veinte minut"	GAP	-illo unit diminutive gap (+ "ratillo" filler noun)
+ILLO09	Cinco minutillos nada mas.	wispr	COUNTDOWN 300s	ok=0 COUNTDOWN dur=0 name="Cinco minutillos nada m"	GAP	-illo unit diminutive gap
+ILLO10	cinco minutillos nada mas	parakeet	COUNTDOWN 300s	ok=0 COUNTDOWN dur=0 name="cinco minutillos nada m"	GAP	-illo unit diminutive gap
+CLOCK01	A las seis y media.	wispr	CT 06:30	ok=1 COUNTDOWN dur=0 clock=06:30(h24=0) name=""	CORRECT	
+CLOCK02	a las seis y media	parakeet	CT 06:30	ok=1 COUNTDOWN dur=0 clock=06:30(h24=0) name=""	CORRECT	
+CLOCK03	A las siete y cuarto.	wispr	CT 07:15	ok=1 COUNTDOWN dur=0 clock=07:15(h24=0) name=""	CORRECT	
+CLOCK04	a las siete y cuarto	parakeet	CT 07:15	ok=1 COUNTDOWN dur=0 clock=07:15(h24=0) name=""	CORRECT	
+CLOCK05	A las ocho de la tarde.	wispr	CT 20:00	ok=1 COUNTDOWN dur=0 clock=20:00(h24=1) name=""	CORRECT	
+CLOCK06	a las ocho de la tarde	parakeet	CT 20:00	ok=1 COUNTDOWN dur=0 clock=20:00(h24=1) name=""	CORRECT	
+CLOCK07	A las nueve de la noche.	wispr	CT 21:00	ok=1 COUNTDOWN dur=0 clock=21:00(h24=1) name=""	CORRECT	
+CLOCK08	a las nueve de la noche	parakeet	CT 21:00	ok=1 COUNTDOWN dur=0 clock=21:00(h24=1) name=""	CORRECT	
+CLOCK09	A las siete de la manana.	wispr	CT 07:00	ok=1 COUNTDOWN dur=0 clock=07:00(h24=1) name=""	CORRECT	hour24_known should stay false (AM ambiguous 7 vs 19) since 'de la manana' only disambiguates AM/PM class, not 24h-ness the same way pm does -- accept hour24_known True or False
+CLOCK10	a las siete de la manana	parakeet	CT 07:00	ok=1 COUNTDOWN dur=0 clock=07:00(h24=1) name=""	CORRECT	hour24_known should stay false (AM ambiguous 7 vs 19) since 'de la manana' only disambiguates AM/PM class, not 24h-ness the same way pm does -- accept hour24_known True or False
+CLOCK11	Hasta las seis.	wispr	CT 06:00	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name=""	CORRECT	
+CLOCK12	hasta las seis	parakeet	CT 06:00	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name=""	CORRECT	
+CLOCK13	A la una y cuarto.	wispr	CT 01:15	ok=1 COUNTDOWN dur=0 clock=01:15(h24=0) name=""	CORRECT	
+CLOCK14	a la una y cuarto	parakeet	CT 01:15	ok=1 COUNTDOWN dur=0 clock=01:15(h24=0) name=""	CORRECT	
+CLOCK15	A las diez y veinte.	wispr	CT 10:20	ok=1 COUNTDOWN dur=0 clock=10:00(h24=0) name=""	SILENT-WRONG	"H y MM" with an arbitrary (non-cuarto/media) minute number -- the direct-adjacency minute-group check requires NO joiner between hour and minute, so 'y' breaks it
+CLOCK16	a las diez y veinte	parakeet	CT 10:20	ok=1 COUNTDOWN dur=0 clock=10:00(h24=0) name=""	SILENT-WRONG	"H y MM" with an arbitrary (non-cuarto/media) minute number -- the direct-adjacency minute-group check requires NO joiner between hour and minute, so 'y' breaks it
+CLOCK17	A las cinco y diez de la tarde.	wispr	CT 17:10	ok=1 COUNTDOWN dur=0 clock=05:00(h24=0) name="diez la tarde"	SILENT-WRONG	same H-y-MM gap, plus PM marker never reached because the minute-parse failure leaves the cursor mis-positioned
+CLOCK18	a las cinco y diez de la tarde	parakeet	CT 17:10	ok=1 COUNTDOWN dur=0 clock=05:00(h24=0) name="diez la tarde"	SILENT-WRONG	same H-y-MM gap, plus PM marker never reached because the minute-parse failure leaves the cursor mis-positioned
+CLOCK19	A las doce de la noche.	wispr	CT 00:00	ok=1 COUNTDOWN dur=0 clock=12:00(h24=1) name=""	SILENT-WRONG	
+CLOCK20	a las doce de la noche	parakeet	CT 00:00	ok=1 COUNTDOWN dur=0 clock=12:00(h24=1) name=""	SILENT-WRONG	
+CLOCK21	A las seis en punto.	wispr	CT 06:00	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="en punto"	NAME-POLLUTION	
+CLOCK22	a las seis en punto	parakeet	CT 06:00	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="en punto"	NAME-POLLUTION	
+CLK2401	A las 18:30.	wispr	CT 18:30	ok=0 COUNTDOWN dur=0 name="las 18:30"	GAP	digit HH:MM with a literal colon -- colon is stripped as bare punctuation (no boundary), concatenating '18:30' into one bogus token '1830'
+CLK2402	a las 18:30	parakeet	CT 18:30	ok=0 COUNTDOWN dur=0 name="las 18:30"	GAP	digit HH:MM with a literal colon -- colon is stripped as bare punctuation (no boundary), concatenating '18:30' into one bogus token '1830'
+CLK2403	A las dieciocho treinta.	wispr	CT 18:30	ok=1 COUNTDOWN dur=0 clock=18:30(h24=1) name=""	CORRECT	
+CLK2404	a las dieciocho treinta	parakeet	CT 18:30	ok=1 COUNTDOWN dur=0 clock=18:30(h24=1) name=""	CORRECT	
+CLK2405	A las 20:00.	wispr	CT 20:00	ok=0 COUNTDOWN dur=0 name="las 20:00"	GAP	same colon-collapse gap ('20:00' -> '2000')
+CLK2406	a las veinte horas	parakeet	CT 20:00	ok=1 COUNTDOWN dur=0 clock=20:00(h24=1) name=""	CORRECT	
+CLK2407	A las 6:45.	wispr	CT 06:45	ok=0 COUNTDOWN dur=0 name="las 6:45"	GAP	same colon-collapse gap
+CLK2408	a las seis cuarenta y cinco	parakeet	CT 06:45	ok=1 COUNTDOWN dur=0 clock=06:45(h24=0) name=""	CORRECT	
+CLK2409	A las 14:15.	wispr	CT 14:15	ok=0 COUNTDOWN dur=0 name="las 14:15"	GAP	same colon-collapse gap
+CLK2410	a las catorce quince	parakeet	CT 14:15	ok=1 COUNTDOWN dur=0 clock=14:15(h24=1) name=""	CORRECT	
+MENOS01	Las seis menos cuarto.	wispr	CT 05:45	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="menos cuarto"	SILENT-WRONG	"menos cuarto" subtractive form -- not implemented; resolves to the bare hour instead
+MENOS02	las seis menos cuarto	parakeet	CT 05:45	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="menos cuarto"	SILENT-WRONG	"menos cuarto" subtractive form -- not implemented; resolves to the bare hour instead
+MENOS03	A las seis menos cuarto.	wispr	CT 05:45	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="menos cuarto"	SILENT-WRONG	menos cuarto gap
+MENOS04	a las seis menos cuarto	parakeet	CT 05:45	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="menos cuarto"	SILENT-WRONG	menos cuarto gap
+MENOS05	Las ocho menos veinte.	wispr	CT 07:40	ok=1 COUNTDOWN dur=0 clock=08:00(h24=0) name="menos veinte"	SILENT-WRONG	menos veinte gap
+MENOS06	las ocho menos veinte	parakeet	CT 07:40	ok=1 COUNTDOWN dur=0 clock=08:00(h24=0) name="menos veinte"	SILENT-WRONG	menos veinte gap
+MENOS07	A las nueve menos diez.	wispr	CT 08:50	ok=1 COUNTDOWN dur=0 clock=09:00(h24=0) name="menos diez"	SILENT-WRONG	menos diez gap
+MENOS08	a las nueve menos diez	parakeet	CT 08:50	ok=1 COUNTDOWN dur=0 clock=09:00(h24=0) name="menos diez"	SILENT-WRONG	menos diez gap
+MENOS09	Las siete menos cinco de la tarde.	wispr	CT 18:55	ok=1 COUNTDOWN dur=0 clock=07:00(h24=0) name="menos cinco la tarde"	SILENT-WRONG	menos cinco + de la tarde gap
+MENOS10	las siete menos cinco de la tarde	parakeet	CT 18:55	ok=1 COUNTDOWN dur=0 clock=07:00(h24=0) name="menos cinco la tarde"	SILENT-WRONG	menos cinco + de la tarde gap
+MENOS11	Hasta las seis menos cuarto.	wispr	CT 05:45	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="menos cuarto"	SILENT-WRONG	menos cuarto gap
+MENOS12	hasta las seis menos cuarto	parakeet	CT 05:45	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="menos cuarto"	SILENT-WRONG	menos cuarto gap
+MENOS13	Pon la alarma a las ocho menos cuarto.	wispr	CT 07:45	ok=1 COUNTDOWN dur=0 clock=08:00(h24=0) name="la menos cuarto"	SILENT-WRONG	menos cuarto gap
+MENOS14	pon la alarma a las ocho menos cuarto	parakeet	CT 07:45	ok=1 COUNTDOWN dur=0 clock=08:00(h24=0) name="la menos cuarto"	SILENT-WRONG	menos cuarto gap
+MENOS15	Menos cuarto para las diez.	wispr	CT 09:45	ok=1 COUNTDOWN dur=0 clock=10:00(h24=0) name="Menos cuarto"	SILENT-WRONG	menos cuarto (reversed phrasing) gap
+MENOS16	menos cuarto para las diez	parakeet	CT 09:45	ok=1 COUNTDOWN dur=0 clock=10:00(h24=0) name="menos cuarto"	SILENT-WRONG	menos cuarto (reversed phrasing) gap
+PICO01	Hasta las ocho y pico.	wispr	CT 08:05	ok=1 COUNTDOWN dur=0 clock=08:00(h24=0) name="pico"	SILENT-WRONG	"y pico" clock approximation -- no target range exists so any ~8:01-8:15 is defensible; resolves to exactly 8:00, silently dropping the +pico nuance
+PICO02	hasta las ocho y pico	parakeet	CT 08:05	ok=1 COUNTDOWN dur=0 clock=08:00(h24=0) name="pico"	SILENT-WRONG	"y pico" clock approximation -- no target range exists so any ~8:01-8:15 is defensible; resolves to exactly 8:00, silently dropping the +pico nuance
+PICO03	A las seis y pico.	wispr	CT 06:05	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="pico"	SILENT-WRONG	y pico clock approximation
+PICO04	a las seis y pico	parakeet	CT 06:05	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="pico"	SILENT-WRONG	y pico clock approximation
+PICO05	Veinte minutos y pico.	wispr	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="pico"	NAME-POLLUTION	y pico duration approximation (base number kept exactly, pico dropped -- reasonable)
+PICO06	veinte minutos y pico	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="pico"	NAME-POLLUTION	y pico duration approximation (base number kept exactly, pico dropped -- reasonable)
+PICO07	Un cuarto de hora y pico.	wispr	COUNTDOWN 900s	ok=1 COUNTDOWN dur=900 name="pico"	NAME-POLLUTION	y pico duration approximation
+PICO08	un cuarto de hora y pico	parakeet	COUNTDOWN 900s	ok=1 COUNTDOWN dur=900 name="pico"	NAME-POLLUTION	y pico duration approximation
+PICO09	Diez minutos y pico para la tortilla.	wispr	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="pico la tortilla"	NAME-POLLUTION	y pico duration approximation
+PICO10	diez minutos y pico para la tortilla	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="pico la tortilla"	NAME-POLLUTION	y pico duration approximation
+REP01	Repite cada veinte minutos.	wispr	REPEAT 1200s	ok=1 REPEAT dur=1200 name="Repite"	NAME-POLLUTION	conjugated 'repite' not in KIND_REPEAT_WORDS (only infinitive 'repetir' is) -- resolves via 'cada' anyway, but 'Repite' pollutes the name
+REP02	repite cada veinte minutos	parakeet	REPEAT 1200s	ok=1 REPEAT dur=1200 name="repite"	NAME-POLLUTION	conjugated 'repite' not in KIND_REPEAT_WORDS (only infinitive 'repetir' is) -- resolves via 'cada' anyway, but 'Repite' pollutes the name
+REP03	Cada cinco minutos.	wispr	REPEAT 300s	ok=1 REPEAT dur=300 name=""	CORRECT	
+REP04	cada cinco minutos	parakeet	REPEAT 300s	ok=1 REPEAT dur=300 name=""	CORRECT	
+REP05	Un intervalo de diez minutos.	wispr	REPEAT 600s	ok=1 REPEAT dur=600 name=""	CORRECT	
+REP06	un intervalo de diez minutos	parakeet	REPEAT 600s	ok=1 REPEAT dur=600 name=""	CORRECT	
+REP07	Temporizador recurrente de treinta segundos.	wispr	REPEAT 30s	ok=1 REPEAT dur=30 name=""	CORRECT	
+REP08	temporizador recurrente de treinta segundos	parakeet	REPEAT 30s	ok=1 REPEAT dur=30 name=""	CORRECT	
+REP09	Repetir cada media hora.	wispr	REPEAT 1800s	ok=1 REPEAT dur=1800 name=""	CORRECT	
+REP10	repetir cada media hora	parakeet	REPEAT 1800s	ok=1 REPEAT dur=1800 name=""	CORRECT	
+SW01	Cronometro.	wispr	STOPWATCH 0s	ok=1 STOPWATCH dur=0 name=""	CORRECT	
+SW02	cronometro	parakeet	STOPWATCH 0s	ok=1 STOPWATCH dur=0 name=""	CORRECT	
+SW03	Pon el crono.	wispr	STOPWATCH 0s	ok=1 STOPWATCH dur=0 name="el"	NAME-POLLUTION	'el' (article) leaks -- not a filler
+SW04	pon el crono	parakeet	STOPWATCH 0s	ok=1 STOPWATCH dur=0 name="el"	NAME-POLLUTION	'el' (article) leaks -- not a filler
+SW05	Cronometro para el gimnasio.	wispr	STOPWATCH 0s	ok=1 STOPWATCH dur=0 name="el gimnasio"	NAME-POLLUTION	scenario noun residue, expected
+SW06	cronometro para el gimnasio	parakeet	STOPWATCH 0s	ok=1 STOPWATCH dur=0 name="el gimnasio"	NAME-POLLUTION	scenario noun residue, expected
+SW07	Activad el cronometro.	wispr	STOPWATCH 0s	ok=1 STOPWATCH dur=0 name="Activad el"	NAME-POLLUTION	vosotros imperative 'activad'/'el' leak -- not in vocab
+SW08	activad el cronometro	parakeet	STOPWATCH 0s	ok=1 STOPWATCH dur=0 name="activad el"	NAME-POLLUTION	vosotros imperative 'activad'/'el' leak -- not in vocab
+PAELLA01	Veinte minutos para la paella.	wispr	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="la paella"	NAME-POLLUTION	scenario noun residue expected
+PAELLA02	veinte minutos para la paella	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="la paella"	NAME-POLLUTION	scenario noun residue expected
+PAELLA03	Pon el temporizador de la paella a veinte minutos.	wispr	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="el la paella"	NAME-POLLUTION	scenario noun residue expected
+PAELLA04	pon el temporizador de la paella a veinte minutos	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="el la paella"	NAME-POLLUTION	scenario noun residue expected
+PAELLA05	Avisame en veinte minutos que tengo la paella en el fuego.	wispr	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="Avisame en que tengo la"	NAME-POLLUTION	long carrier sentence, heavy residue expected
+PAELLA06	avisame en veinte minutos que tengo la paella en el fuego eh	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="avisame en que tengo la"	NAME-POLLUTION	long carrier sentence, heavy residue expected
+TORTI01	Diez minutos para la tortilla.	wispr	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="la tortilla"	NAME-POLLUTION	scenario noun residue expected
+TORTI02	diez minutos para la tortilla	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="la tortilla"	NAME-POLLUTION	scenario noun residue expected
+TORTI03	Cronometro de diez minutos para cuajar la tortilla.	wispr	STOPWATCH 0s	ok=1 STOPWATCH dur=0 name="cuajar la tortilla"	NAME-POLLUTION	scenario noun residue expected
+TORTI04	cronometro de diez minutos para cuajar la tortilla	parakeet	STOPWATCH 0s	ok=1 STOPWATCH dur=0 name="cuajar la tortilla"	NAME-POLLUTION	scenario noun residue expected
+TORTI05	Diez minutitos para la tortilla de patatas.	wispr	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="la tortilla patatas"	NAME-POLLUTION	scenario noun residue expected
+TORTI06	diez minutitos para la tortilla de patatas	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="la tortilla patatas"	NAME-POLLUTION	scenario noun residue expected
+SIESTA01	Venga, veinte minutos de siesta.	wispr	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="Venga siesta"	NAME-POLLUTION	'venga' not in vocab -- name pollution
+SIESTA02	venga veinte minutos de siesta	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="venga siesta"	NAME-POLLUTION	'venga' not in vocab -- name pollution
+SIESTA03	Pon un cuarto de hora de siesta.	wispr	COUNTDOWN 900s	ok=1 COUNTDOWN dur=900 name="siesta"	NAME-POLLUTION	scenario noun residue expected
+SIESTA04	pon un cuarto de hora de siesta	parakeet	COUNTDOWN 900s	ok=1 COUNTDOWN dur=900 name="siesta"	NAME-POLLUTION	scenario noun residue expected
+SIESTA05	Media horita de siesta, nada mas.	wispr	COUNTDOWN 1800s	ok=1 COUNTDOWN dur=1800 name="siesta nada mas"	NAME-POLLUTION	scenario noun residue expected
+SIESTA06	media horita de siesta nada mas	parakeet	COUNTDOWN 1800s	ok=1 COUNTDOWN dur=1800 name="siesta nada mas"	NAME-POLLUTION	scenario noun residue expected
+LAVA01	Cuarenta minutos para la lavadora.	wispr	COUNTDOWN 2400s	ok=1 COUNTDOWN dur=2400 name="la lavadora"	NAME-POLLUTION	scenario noun residue expected
+LAVA02	cuarenta minutos para la lavadora	parakeet	COUNTDOWN 2400s	ok=1 COUNTDOWN dur=2400 name="la lavadora"	NAME-POLLUTION	scenario noun residue expected
+LAVA03	La lavadora tarda cincuenta y nueve minutos, pon el temporizador.	wispr	COUNTDOWN 3540s	ok=1 COUNTDOWN dur=3540 name="La lavadora tarda el"	NAME-POLLUTION	carrier verb residue expected
+LAVA04	la lavadora tarda cincuenta y nueve minutos pon el temporizador	parakeet	COUNTDOWN 3540s	ok=1 COUNTDOWN dur=3540 name="la lavadora tarda el"	NAME-POLLUTION	carrier verb residue expected
+LAVA05	Poned cincuenta y nueve minutos para la lavadora.	wispr	COUNTDOWN 3540s	ok=1 COUNTDOWN dur=3540 name="Poned la lavadora"	NAME-POLLUTION	vosotros 'poned' not in vocab -- name pollution
+LAVA06	poned cincuenta y nueve minutos para la lavadora	parakeet	COUNTDOWN 3540s	ok=1 COUNTDOWN dur=3540 name="poned la lavadora"	NAME-POLLUTION	vosotros 'poned' not in vocab -- name pollution
+GYM01	Treinta segundos de descanso entre series.	wispr	COUNTDOWN 30s	ok=1 COUNTDOWN dur=30 name="descanso entre series"	NAME-POLLUTION	scenario noun residue expected
+GYM02	treinta segundos de descanso entre series	parakeet	COUNTDOWN 30s	ok=1 COUNTDOWN dur=30 name="descanso entre series"	NAME-POLLUTION	scenario noun residue expected
+GYM03	Un minuto de plancha.	wispr	COUNTDOWN 60s	ok=1 COUNTDOWN dur=60 name="plancha"	NAME-POLLUTION	scenario noun residue expected
+GYM04	un minuto de plancha	parakeet	COUNTDOWN 60s	ok=1 COUNTDOWN dur=60 name="plancha"	NAME-POLLUTION	scenario noun residue expected
+GYM05	Cronometro para el gimnasio, cuarenta y cinco minutos.	wispr	COUNTDOWN 2700s	ok=1 COUNTDOWN dur=2700 name="el gimnasio"	NAME-POLLUTION	scenario noun residue expected
+GYM06	cronometro para el gimnasio cuarenta y cinco minutos	parakeet	COUNTDOWN 2700s	ok=1 COUNTDOWN dur=2700 name="el gimnasio"	NAME-POLLUTION	scenario noun residue expected
+MUS01	Diez minutos por partida de mus.	wispr	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="partida mus"	NAME-POLLUTION	scenario noun residue expected
+MUS02	diez minutos por partida de mus	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="partida mus"	NAME-POLLUTION	scenario noun residue expected
+MUS03	Pon cinco minutos para la partida de mus.	wispr	COUNTDOWN 300s	ok=1 COUNTDOWN dur=300 name="la partida mus"	NAME-POLLUTION	scenario noun residue expected
+MUS04	pon cinco minutos para la partida de mus	parakeet	COUNTDOWN 300s	ok=1 COUNTDOWN dur=300 name="la partida mus"	NAME-POLLUTION	scenario noun residue expected
+MUS05	Cinco minutillos por mano de mus.	wispr	COUNTDOWN 300s	ok=0 COUNTDOWN dur=0 name="Cinco minutillos mano m"	GAP	-illo unit diminutive gap (same as ILLO*)
+MUS06	cinco minutillos por mano de mus	parakeet	COUNTDOWN 300s	ok=0 COUNTDOWN dur=0 name="cinco minutillos mano m"	GAP	-illo unit diminutive gap (same as ILLO*)
+PARK01	Una hora de parquimetro.	wispr	COUNTDOWN 3600s	ok=1 COUNTDOWN dur=3600 name="parquimetro"	NAME-POLLUTION	scenario noun residue expected
+PARK02	una hora de parquimetro	parakeet	COUNTDOWN 3600s	ok=1 COUNTDOWN dur=3600 name="parquimetro"	NAME-POLLUTION	scenario noun residue expected
+PARK03	Pon el temporizador del parquimetro a dos horas.	wispr	COUNTDOWN 7200s	ok=1 COUNTDOWN dur=7200 name="el del parquimetro"	NAME-POLLUTION	scenario noun residue expected
+PARK04	pon el temporizador del parquimetro a dos horas	parakeet	COUNTDOWN 7200s	ok=1 COUNTDOWN dur=7200 name="el del parquimetro"	NAME-POLLUTION	scenario noun residue expected
+PARK05	Hasta las seis que quito el coche del parquimetro.	wispr	CT 06:00	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="que quito el coche del "	NAME-POLLUTION	scenario noun residue expected (clock value itself correct here)
+PARK06	hasta las seis que quito el coche del parquimetro	parakeet	CT 06:00	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="que quito el coche del "	NAME-POLLUTION	scenario noun residue expected (clock value itself correct here)
+PARK07	Una hora y media de parquimetro, que no me pillen la multa.	wispr	COUNTDOWN 5400s	ok=1 COUNTDOWN dur=5400 name="parquimetro que no me p"	NAME-POLLUTION	long carrier sentence, heavy residue expected
+PARK08	una hora y media de parquimetro que no me pillen la multa eh	parakeet	COUNTDOWN 5400s	ok=1 COUNTDOWN dur=5400 name="parquimetro que no me p"	NAME-POLLUTION	long carrier sentence, heavy residue expected
+FILL01	eh pon como diez minutos para la siesta	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="eh la siesta"	NAME-POLLUTION	'eh' filler not in vocab -- name pollution; 'como' correctly dropped as APPROX
+FILL02	esto pon veinte minutos para la paella	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="esto la paella"	NAME-POLLUTION	'esto' filler not in vocab -- name pollution
+FILL03	este pues quince minutos	parakeet	COUNTDOWN 900s	ok=1 COUNTDOWN dur=900 name="este pues"	NAME-POLLUTION	'este'/'pues' fillers not in vocab -- name pollution
+FILL04	pues nada diez minutos	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="pues nada"	NAME-POLLUTION	'pues'/'nada' not in vocab -- name pollution
+FILL05	o sea veinte minutos para el gimnasio	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="o sea el gimnasio"	NAME-POLLUTION	'o sea' not in vocab -- name pollution
+FILL06	eh este pon un temporizador de diez minutos	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="eh este"	NAME-POLLUTION	'eh'/'este' not in vocab -- name pollution
+FILL07	Pon veinte minutos, por favor.	wispr	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="favor"	NAME-POLLUTION	'favor' leak ('por' consumed as filler, 'favor' is not)
+FILL08	Quince minutos, gracias.	wispr	COUNTDOWN 900s	ok=1 COUNTDOWN dur=900 name="gracias"	NAME-POLLUTION	'gracias' leak -- not in vocab
+CORR01	diez minutos no espera quince minutos	parakeet	COUNTDOWN 900s	ok=1 COUNTDOWN dur=600 name="no espera quince"	SILENT-WRONG	self-correction 'no espera' -- first-match-wins keeps the SUPERSEDED value 10 min instead of the corrected 15 min
+CORR02	veinte minutos digo treinta minutos	parakeet	COUNTDOWN 1800s	ok=1 COUNTDOWN dur=1200 name="digo treinta"	SILENT-WRONG	self-correction 'digo' -- keeps superseded 20 min instead of corrected 30 min
+CORR03	pon cinco minutos perdon diez minutos	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=300 name="perdon diez"	SILENT-WRONG	self-correction 'perdon' -- keeps superseded 5 min instead of corrected 10 min
+CORR04	quince minutos mejor veinte minutos	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=900 name="mejor veinte"	SILENT-WRONG	self-correction 'mejor' -- keeps superseded 15 min instead of corrected 20 min
+CORR05	Pon quince minutos.	wispr	COUNTDOWN 900s	ok=1 COUNTDOWN dur=900 name=""	CORRECT	
+CORR06	Pon veinte minutos.	wispr	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name=""	CORRECT	
+CORR07	treinta segundos no treinta segundos no espera un minuto	parakeet	COUNTDOWN 60s	ok=1 COUNTDOWN dur=30 name="no treinta no espera un"	SILENT-WRONG	double self-correction -- keeps superseded 30s instead of corrected 60s
+APPRX01	Unos veinte minutos.	wispr	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name=""	CORRECT	
+APPRX02	unos veinte minutos	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name=""	CORRECT	
+APPRX03	Como diez minutos.	wispr	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name=""	CORRECT	
+APPRX04	como diez minutos	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name=""	CORRECT	
+APPRX05	Unos cinco minutos para la tortilla.	wispr	COUNTDOWN 300s	ok=1 COUNTDOWN dur=300 name="la tortilla"	NAME-POLLUTION	scenario noun residue expected
+APPRX06	unos cinco minutos para la tortilla	parakeet	COUNTDOWN 300s	ok=1 COUNTDOWN dur=300 name="la tortilla"	NAME-POLLUTION	scenario noun residue expected
+APPRX07	Mas o menos veinte minutos.	wispr	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="Mas o menos"	NAME-POLLUTION	multi-word 'mas o menos' -- not filtered by APPROX_DROP_WORDS (a different, single-word shape), so it leaks into the name
+APPRX08	mas o menos veinte minutos	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="mas o menos"	NAME-POLLUTION	multi-word 'mas o menos' -- not filtered by APPROX_DROP_WORDS (a different, single-word shape), so it leaks into the name
+HUND01	Ciento veinte segundos.	wispr	COUNTDOWN 120s [culled-v0.1.13: hundred-composite capability removed for size (1,063B ARM / 10 corpus rows); now REFUSE -- hundred_present guard forces fail-soft]	ok=0 COUNTDOWN dur=0 name="Ciento veinte"	FAIL-SOFT (culled-v0.1.13)	hundred-composite composer removed v0.1.13 for size; hundred_present guard now refuses this shape instead of composing 120s (was CORRECT pre-cull)
+HUND02	ciento veinte segundos	parakeet	COUNTDOWN 120s [culled-v0.1.13: hundred-composite capability removed for size (1,063B ARM / 10 corpus rows); now REFUSE -- hundred_present guard forces fail-soft]	ok=0 COUNTDOWN dur=0 name="ciento veinte"	FAIL-SOFT (culled-v0.1.13)	hundred-composite composer removed v0.1.13 for size; hundred_present guard now refuses this shape instead of composing 120s (was CORRECT pre-cull)
+HUND03	Doscientos segundos.	wispr	COUNTDOWN 200s	ok=0 COUNTDOWN dur=0 name="Doscientos"	GAP	'doscientos' as one compound word is not in any vocab table -- only 'cien/ciento/cientos' combining forms are
+HUND04	dos cientos segundos	parakeet	COUNTDOWN 200s [culled-v0.1.13: hundred-composite capability removed for size (1,063B ARM / 10 corpus rows); now REFUSE -- hundred_present guard forces fail-soft]	ok=0 COUNTDOWN dur=0 name="dos cientos"	FAIL-SOFT (culled-v0.1.13)	unnatural pre-split spacing 'dos cientos' used to hit the composite rule (see HUND03 for the 'doscientos' one-token GAP, unaffected by this cull); hundred-composite composer removed v0.1.13 for size (was CORRECT pre-cull)
+HUND05	Ciento ochenta minutos.	wispr	COUNTDOWN 10800s [culled-v0.1.13: hundred-composite capability removed for size (1,063B ARM / 10 corpus rows); now REFUSE -- hundred_present guard forces fail-soft]	ok=0 COUNTDOWN dur=0 name="Ciento ochenta"	FAIL-SOFT (culled-v0.1.13)	hundred-composite composer removed v0.1.13 for size; hundred_present guard now refuses this shape instead of composing 10800s (was CORRECT pre-cull)
+HUND06	ciento ochenta minutos	parakeet	COUNTDOWN 10800s [culled-v0.1.13: hundred-composite capability removed for size (1,063B ARM / 10 corpus rows); now REFUSE -- hundred_present guard forces fail-soft]	ok=0 COUNTDOWN dur=0 name="ciento ochenta"	FAIL-SOFT (culled-v0.1.13)	hundred-composite composer removed v0.1.13 for size; hundred_present guard now refuses this shape instead of composing 10800s (was CORRECT pre-cull)
+HUND07	Dos horas y media.	wispr	COUNTDOWN 9000s	ok=1 COUNTDOWN dur=9000 name=""	CORRECT	
+HUND08	dos horas y media	parakeet	COUNTDOWN 9000s	ok=1 COUNTDOWN dur=9000 name=""	CORRECT	
+VOS01	Poned el temporizador a diez minutos.	wispr	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="Poned el"	NAME-POLLUTION	vosotros 'poned'/'el' not in vocab -- name pollution
+VOS02	poned el temporizador a diez minutos	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="poned el"	NAME-POLLUTION	vosotros 'poned'/'el' not in vocab -- name pollution
+VOS03	Echad veinte minutos para la paella.	wispr	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="Echad la paella"	NAME-POLLUTION	vosotros 'echad' not in vocab -- name pollution
+VOS04	echad veinte minutos para la paella	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="echad la paella"	NAME-POLLUTION	vosotros 'echad' not in vocab -- name pollution
+VOS05	Quitad la alarma de las seis.	wispr	CT 06:00	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="Quitad la"	NAME-POLLUTION	vosotros 'quitad'/'la' not in vocab -- name pollution; clock value itself correct
+VOS06	quitad la alarma de las seis	parakeet	CT 06:00	ok=1 COUNTDOWN dur=0 clock=06:00(h24=0) name="quitad la"	NAME-POLLUTION	vosotros 'quitad'/'la' not in vocab -- name pollution; clock value itself correct
+VOS07	Activad un temporizador de media hora.	wispr	COUNTDOWN 1800s	ok=1 COUNTDOWN dur=1800 name="Activad"	NAME-POLLUTION	vosotros 'activad' not in vocab -- name pollution
+VOS08	activad un temporizador de media hora	parakeet	COUNTDOWN 1800s	ok=1 COUNTDOWN dur=1800 name="activad"	NAME-POLLUTION	vosotros 'activad' not in vocab -- name pollution
+VENGA01	Venga, diez minutos.	wispr	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="Venga"	NAME-POLLUTION	'venga' not in vocab -- name pollution
+VENGA02	venga diez minutos	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="venga"	NAME-POLLUTION	'venga' not in vocab -- name pollution
+VENGA03	Venga, cinco minutos para el cafe.	wispr	COUNTDOWN 300s	ok=1 COUNTDOWN dur=300 name="Venga el cafe"	NAME-POLLUTION	'venga' not in vocab -- name pollution
+VENGA04	venga cinco minutos para el cafe	parakeet	COUNTDOWN 300s	ok=1 COUNTDOWN dur=300 name="venga el cafe"	NAME-POLLUTION	'venga' not in vocab -- name pollution
+VENGA05	Venga va, veinte minutos.	wispr	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="Venga va"	NAME-POLLUTION	'venga va' not in vocab -- name pollution
+VENGA06	venga va veinte minutos	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="venga va"	NAME-POLLUTION	'venga va' not in vocab -- name pollution
+TRAIL01	Una hora veinte.	wispr	COUNTDOWN 4800s	ok=1 COUNTDOWN dur=4800 name=""	CORRECT	
+TRAIL02	una hora veinte	parakeet	COUNTDOWN 4800s	ok=1 COUNTDOWN dur=4800 name=""	CORRECT	
+TRAIL03	Seis minutos cuarenta y cinco.	wispr	COUNTDOWN 405s	ok=1 COUNTDOWN dur=405 name=""	CORRECT	
+TRAIL04	seis minutos cuarenta y cinco	parakeet	COUNTDOWN 405s	ok=1 COUNTDOWN dur=405 name=""	CORRECT	
+TRAIL05	Hora y veinte para la lavadora.	wispr	COUNTDOWN 4800s	ok=0 COUNTDOWN dur=0 name="veinte la lavadora"	GAP	'hora y veinte' -- same H-y-MM-style joiner gap as CLOCK15/16, here in the N3 trailing-sub-count duration rule (which requires bare adjacency, no 'y')
+TRAIL06	hora y veinte para la lavadora	parakeet	COUNTDOWN 4800s	ok=0 COUNTDOWN dur=0 name="veinte la lavadora"	GAP	'hora y veinte' -- same H-y-MM-style joiner gap as CLOCK15/16, here in the N3 trailing-sub-count duration rule (which requires bare adjacency, no 'y')
+TRAIL07	6 minutos 45.	wispr	COUNTDOWN 405s	ok=1 COUNTDOWN dur=405 name=""	CORRECT	
+TRAIL08	6 minutos 45	parakeet	COUNTDOWN 405s	ok=1 COUNTDOWN dur=405 name=""	CORRECT	
+NAME01	Temporizador para el arroz, veinte minutos.	wispr	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="el arroz"	NAME-POLLUTION	scenario noun residue expected (deliberate name)
+NAME02	temporizador para el arroz veinte minutos	parakeet	COUNTDOWN 1200s	ok=1 COUNTDOWN dur=1200 name="el arroz"	NAME-POLLUTION	scenario noun residue expected (deliberate name)
+NAME03	Pon un temporizador para la tortilla de diez minutos.	wispr	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="la tortilla"	NAME-POLLUTION	scenario noun residue expected (deliberate name)
+NAME04	pon un temporizador para la tortilla de diez minutos	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="la tortilla"	NAME-POLLUTION	scenario noun residue expected (deliberate name)
+MIX01	Pon la alarma a las siete menos cuarto de la manana.	wispr	CT 06:45	ok=1 COUNTDOWN dur=0 clock=07:00(h24=0) name="la menos cuarto la mana"	SILENT-WRONG	menos cuarto gap, stacked with vosotros 'la'/'pon' pollution
+MIX02	pon la alarma a las siete menos cuarto de la manana	parakeet	CT 06:45	ok=1 COUNTDOWN dur=0 clock=07:00(h24=0) name="la menos cuarto la mana"	SILENT-WRONG	menos cuarto gap, stacked with vosotros 'la'/'pon' pollution
+MIX03	Cronometro, venga.	wispr	STOPWATCH 0s	ok=1 STOPWATCH dur=0 name="venga"	NAME-POLLUTION	'venga' pollution
+MIX04	cronometro venga	parakeet	STOPWATCH 0s	ok=1 STOPWATCH dur=0 name="venga"	NAME-POLLUTION	'venga' pollution
+MIX05	Repite cada cuarto de hora.	wispr	REPEAT 900s	ok=1 REPEAT dur=900 name="Repite"	NAME-POLLUTION	conjugated 'repite' pollution (same as REP01/02)
+MIX06	repite cada cuarto de hora	parakeet	REPEAT 900s	ok=1 REPEAT dur=900 name="repite"	NAME-POLLUTION	conjugated 'repite' pollution (same as REP01/02)
+MIX07	Diez minutitos y pico, venga.	wispr	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="pico venga"	NAME-POLLUTION	y pico + venga pollution
+MIX08	diez minutitos y pico venga	parakeet	COUNTDOWN 600s	ok=1 COUNTDOWN dur=600 name="pico venga"	NAME-POLLUTION	y pico + venga pollution
+MIX09	Menos veinte para las nueve, la tortilla.	wispr	CT 08:40	ok=1 COUNTDOWN dur=0 clock=09:00(h24=0) name="Menos veinte la tortill"	SILENT-WRONG	menos veinte gap, stacked with scenario-noun pollution
+MIX10	menos veinte para las nueve la tortilla	parakeet	CT 08:40	ok=1 COUNTDOWN dur=0 clock=09:00(h24=0) name="menos veinte la tortill"	SILENT-WRONG	menos veinte gap, stacked with scenario-noun pollution

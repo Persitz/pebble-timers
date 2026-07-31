@@ -28,6 +28,7 @@
 // racing a live firmware retry loop in an emulator script ever could.
 #include "dictation_am.h"
 
+#include <stdio.h>
 #include <string.h>
 
 #include "fff.h"
@@ -38,6 +39,12 @@
 #include "screen_voice.h"
 #include "testlog_am.h"
 #include "unity.h"
+
+// Only for NL_TABLES_TOTAL, to size/reload the real vocabulary blob this
+// file's linked-in (not faked) lib/parse_nl.c needs -- see
+// test_callback_success_full_scope_when_vocabulary_unavailable_shows_data_unavailable's
+// own comment below.
+#include "../resources/generated/nl_tables.h"
 
 DEFINE_FFF_GLOBALS;
 
@@ -352,6 +359,45 @@ void test_callback_success_full_scope_unparseable_shows_parse_fail(void) {
   TEST_ASSERT_FALSE(parse->ok);
   TEST_ASSERT_EQUAL_INT(VOICE_PARSE_FAIL, screen_voice_show_parse_fake.arg2_val);
   TEST_ASSERT_EQUAL_STRING("parse_fail", testlog_fake.arg1_history[testlog_fake.call_count - 1]);
+}
+
+// dictation_am.c:117-124's VOICE_DATA_UNAVAILABLE branch needs direct
+// automated coverage. This imitates
+// test/parse_nl_test.c:76-96's corrupt->assert->restore pattern: this file
+// links the REAL lib/parse_nl.c (not faked -- see this file's header
+// comment), and a host build starts with its vocabulary already installed
+// (parse_nl.h's own doc comment on parse_nl_vocabulary_available()), so the
+// vocabulary is deliberately cleared with parse_nl_vocabulary_set(NULL, 0)
+// -- the exact condition dictation_am.c's own guard checks -- then restored
+// from the same generated nl_tables.bin every other test in this process
+// still needs available (the FULL-scope success tests above, and any test
+// that runs after this one, exercise the real parser).
+void test_callback_success_full_scope_when_vocabulary_unavailable_shows_data_unavailable(void) {
+  static uint8_t vocab_backup[NL_TABLES_TOTAL];
+  FILE *fp = fopen("../resources/generated/nl_tables.bin", "rb");
+  if (fp == NULL) fp = fopen("resources/generated/nl_tables.bin", "rb");
+  TEST_ASSERT_NOT_NULL_MESSAGE(fp, "could not open generated nl_tables.bin");
+  size_t read_size = fread(vocab_backup, 1, sizeof vocab_backup, fp);
+  TEST_ASSERT_EQUAL_UINT32(NL_TABLES_TOTAL, read_size);
+  fclose(fp);
+
+  TEST_ASSERT_FALSE(parse_nl_vocabulary_set(NULL, 0));
+  TEST_ASSERT_FALSE(parse_nl_vocabulary_available());
+
+  dictation_am_start(DICT_SCOPE_FULL);
+  DictationSessionStatusCallback cb = registered_callback();
+  cb(kSession, DictationSessionStatusSuccess, (char *)"five minutes", NULL);
+
+  TEST_ASSERT_EQUAL_INT(1, screen_voice_show_parse_fake.call_count);
+  TEST_ASSERT_EQUAL_STRING("five minutes", screen_voice_show_parse_fake.arg0_val);
+  TEST_ASSERT_NULL(screen_voice_show_parse_fake.arg1_val);
+  TEST_ASSERT_EQUAL_INT(VOICE_DATA_UNAVAILABLE, screen_voice_show_parse_fake.arg2_val);
+  TEST_ASSERT_EQUAL_STRING("dictation_outcome", testlog_fake.arg0_history[testlog_fake.call_count - 1]);
+  TEST_ASSERT_EQUAL_STRING("data_unavailable", testlog_fake.arg1_history[testlog_fake.call_count - 1]);
+
+  // Restore -- see this test's own header comment.
+  TEST_ASSERT_TRUE(parse_nl_vocabulary_set(vocab_backup, sizeof vocab_backup));
+  TEST_ASSERT_TRUE(parse_nl_vocabulary_available());
 }
 
 // A successful NAME-scope
@@ -695,6 +741,7 @@ int main(void) {
   RUN_TEST(test_callback_success_full_scope_parses_and_shows_confirm_preview);
   RUN_TEST(test_callback_success_full_scope_clock_target_resolves_via_real_clock);
   RUN_TEST(test_callback_success_full_scope_unparseable_shows_parse_fail);
+  RUN_TEST(test_callback_success_full_scope_when_vocabulary_unavailable_shows_data_unavailable);
   RUN_TEST(test_callback_success_name_scope_sets_the_name_via_screen_voice);
   RUN_TEST(test_callback_failed_name_scope_leaves_the_preview_untouched);
   RUN_TEST(test_callback_rejected_name_scope_does_not_navigate_home);

@@ -10,7 +10,6 @@
 #include "hold.h"
 #include "lib/app_state.h"
 #include "lib/format.h"
-#include "lib/sched.h"
 #include "lib/store.h"
 #include "lib/timer.h"
 #include "lib/view.h"
@@ -547,20 +546,20 @@ static void root_layer_update_proc(Layer *layer, GContext *ctx) {
         render_start_end_labels(ctx, bounds, t->started_at, timer_deadline(t), clock_is_24h_style());
       }
       // The noBgAlarm indicator: a muted-grey "won't fire in the
-      // background" mark if this timer is in the scheduler's unschedulable
-      // set. Recomputed on every redraw rather than cached -- MAX_TIMERS=16
-      // keeps sched_plan() cheap enough for a button-driven, low-refresh-rate
-      // UI. A plain filled dot here left blind users unable to tell what it
+      // background" mark if this timer is NOT in the adapter's real,
+      // firmware-accepted armed set (wakeup_adapter_is_armed() -- the most
+      // recent replan's result, including read-back-unconfirmed entries, not
+      // a per-redraw pure-planner guess. The pure planner and the real
+      // adapter can disagree in both directions once the adapter
+      // stopped capping candidates at 8, so this indicator must read the
+      // adapter's own real outcome, not recompute an independent guess). A
+      // plain filled dot here left blind users unable to tell what it
       // meant -- render_no_bg_alarm_indicator's prohibition-sign shape (open
       // circle + slash) is minimally self-explanatory without any new
       // text/naming.
-      if (!t->is_paused) {
-        SchedPlan plan;
-        sched_plan(app_context_store(), now, &plan);
-        if (view_no_bg_alarm(t->cookie, &plan)) {
-          render_no_bg_alarm_indicator(ctx, GPoint(bounds.size.w - 15, value_rect.origin.y + 7), 5,
-                                        RENDER_COLOR_MUTED);
-        }
+      if (!t->is_paused && !wakeup_adapter_is_armed(t->cookie)) {
+        render_no_bg_alarm_indicator(ctx, GPoint(bounds.size.w - 15, value_rect.origin.y + 7), 5,
+                                      RENDER_COLOR_MUTED);
       }
       // The hold-footer: bottom-anchored selected pill + hold-fill bar,
       // replacing the old centered "Hold: X" text + mid-screen bar overlay.

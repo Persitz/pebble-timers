@@ -23,9 +23,6 @@
 #include "testlog_am.h"
 #include "vibes_adapter.h"
 #include "wakeup_adapter.h"
-#ifdef GALLERY_MODE
-#include "gallery.h"
-#endif
 
 // Reuses HOME's own header shape (paper + top-right clock + hairline at
 // y=39, render_header_hairline) rather than ACTIONS'/the alarm-hero's
@@ -66,9 +63,6 @@
 // row 1 ("Say a preset") absorbs whatever viewport remains below this, same
 // "fixed hero + stretch-to-fill sibling" shape HOME's own empty state uses.
 #define LIBRARY_EMPTY_HERO_H 112
-
-#define SCROLL_INDICATOR_WIDTH 3
-#define SCROLL_INDICATOR_MARGIN 3
 
 // Hold-Select-for-options is undiscoverable on a preset row. The approach
 // uses a transient hint (appears briefly, reverts, no permanent layout cost),
@@ -435,10 +429,10 @@ static void window_appear(Window *window) {
 
 #ifndef GALLERY_MODE
   // Real app only -- gated so every existing/new gallery scene's pixels stay
-  // deterministic (a wall-clock AppTimer firing mid-capture would otherwise
-  // make an ARBITRARY prior scene's transition decide whether THIS scene's
-  // screenshot shows "LIBRARY" or the transient hint, see this file's own
-  // constants-block comment). A dedicated gallery scene instead calls
+  // deterministic (a wall-clock AppTimer firing while a scene is on screen
+  // would otherwise make an ARBITRARY prior scene's transition decide
+  // whether THIS scene displays "LIBRARY" or the transient hint, see this
+  // file's own constants-block comment). A dedicated gallery scene instead calls
   // screen_library_debug_force_hint() to show the hint state on demand.
   arm_library_hint();
 #endif
@@ -489,67 +483,45 @@ static void scroll_indicator_update_proc(Layer *layer, GContext *ctx) {
 // Everything is created ONCE here, never re-allocated across navigation
 // (avoids MenuLayer churn, consistent with other list screens).
 Window *screen_library_create(void) {
-  s_window = window_create();
-  window_set_background_color(s_window, RENDER_COLOR_PAPER);
-#ifdef GALLERY_MODE
-  // Screen gallery mode -- never compiled into a release build.
-  window_set_click_config_provider(s_window, gallery_click_config_provider);
-#else
-  window_set_click_config_provider(s_window, click_config_provider);
-#endif
-  window_set_window_handlers(s_window, (WindowHandlers){
-                                            .appear = window_appear,
-                                        });
-
-  Layer *root = window_get_root_layer(s_window);
-  GRect bounds = layer_get_bounds(root);
-
-  s_header = layer_create(GRect(0, 0, bounds.size.w, LIBRARY_HEADER_H));
-  layer_set_update_proc(s_header, header_update_proc);
-  layer_add_child(root, s_header);
-
-  s_menu = menu_layer_create(
-      GRect(0, LIBRARY_HEADER_H, bounds.size.w, bounds.size.h - LIBRARY_HEADER_H));
-  // Disable the SDK's default pad_bottom (an un-disabled pad_bottom lets
-  // the scroll offset over-scroll 20px past the real content bottom, garbling
-  // the top row's numeral at max-scroll) -- mirroring screen_home.c's own fix.
-  menu_layer_pad_bottom_enable(s_menu, false);
-  // An un-called MenuLayer defaults its BEYOND-CONTENT background to white,
-  // not this window's paper -- override it. Kept even though the composed
-  // empty hero fills its own row's full viewport height, since a populated
-  // library scrolled to a short list can still show real BEYOND-CONTENT space
-  // beneath the "Save new" row.
-  menu_layer_set_normal_colors(s_menu, RENDER_COLOR_PAPER, RENDER_COLOR_INK);
-  // The SDK's own highlight default is a full-cell black fill, which would
-  // show as a black band around render_row()'s/render_menu_row()'s own smaller
-  // inset pill -- override it (same fix as every other MenuLayer).
-  menu_layer_set_highlight_colors(s_menu, RENDER_COLOR_PAPER, GColorBlack);
-  menu_layer_set_callbacks(s_menu, NULL,
-                            (MenuLayerCallbacks){
-                                .get_num_rows = get_num_rows,
-                                .get_cell_height = get_cell_height,
-                                .draw_row = draw_row,
-                            });
-  layer_add_child(root, menu_layer_get_layer(s_menu));
-
-  s_scroll_indicator = layer_create(GRect(bounds.size.w - SCROLL_INDICATOR_WIDTH - SCROLL_INDICATOR_MARGIN,
-                                           LIBRARY_HEADER_H, SCROLL_INDICATOR_WIDTH,
-                                           bounds.size.h - LIBRARY_HEADER_H));
-  layer_set_update_proc(s_scroll_indicator, scroll_indicator_update_proc);
-  layer_add_child(root, s_scroll_indicator);
-
+  RenderMenuScreen screen = render_build_menu_screen(&(RenderMenuScreenSpec){
+      .window_bg = RENDER_COLOR_PAPER,
+      .click_config_provider = click_config_provider,
+      .window_handlers = (WindowHandlers){.appear = window_appear},
+      .header_height = LIBRARY_HEADER_H,
+      .header_update_proc = header_update_proc,
+      // Disable the SDK's default pad_bottom (an un-disabled pad_bottom lets
+      // the scroll offset over-scroll 20px past the real content bottom,
+      // garbling the top row's numeral at max-scroll) -- mirroring
+      // screen_home.c's own fix.
+      .pad_bottom_disable = true,
+      // An un-called MenuLayer defaults its BEYOND-CONTENT background to
+      // white, not this window's paper -- override it. Kept even though the
+      // composed empty hero fills its own row's full viewport height, since
+      // a populated library scrolled to a short list can still show real
+      // BEYOND-CONTENT space beneath the "Save new" row.
+      .set_normal_colors = true,
+      .normal_bg = RENDER_COLOR_PAPER,
+      .normal_fg = RENDER_COLOR_INK,
+      .get_num_rows = get_num_rows,
+      .get_cell_height = get_cell_height,
+      .draw_row = draw_row,
+      .with_scroll_indicator = true,
+      .scroll_indicator_update_proc = scroll_indicator_update_proc,
+  });
+  s_window = screen.window;
+  s_header = screen.header;
+  s_menu = screen.menu;
+  s_scroll_indicator = screen.scroll_indicator;
   return s_window;
 }
 
 void screen_library_destroy(void) {
   cancel_library_hint();  // defensive cleanup
-  layer_destroy(s_scroll_indicator);
+  render_destroy_menu_screen(&(RenderMenuScreen){
+      .window = s_window, .header = s_header, .menu = s_menu, .scroll_indicator = s_scroll_indicator});
   s_scroll_indicator = NULL;
-  menu_layer_destroy(s_menu);
   s_menu = NULL;
-  layer_destroy(s_header);
   s_header = NULL;
-  window_destroy(s_window);
   s_window = NULL;
 }
 

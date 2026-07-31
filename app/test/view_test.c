@@ -138,15 +138,9 @@ void test_row_label_named_timer_returns_name_unchanged(void) {
   TEST_ASSERT_EQUAL_STRING("egg", view_row_label("egg"));
 }
 
-// --- no_bg_alarm -----------------------------------------------------------
-
-void test_no_bg_alarm_true_when_unschedulable(void) {
-  SchedPlan plan = {0};
-  plan.unschedulable[0] = 7;
-  plan.unschedulable_count = 1;
-  TEST_ASSERT_TRUE(view_no_bg_alarm(7, &plan));
-  TEST_ASSERT_FALSE(view_no_bg_alarm(8, &plan));
-}
+// view_no_bg_alarm() and its test were removed because recomputing armed
+// state in the view could disagree with firmware. See lib/view.h's comment
+// at that removed declaration's old location for why.
 
 // --- HOME per-count value sizing --------------------------------------------
 // `view_home_scroll_offset` (the hand-rolled windowed-scroll math) has been
@@ -357,7 +351,6 @@ int main(void) {
   RUN_TEST(test_row_label_null_name_is_unlabeled);
   RUN_TEST(test_row_label_empty_name_is_unlabeled);
   RUN_TEST(test_row_label_named_timer_returns_name_unchanged);
-  RUN_TEST(test_no_bg_alarm_true_when_unschedulable);
   RUN_TEST(test_home_value_size_xlarge_for_zero_and_one);
   RUN_TEST(test_home_value_size_large_for_two);
   RUN_TEST(test_home_value_size_medium_for_three_and_four);

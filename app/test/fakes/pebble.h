@@ -59,6 +59,56 @@ void layer_mark_dirty(Layer *layer);
 // hold.c's own now_ms() helper reads the current time through this.
 void time_ms(time_t *tick_time, uint16_t *out_ms);
 
+// -- Persist (persist_adapter.c only) --------------------------------------
+// Matches pebble.h's persist_* family (emery SDK 4.17). status_t is int32_t
+// per the SDK; 0 (S_SUCCESS) on success, negative on failure -- the exact
+// negative value persist_adapter.c never inspects (see
+// test/persist_adapter_test.c's own top comment for why that's the subject
+// under test here, not incidental).
+typedef int32_t status_t;
+
+bool persist_exists(uint32_t key);
+int32_t persist_read_int(uint32_t key);
+status_t persist_write_int(uint32_t key, int32_t value);
+int persist_read_data(uint32_t key, void *buffer, size_t buffer_size);
+int persist_write_data(uint32_t key, const void *data, size_t size);
+status_t persist_delete(uint32_t key);
+
+// -- Logging (wakeup_adapter.c's durable-diagnostic reader only) ----------
+// Matches pebble.h:1630-1652 (SDK 4.17, emery) exactly, including the
+// __FILE_NAME__-based macro -- the production reader for
+// wakeup_adapter.c's durable diagnostic record IS this channel (readable on
+// a real watch via `pebble logs`, no companion phone app needed), so the
+// fake macro must expand the same way the real one does, not just compile.
+void app_log(uint8_t log_level, const char *src_filename, int src_line_number, const char *fmt, ...);
+
+#define APP_LOG(level, fmt, args...) app_log(level, __FILE_NAME__, __LINE__, fmt, ##args)
+
+typedef enum {
+  APP_LOG_LEVEL_ERROR = 1,
+  APP_LOG_LEVEL_WARNING = 50,
+  APP_LOG_LEVEL_INFO = 100,
+  APP_LOG_LEVEL_DEBUG = 200,
+  APP_LOG_LEVEL_DEBUG_VERBOSE = 255,
+} AppLogLevel;
+
+// -- Wakeup (wakeup_adapter.c only) --------------------------------------
+
+typedef int32_t WakeupId;
+
+// StatusCode subset wakeup_adapter.c actually branches on
+// (pebble.h:3087-3139, emery SDK 4.17) -- not the full enum, just the four
+// documented wakeup_schedule() negative results.
+#define E_INTERNAL (-3)
+#define E_INVALID_ARGUMENT (-4)
+#define E_OUT_OF_RESOURCES (-7)
+#define E_RANGE (-8)
+
+void wakeup_cancel_all(void);
+void wakeup_cancel(WakeupId wakeup_id);
+WakeupId wakeup_schedule(time_t timestamp, int32_t cookie, bool notify_if_missed);
+bool wakeup_query(WakeupId wakeup_id, time_t *timestamp);
+
 // -- AppMessage -----------------------------------------------------------------
 
 typedef struct DictionaryIterator DictionaryIterator;

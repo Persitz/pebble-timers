@@ -1,0 +1,203 @@
+utterance	region	engine	expected	actual	class
+pone diez minutos para el mate	AR-BA	wispr	600s; 'pone' voseo imperative leaks into name	"ok=OK kind=COUNTDOWN duration_s=600 name=""pone el mate"""	NAME-POLLUTION
+eh, pone, este, diez minutos para el mate	AR-BA	parakeet	600s; 'pone' voseo imperative leaks into name	"ok=OK kind=COUNTDOWN duration_s=600 name=""eh pone este el mate"""	NAME-POLLUTION
+para, necesito veinte minutos para el asado	AR-BA	wispr	1200s; 'para necesito' leaks (voseo imperative + verb)	"ok=OK kind=COUNTDOWN duration_s=1200 name=""necesito el asado"""	NAME-POLLUTION
+para, eh, necesito veinte minutos, este, para el asado	AR-BA	parakeet	1200s; 'para necesito' leaks (voseo imperative + verb)	"ok=OK kind=COUNTDOWN duration_s=1200 name=""eh necesito este el asa"""	NAME-POLLUTION
+fijate diez minutos de la parrilla	AR-BA	wispr	600s; 'fijate (vos)' leaks	"ok=OK kind=COUNTDOWN duration_s=600 name=""fijate la parrilla"""	NAME-POLLUTION
+fijate vos, eh, diez minutos de la parrilla	AR-BA	parakeet	600s; 'fijate (vos)' leaks	"ok=OK kind=COUNTDOWN duration_s=600 name=""fijate vos eh la parril"""	NAME-POLLUTION
+dale que van quince minutos de truco	AR-BA	wispr	900s; 'dale que van' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""dale que van truco"""	NAME-POLLUTION
+dale que van, eh, quince minutos, este, de truco	AR-BA	parakeet	900s; 'dale que van' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""dale que van eh este tr"""	NAME-POLLUTION
+che, espera diez minutos que llega el bondi	AR-BA	wispr	600s; 'che espera que llega el bondi' leaks (heavy)	"ok=OK kind=COUNTDOWN duration_s=600 name=""che espera que llega el"""	NAME-POLLUTION
+che, espera, eh, diez minutos que llega el bondi	AR-BA	parakeet	600s; 'che espera que llega el bondi' leaks (heavy)	"ok=OK kind=COUNTDOWN duration_s=600 name=""che espera eh que llega"""	NAME-POLLUTION
+ta, ponele quince minutos al asado	UY	wispr	900s; 'ta ponele al' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""ta ponele al asado"""	NAME-POLLUTION
+ta, ponele, eh, quince minutos, este, al asado	UY	parakeet	900s; 'ta ponele al' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""ta ponele eh este al as"""	NAME-POLLUTION
+bo, pone media hora de parrillada	UY	wispr	1800s (media hora fraction); 'bo pone' leaks	"ok=OK kind=COUNTDOWN duration_s=1800 name=""bo pone parrillada"""	NAME-POLLUTION
+bo, pone, eh, media hora, este, de parrillada	UY	parakeet	1800s (media hora fraction); 'bo pone' leaks	"ok=OK kind=COUNTDOWN duration_s=1800 name=""bo pone eh este parrill"""	NAME-POLLUTION
+ta bien, quince minutos de mate	UY	wispr	900s; 'ta bien' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""ta bien mate"""	NAME-POLLUTION
+ta bien, eh, quince minutos, este, de mate	UY	parakeet	900s; 'ta bien' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""ta bien eh este mate"""	NAME-POLLUTION
+posta, necesito cinco minutos para las papas	AR-BA	wispr	300s; 'posta necesito' leaks	"ok=OK kind=COUNTDOWN duration_s=300 name=""posta necesito las papa"""	NAME-POLLUTION
+posta, eh, necesito, este, cinco minutos para las papas	AR-BA	parakeet	300s; 'posta necesito' leaks	"ok=OK kind=COUNTDOWN duration_s=300 name=""posta eh necesito este """	NAME-POLLUTION
+dale, treinta minutos de parrilla y listo	AR-BA	wispr	1800s; 'dale ... y listo' leaks	"ok=OK kind=COUNTDOWN duration_s=1800 name=""dale parrilla listo"""	NAME-POLLUTION
+dale, eh, treinta minutos, este, de parrilla y listo	AR-BA	parakeet	1800s; 'dale ... y listo' leaks	"ok=OK kind=COUNTDOWN duration_s=1800 name=""dale eh este parrilla l"""	NAME-POLLUTION
+de una, veinte minutos de bondi hasta el centro	UY	wispr	1200s; orphan 'una'(=1, from 'de una' idiom) floats unclaimed + 'bondi hasta el centro' residue	"ok=OK kind=COUNTDOWN duration_s=1200 name=""una bondi hasta el cent"""	NAME-POLLUTION
+de una, eh, veinte minutos, este, de bondi hasta el centro	UY	parakeet	1200s; orphan 'una'(=1, from 'de una' idiom) floats unclaimed + 'bondi hasta el centro' residue	"ok=OK kind=COUNTDOWN duration_s=1200 name=""una eh este bondi hasta"""	NAME-POLLUTION
+aguanta diez minutos que estoy en el horno	AR-BA	wispr	600s; 'aguanta que estoy en el horno' leaks	"ok=OK kind=COUNTDOWN duration_s=600 name=""aguanta que estoy en el"""	NAME-POLLUTION
+aguanta, eh, diez minutos, este, que estoy en el horno	AR-BA	parakeet	600s; 'aguanta que estoy en el horno' leaks	"ok=OK kind=COUNTDOWN duration_s=600 name=""aguanta eh este que est"""	NAME-POLLUTION
+espera un toque	AR-BA	wispr	no number/unit at all -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""espera un toque"""	FAIL-SOFT
+espera, eh, un toque, este	AR-BA	parakeet	no number/unit at all -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""espera eh un toque este"""	FAIL-SOFT
+dale, un toque nomas	UY	wispr	no number/unit -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""dale un toque nomas"""	FAIL-SOFT
+dale, eh, un toque, este, nomas	UY	parakeet	no number/unit -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""dale eh un toque este n"""	FAIL-SOFT
+pone un cacho de tiempo para la pasta	AR-BA	wispr	no number/unit ('cacho'/'tiempo' aren't units) -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""pone un cacho tiempo la"""	FAIL-SOFT
+pone, eh, un cacho de tiempo, este, para la pasta	AR-BA	parakeet	no number/unit ('cacho'/'tiempo' aren't units) -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""pone eh un cacho tiempo"""	FAIL-SOFT
+ta, un cachito nomas	UY	wispr	no number/unit -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""ta un cachito nomas"""	FAIL-SOFT
+ta, eh, un cachito, este, nomas	UY	parakeet	no number/unit -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""ta eh un cachito este n"""	FAIL-SOFT
+un toque de mate, nada mas	AR-BA	wispr	no number/unit -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""un toque mate nada mas"""	FAIL-SOFT
+un toque de mate, este, nada mas	AR-BA	parakeet	no number/unit -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""un toque mate este nada"""	FAIL-SOFT
+espera un cachito que ya termino	UY	wispr	no number/unit -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""espera un cachito que y"""	FAIL-SOFT
+espera, eh, un cachito, este, que ya termino	UY	parakeet	no number/unit -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""espera eh un cachito es"""	FAIL-SOFT
+espera un toque, tipo cinco minutos	AR-BA	wispr	300s ('cinco minutos'); heavy residue 'espera un toque tipo'	"ok=OK kind=COUNTDOWN duration_s=300 name=""espera un toque tipo"""	NAME-POLLUTION
+espera, eh, un toque, tipo cinco minutos, este	AR-BA	parakeet	300s ('cinco minutos'); heavy residue 'espera un toque tipo'	"ok=OK kind=COUNTDOWN duration_s=300 name=""espera eh un toque tipo"""	NAME-POLLUTION
+un cacho, unos diez minutos para el asado	AR-BA	wispr	600s ('unos' dropped as approx); residue 'un cacho'	"ok=OK kind=COUNTDOWN duration_s=600 name=""un cacho el asado"""	NAME-POLLUTION
+un cacho, eh, unos diez minutos, este, para el asado	AR-BA	parakeet	600s ('unos' dropped as approx); residue 'un cacho'	"ok=OK kind=COUNTDOWN duration_s=600 name=""un cacho eh este el asa"""	NAME-POLLUTION
+ta, un toque, dame quince minutos	UY	wispr	900s; residue 'ta un toque dame'	"ok=OK kind=COUNTDOWN duration_s=900 name=""ta un toque dame"""	NAME-POLLUTION
+ta, eh, un toque, dame, este, quince minutos	UY	parakeet	900s; residue 'ta un toque dame'	"ok=OK kind=COUNTDOWN duration_s=900 name=""ta eh un toque dame est"""	NAME-POLLUTION
+dale, un cacho mas, cinco minutos y listo	AR-BA	wispr	300s; residue 'dale un cacho mas y listo'	"ok=OK kind=COUNTDOWN duration_s=300 name=""dale un cacho mas listo"""	NAME-POLLUTION
+dale, eh, un cacho mas, este, cinco minutos y listo	AR-BA	parakeet	300s; residue 'dale un cacho mas y listo'	"ok=OK kind=COUNTDOWN duration_s=300 name=""dale eh un cacho mas es"""	NAME-POLLUTION
+che, diez minutos para el mate, posta	AR-BA	wispr	600s; residue 'che posta'	"ok=OK kind=COUNTDOWN duration_s=600 name=""che el mate posta"""	NAME-POLLUTION
+che, eh, diez minutos, este, para el mate, posta	AR-BA	parakeet	600s; residue 'che posta'	"ok=OK kind=COUNTDOWN duration_s=600 name=""che eh este el mate pos"""	NAME-POLLUTION
+pone diez minutos, che	AR-BA	wispr	600s; residue 'pone che'	"ok=OK kind=COUNTDOWN duration_s=600 name=""pone che"""	NAME-POLLUTION
+pone, eh, diez minutos, este, che	AR-BA	parakeet	600s; residue 'pone che'	"ok=OK kind=COUNTDOWN duration_s=600 name=""pone eh este che"""	NAME-POLLUTION
+che vos, che, cinco minutos	AR-BA	wispr	300s; residue 'che vos che' (doubled che)	"ok=OK kind=COUNTDOWN duration_s=300 name=""che vos che"""	NAME-POLLUTION
+che vos, che, eh, cinco minutos, este	AR-BA	parakeet	300s; residue 'che vos che' (doubled che)	"ok=OK kind=COUNTDOWN duration_s=300 name=""che vos che eh este"""	NAME-POLLUTION
+bo, quince minutos para el asado, bo	UY	wispr	900s; residue 'bo bo' (doubled)	"ok=OK kind=COUNTDOWN duration_s=900 name=""bo el asado bo"""	NAME-POLLUTION
+bo, eh, quince minutos, este, para el asado, bo	UY	parakeet	900s; residue 'bo bo' (doubled)	"ok=OK kind=COUNTDOWN duration_s=900 name=""bo eh este el asado bo"""	NAME-POLLUTION
+eh che, mira, diez minutos	AR-BA	wispr	600s; residue 'eh che mira' ('eh' itself unfiltered too)	"ok=OK kind=COUNTDOWN duration_s=600 name=""eh che mira"""	NAME-POLLUTION
+eh che, mira, eh, diez minutos, este	AR-BA	parakeet	600s; residue 'eh che mira' ('eh' itself unfiltered too)	"ok=OK kind=COUNTDOWN duration_s=600 name=""eh che mira eh este"""	NAME-POLLUTION
+quince minutos y monedas para el asado	AR-BA	wispr	900s; 'monedas' leaks into name	"ok=OK kind=COUNTDOWN duration_s=900 name=""monedas el asado"""	NAME-POLLUTION
+quince minutos y monedas, este, para el asado	AR-BA	parakeet	900s; 'monedas' leaks into name	"ok=OK kind=COUNTDOWN duration_s=900 name=""monedas este el asado"""	NAME-POLLUTION
+quince y monedas, nada mas	AR-BA	wispr	no unit stated at all -- bare-numeral gap, same family as 103's 'ponme veinte'	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""quince monedas nada mas"""	GAP
+quince y monedas, este, nada mas	AR-BA	parakeet	no unit stated at all -- bare-numeral gap, same family as 103's 'ponme veinte'	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""quince monedas este nad"""	GAP
+ta, quince minutos y unas monedas de bondi	UY	wispr	900s; 'unas' dropped (approx), 'monedas' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""ta monedas bondi"""	NAME-POLLUTION
+ta, eh, quince minutos y unas monedas, este, de bondi	UY	parakeet	900s; 'unas' dropped (approx), 'monedas' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""ta eh monedas este bond"""	NAME-POLLUTION
+dale, veinte minutos y pico y monedas para el truco	AR-BA	wispr	1200s; double garbage 'pico' + 'monedas' both leak	"ok=OK kind=COUNTDOWN duration_s=1200 name=""dale pico monedas el tr"""	NAME-POLLUTION
+dale, eh, veinte minutos y pico y monedas, este, para el truco	AR-BA	parakeet	1200s; double garbage 'pico' + 'monedas' both leak	"ok=OK kind=COUNTDOWN duration_s=1200 name=""dale eh pico monedas es"""	NAME-POLLUTION
+capaz quince y monedas de mate	AR-BA	wispr	no unit stated -- bare-numeral gap persists even with 'capaz' hedge	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""capaz quince monedas ma"""	GAP
+capaz, eh, quince y monedas, este, de mate	AR-BA	parakeet	no unit stated -- bare-numeral gap persists even with 'capaz' hedge	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""capaz eh quince monedas"""	GAP
+despertame tipo a las seis y media	AR-BA	wispr	clock 6:30 resolves correctly; 'tipo' leaks into name	"ok=OK kind=COUNTDOWN clock=6:30 (hour24_known=0) -> resolves to 18:30 (23400s from noon) name=""despertame tipo"""	NAME-POLLUTION
+despertame, eh, tipo a las seis y media, este	AR-BA	parakeet	clock 6:30 resolves correctly; 'tipo' leaks into name	"ok=OK kind=COUNTDOWN clock=6:30 (hour24_known=0) -> resolves to 18:30 (23400s from noon) name=""despertame eh tipo este"""	NAME-POLLUTION
+tipo seis y media, nos vemos	AR-BA	wispr	no clock prep ('a'/'las' absent) and no unit -- fails entirely; human clearly means ~6:30	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""tipo seis media nos vem"""	GAP
+tipo, eh, seis y media, este, nos vemos	AR-BA	parakeet	no clock prep ('a'/'las' absent) and no unit -- fails entirely; human clearly means ~6:30	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""tipo eh seis media este"""	GAP
+ta, tipo a las siete menos cuarto salimos	UY	wispr	clock resolves 7:00 (should be 6:45) -- 'menos cuarto' silently dropped + leaks into name	"ok=OK kind=COUNTDOWN clock=7:00 (hour24_known=0) -> resolves to 19:00 (25200s from noon) name=""ta tipo menos cuarto sa"""	SILENT-WRONG
+ta, eh, tipo a las siete menos cuarto, este, salimos	UY	parakeet	clock resolves 7:00 (should be 6:45) -- 'menos cuarto' silently dropped + leaks into name	"ok=OK kind=COUNTDOWN clock=7:00 (hour24_known=0) -> resolves to 19:00 (25200s from noon) name=""ta eh tipo menos cuarto"""	SILENT-WRONG
+tipo a las nueve	AR-BA	wispr	clock 9:00 resolves correctly (top of hour, no minute loss); 'tipo' leaks	"ok=OK kind=COUNTDOWN clock=9:00 (hour24_known=0) -> resolves to 21:00 (32400s from noon) name=""tipo"""	NAME-POLLUTION
+tipo, eh, a las nueve, este	AR-BA	parakeet	clock 9:00 resolves correctly (top of hour, no minute loss); 'tipo' leaks	"ok=OK kind=COUNTDOWN clock=9:00 (hour24_known=0) -> resolves to 21:00 (32400s from noon) name=""tipo eh este"""	NAME-POLLUTION
+bo, tipo a la una y cuarto nos juntamos	UY	wispr	clock 1:15 resolves correctly; 'tipo bo nos juntamos' leaks	"ok=OK kind=COUNTDOWN clock=1:15 (hour24_known=0) -> resolves to 13:15 (4500s from noon) name=""bo tipo nos juntamos"""	NAME-POLLUTION
+bo, eh, tipo a la una y cuarto, este, nos juntamos	UY	parakeet	clock 1:15 resolves correctly; 'tipo bo nos juntamos' leaks	"ok=OK kind=COUNTDOWN clock=1:15 (hour24_known=0) -> resolves to 13:15 (4500s from noon) name=""bo eh tipo este nos jun"""	NAME-POLLUTION
+capaz veinte minutos de parrilla	AR-BA	wispr	1200s; 'capaz' leaks (not in APPROX_DROP_WORDS)	"ok=OK kind=COUNTDOWN duration_s=1200 name=""capaz parrilla"""	NAME-POLLUTION
+capaz, eh, veinte minutos, este, de parrilla	AR-BA	parakeet	1200s; 'capaz' leaks (not in APPROX_DROP_WORDS)	"ok=OK kind=COUNTDOWN duration_s=1200 name=""capaz eh este parrilla"""	NAME-POLLUTION
+capaz necesito media hora para el asado	AR-BA	wispr	1800s; 'capaz necesito' leaks	"ok=OK kind=COUNTDOWN duration_s=1800 name=""capaz necesito el asado"""	NAME-POLLUTION
+capaz, eh, necesito, este, media hora para el asado	AR-BA	parakeet	1800s; 'capaz necesito' leaks	"ok=OK kind=COUNTDOWN duration_s=1800 name=""capaz eh necesito este """	NAME-POLLUTION
+de repente quince minutos alcanza	UY	wispr	900s; 'de' silently eaten (FILLER), stranding 'repente' alone in residue alongside 'alcanza'	"ok=OK kind=COUNTDOWN duration_s=900 name=""repente alcanza"""	NAME-POLLUTION
+de repente, eh, quince minutos, este, alcanza	UY	parakeet	900s; 'de' silently eaten (FILLER), stranding 'repente' alone in residue alongside 'alcanza'	"ok=OK kind=COUNTDOWN duration_s=900 name=""repente eh este alcanza"""	NAME-POLLUTION
+capaz que son diez minutos	AR-BA	wispr	600s; 'capaz que son' leaks	"ok=OK kind=COUNTDOWN duration_s=600 name=""capaz que son"""	NAME-POLLUTION
+capaz que son, eh, diez minutos, este	AR-BA	parakeet	600s; 'capaz que son' leaks	"ok=OK kind=COUNTDOWN duration_s=600 name=""capaz que son eh este"""	NAME-POLLUTION
+ta, capaz veinte minutos de bondi	UY	wispr	1200s; 'ta capaz' leaks	"ok=OK kind=COUNTDOWN duration_s=1200 name=""ta capaz bondi"""	NAME-POLLUTION
+ta, eh, capaz, este, veinte minutos de bondi	UY	parakeet	1200s; 'ta capaz' leaks	"ok=OK kind=COUNTDOWN duration_s=1200 name=""ta eh capaz este bondi"""	NAME-POLLUTION
+ta, diez minutos y arrancamos	UY	wispr	600s; 'ta arrancamos' leaks	"ok=OK kind=COUNTDOWN duration_s=600 name=""ta arrancamos"""	NAME-POLLUTION
+ta, eh, diez minutos, este, y arrancamos	UY	parakeet	600s; 'ta arrancamos' leaks	"ok=OK kind=COUNTDOWN duration_s=600 name=""ta eh este arrancamos"""	NAME-POLLUTION
+ta bien, quince minutos alcanza y sobra	UY	wispr	900s; 'ta bien alcanza y sobra' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""ta bien alcanza sobra"""	NAME-POLLUTION
+ta bien, eh, quince minutos, este, alcanza y sobra	UY	parakeet	900s; 'ta bien alcanza y sobra' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""ta bien eh este alcanza"""	NAME-POLLUTION
+ta, pone media hora de asado	UY	wispr	1800s; 'ta pone' leaks	"ok=OK kind=COUNTDOWN duration_s=1800 name=""ta pone asado"""	NAME-POLLUTION
+ta, eh, pone, este, media hora de asado	UY	parakeet	1800s; 'ta pone' leaks	"ok=OK kind=COUNTDOWN duration_s=1800 name=""ta eh pone este asado"""	NAME-POLLUTION
+no ta, mejor veinte minutos	UY	wispr	1200s; 'no ta mejor' leaks	"ok=OK kind=COUNTDOWN duration_s=1200 name=""no ta mejor"""	NAME-POLLUTION
+no ta, mejor, eh, veinte minutos, este	UY	parakeet	1200s; 'no ta mejor' leaks	"ok=OK kind=COUNTDOWN duration_s=1200 name=""no ta mejor eh este"""	NAME-POLLUTION
+ta ta, diez minutos nomas	UY	wispr	600s; 'ta ta nomas' leaks (doubled ta, characteristic UY speech)	"ok=OK kind=COUNTDOWN duration_s=600 name=""ta ta nomas"""	NAME-POLLUTION
+ta ta, eh, diez minutos, este, nomas	UY	parakeet	600s; 'ta ta nomas' leaks (doubled ta, characteristic UY speech)	"ok=OK kind=COUNTDOWN duration_s=600 name=""ta ta eh este nomas"""	NAME-POLLUTION
+dale ta, cinco minutos	UY	wispr	300s; 'dale ta' leaks	"ok=OK kind=COUNTDOWN duration_s=300 name=""dale ta"""	NAME-POLLUTION
+dale ta, eh, cinco minutos, este	UY	parakeet	300s; 'dale ta' leaks	"ok=OK kind=COUNTDOWN duration_s=300 name=""dale ta eh este"""	NAME-POLLUTION
+despertame che, hasta las seis menos cuarto que tengo que agarrar el bondi	AR-BA	wispr	clock resolves 6:00, should be 5:45 -- SILENT-WRONG; 'che menos cuarto que tengo que agarrar el bondi' all leak	"ok=OK kind=COUNTDOWN clock=6:00 (hour24_known=0) -> resolves to 18:00 (21600s from noon) name=""despertame che menos cu"""	SILENT-WRONG
+despertame, che, eh, hasta las seis menos cuarto, este, que tengo que agarrar el bondi	AR-BA	parakeet	clock resolves 6:00, should be 5:45 -- SILENT-WRONG; 'che menos cuarto que tengo que agarrar el bondi' all leak	"ok=OK kind=COUNTDOWN clock=6:00 (hour24_known=0) -> resolves to 18:00 (21600s from noon) name=""despertame che eh menos"""	SILENT-WRONG
+ta, hasta las siete menos cuarto tengo tiempo	UY	wispr	clock resolves 7:00, should be 6:45 -- SILENT-WRONG; 'ta menos cuarto tengo tiempo' leak	"ok=OK kind=COUNTDOWN clock=7:00 (hour24_known=0) -> resolves to 19:00 (25200s from noon) name=""ta menos cuarto tengo t"""	SILENT-WRONG
+ta, eh, hasta las siete menos cuarto, este, tengo tiempo	UY	parakeet	clock resolves 7:00, should be 6:45 -- SILENT-WRONG; 'ta menos cuarto tengo tiempo' leak	"ok=OK kind=COUNTDOWN clock=7:00 (hour24_known=0) -> resolves to 19:00 (25200s from noon) name=""ta eh menos cuarto este"""	SILENT-WRONG
+la alarma hasta las nueve menos veinte	AR-BA	wispr	clock resolves 9:00, should be 8:40 -- SILENT-WRONG; 'la veinte' leaks	"ok=OK kind=COUNTDOWN clock=9:00 (hour24_known=0) -> resolves to 21:00 (32400s from noon) name=""la menos veinte"""	SILENT-WRONG
+la alarma, eh, hasta las nueve menos veinte, este	AR-BA	parakeet	clock resolves 9:00, should be 8:40 -- SILENT-WRONG; 'la veinte' leaks	"ok=OK kind=COUNTDOWN clock=9:00 (hour24_known=0) -> resolves to 21:00 (32400s from noon) name=""la eh menos veinte este"""	SILENT-WRONG
+che, espera hasta las ocho menos diez	UY	wispr	clock resolves 8:00, should be 7:50 -- SILENT-WRONG; 'che espera diez' leaks	"ok=OK kind=COUNTDOWN clock=8:00 (hour24_known=0) -> resolves to 20:00 (28800s from noon) name=""che espera menos diez"""	SILENT-WRONG
+che, espera, eh, hasta las ocho menos diez, este	UY	parakeet	clock resolves 8:00, should be 7:50 -- SILENT-WRONG; 'che espera diez' leaks	"ok=OK kind=COUNTDOWN clock=8:00 (hour24_known=0) -> resolves to 20:00 (28800s from noon) name=""che espera eh menos die"""	SILENT-WRONG
+salimos hasta las cinco menos veinticinco	AR-BA	wispr	clock resolves 5:00, should be 4:35 -- SILENT-WRONG; 'salimos veinticinco' leaks	"ok=OK kind=COUNTDOWN clock=5:00 (hour24_known=0) -> resolves to 17:00 (18000s from noon) name=""salimos menos veinticin"""	SILENT-WRONG
+salimos, eh, hasta las cinco menos veinticinco, este	AR-BA	parakeet	clock resolves 5:00, should be 4:35 -- SILENT-WRONG; 'salimos veinticinco' leaks	"ok=OK kind=COUNTDOWN clock=5:00 (hour24_known=0) -> resolves to 17:00 (18000s from noon) name=""salimos eh menos veinti"""	SILENT-WRONG
+el bondi pasa hasta las diez menos cuarto	UY	wispr	clock resolves 10:00, should be 9:45 -- SILENT-WRONG; 'el bondi pasa menos cuarto' leaks	"ok=OK kind=COUNTDOWN clock=10:00 (hour24_known=0) -> resolves to 22:00 (36000s from noon) name=""el bondi pasa menos cua"""	SILENT-WRONG
+el bondi pasa, eh, hasta las diez menos cuarto, este	UY	parakeet	clock resolves 10:00, should be 9:45 -- SILENT-WRONG; 'el bondi pasa menos cuarto' leaks	"ok=OK kind=COUNTDOWN clock=10:00 (hour24_known=0) -> resolves to 22:00 (36000s from noon) name=""el bondi pasa eh menos """	SILENT-WRONG
+vamos a la cancha hasta las cuatro menos veinte	AR-BA	wispr	clock resolves 4:00, should be 3:40 -- SILENT-WRONG; 'vamos cancha veinte' leaks	"ok=OK kind=COUNTDOWN clock=4:00 (hour24_known=0) -> resolves to 16:00 (14400s from noon) name=""vamos la cancha menos v"""	SILENT-WRONG
+vamos a la cancha, eh, hasta las cuatro menos veinte, este	AR-BA	parakeet	clock resolves 4:00, should be 3:40 -- SILENT-WRONG; 'vamos cancha veinte' leaks	"ok=OK kind=COUNTDOWN clock=4:00 (hour24_known=0) -> resolves to 16:00 (14400s from noon) name=""vamos la cancha eh meno"""	SILENT-WRONG
+dale, hasta las dos menos diez terminamos el truco	UY	wispr	clock resolves 2:00, should be 1:50 -- SILENT-WRONG; 'dale diez terminamos el truco' leaks	"ok=OK kind=COUNTDOWN clock=2:00 (hour24_known=0) -> resolves to 14:00 (7200s from noon) name=""dale menos diez termina"""	SILENT-WRONG
+dale, eh, hasta las dos menos diez, este, terminamos el truco	UY	parakeet	clock resolves 2:00, should be 1:50 -- SILENT-WRONG; 'dale diez terminamos el truco' leaks	"ok=OK kind=COUNTDOWN clock=2:00 (hour24_known=0) -> resolves to 14:00 (7200s from noon) name=""dale eh menos diez este"""	SILENT-WRONG
+despertame a las seis y algo	AR-BA	wispr	clock resolves 6:00 with false precision (should be 'sometime after six') -- SILENT-WRONG; 'algo' leaks	"ok=OK kind=COUNTDOWN clock=6:00 (hour24_known=0) -> resolves to 18:00 (21600s from noon) name=""despertame algo"""	SILENT-WRONG
+despertame, eh, a las seis y algo, este	AR-BA	parakeet	clock resolves 6:00 with false precision (should be 'sometime after six') -- SILENT-WRONG; 'algo' leaks	"ok=OK kind=COUNTDOWN clock=6:00 (hour24_known=0) -> resolves to 18:00 (21600s from noon) name=""despertame eh algo este"""	SILENT-WRONG
+ta, la alarma a las siete y algo asi	UY	wispr	clock resolves 7:00 -- SILENT-WRONG; 'ta algo asi' leaks	"ok=OK kind=COUNTDOWN clock=7:00 (hour24_known=0) -> resolves to 19:00 (25200s from noon) name=""ta la algo asi"""	SILENT-WRONG
+ta, eh, la alarma a las siete y algo asi, este	UY	parakeet	clock resolves 7:00 -- SILENT-WRONG; 'ta algo asi' leaks	"ok=OK kind=COUNTDOWN clock=7:00 (hour24_known=0) -> resolves to 19:00 (25200s from noon) name=""ta eh la algo asi este"""	SILENT-WRONG
+nos vemos a las ocho y pico	AR-BA	wispr	clock resolves 8:00 (false precision) -- SILENT-WRONG; 'pico' leaks. NEW vs 103 (pico there only broke duration parses, never a clock target)	"ok=OK kind=COUNTDOWN clock=8:00 (hour24_known=0) -> resolves to 20:00 (28800s from noon) name=""nos vemos pico"""	SILENT-WRONG
+nos vemos, eh, a las ocho y pico, este	AR-BA	parakeet	clock resolves 8:00 (false precision) -- SILENT-WRONG; 'pico' leaks. NEW vs 103 (pico there only broke duration parses, never a clock target)	"ok=OK kind=COUNTDOWN clock=8:00 (hour24_known=0) -> resolves to 20:00 (28800s from noon) name=""nos vemos eh pico este"""	SILENT-WRONG
+la alarma a las diez y pico, posta	AR-BA	wispr	clock resolves 10:00 -- SILENT-WRONG; 'pico posta' leak	"ok=OK kind=COUNTDOWN clock=10:00 (hour24_known=0) -> resolves to 22:00 (36000s from noon) name=""la pico posta"""	SILENT-WRONG
+la alarma, eh, a las diez y pico, este, posta	AR-BA	parakeet	clock resolves 10:00 -- SILENT-WRONG; 'pico posta' leak	"ok=OK kind=COUNTDOWN clock=10:00 (hour24_known=0) -> resolves to 22:00 (36000s from noon) name=""la eh pico este posta"""	SILENT-WRONG
+bo, a las nueve y algo salimos	UY	wispr	clock resolves 9:00 -- SILENT-WRONG; 'bo algo salimos' leak	"ok=OK kind=COUNTDOWN clock=9:00 (hour24_known=0) -> resolves to 21:00 (32400s from noon) name=""bo algo salimos"""	SILENT-WRONG
+bo, eh, a las nueve y algo, este, salimos	UY	parakeet	clock resolves 9:00 -- SILENT-WRONG; 'bo algo salimos' leak	"ok=OK kind=COUNTDOWN clock=9:00 (hour24_known=0) -> resolves to 21:00 (32400s from noon) name=""bo eh algo este salimos"""	SILENT-WRONG
+pone diez minutos, digo, quince	AR-BA	wispr	600s shown, 900s (quince) intended -- SILENT-WRONG, first number wins, 'digo' self-correction never resolves	"ok=OK kind=COUNTDOWN duration_s=600 name=""pone digo quince"""	SILENT-WRONG
+pone, eh, diez minutos, digo, este, quince	AR-BA	parakeet	600s shown, 900s (quince) intended -- SILENT-WRONG, first number wins, 'digo' self-correction never resolves	"ok=OK kind=COUNTDOWN duration_s=600 name=""pone eh digo este quinc"""	SILENT-WRONG
+pone quince minutos, no, mejor veinte	AR-BA	wispr	900s shown, 1200s intended -- SILENT-WRONG	"ok=OK kind=COUNTDOWN duration_s=900 name=""pone no mejor veinte"""	SILENT-WRONG
+pone, eh, quince minutos, no, mejor, este, veinte	AR-BA	parakeet	900s shown, 1200s intended -- SILENT-WRONG	"ok=OK kind=COUNTDOWN duration_s=900 name=""pone eh no mejor este v"""	SILENT-WRONG
+ta, diez minutos, no, capaz quince	UY	wispr	600s shown, 900s intended -- SILENT-WRONG; 'ta no capaz' also leaks	"ok=OK kind=COUNTDOWN duration_s=600 name=""ta no capaz quince"""	SILENT-WRONG
+ta, eh, diez minutos, no, capaz, este, quince	UY	parakeet	600s shown, 900s intended -- SILENT-WRONG; 'ta no capaz' also leaks	"ok=OK kind=COUNTDOWN duration_s=600 name=""ta eh no capaz este qui"""	SILENT-WRONG
+cinco minutos, digo mejor diez, para el mate	AR-BA	wispr	300s shown, 600s intended -- SILENT-WRONG	"ok=OK kind=COUNTDOWN duration_s=300 name=""digo mejor diez el mate"""	SILENT-WRONG
+cinco minutos, digo, mejor, este, diez, para el mate	AR-BA	parakeet	300s shown, 600s intended -- SILENT-WRONG	"ok=OK kind=COUNTDOWN duration_s=300 name=""digo mejor este diez el"""	SILENT-WRONG
+veinte minutos de asado, digo, treinta	AR-BA	wispr	1200s shown, 1800s intended -- SILENT-WRONG	"ok=OK kind=COUNTDOWN duration_s=1200 name=""asado digo treinta"""	SILENT-WRONG
+veinte minutos de asado, digo, este, treinta	AR-BA	parakeet	1200s shown, 1800s intended -- SILENT-WRONG	"ok=OK kind=COUNTDOWN duration_s=1200 name=""asado digo este treinta"""	SILENT-WRONG
+un cuarto de hora largo para el mate	AR-BA	wispr	900s (un cuarto de hora) correct; 'largo' intensifier leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""largo el mate"""	NAME-POLLUTION
+un cuarto de hora largo, este, para el mate	AR-BA	parakeet	900s (un cuarto de hora) correct; 'largo' intensifier leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""largo este el mate"""	NAME-POLLUTION
+ta, una hora larga de bondi	UY	wispr	3600s correct; 'ta larga' leaks	"ok=OK kind=COUNTDOWN duration_s=3600 name=""ta larga bondi"""	NAME-POLLUTION
+ta, eh, una hora larga, este, de bondi	UY	parakeet	3600s correct; 'ta larga' leaks	"ok=OK kind=COUNTDOWN duration_s=3600 name=""ta eh larga este bondi"""	NAME-POLLUTION
+media hora pico de cola en la parrilla	AR-BA	wispr	1800s correct; residue 'pico de cola en la parrilla' is reasonable descriptive name, not a bug	"ok=OK kind=COUNTDOWN duration_s=1800 name=""pico cola en la parrill"""	CORRECT
+media hora pico de cola, este, en la parrilla	AR-BA	parakeet	1800s correct; residue 'pico de cola en la parrilla' is reasonable descriptive name, not a bug	"ok=OK kind=COUNTDOWN duration_s=1800 name=""pico cola este en la pa"""	CORRECT
+tres cuartos de hora largos para el asado	AR-BA	wispr	2700s correct; 'largos' leaks	"ok=OK kind=COUNTDOWN duration_s=2700 name=""largos el asado"""	NAME-POLLUTION
+tres cuartos de hora largos, este, para el asado	AR-BA	parakeet	2700s correct; 'largos' leaks	"ok=OK kind=COUNTDOWN duration_s=2700 name=""largos este el asado"""	NAME-POLLUTION
+ta, hora y media larga de fogon	UY	wispr	5400s correct; 'ta larga' leaks	"ok=OK kind=COUNTDOWN duration_s=5400 name=""ta larga fogon"""	NAME-POLLUTION
+ta, eh, hora y media larga, este, de fogon	UY	parakeet	5400s correct; 'ta larga' leaks	"ok=OK kind=COUNTDOWN duration_s=5400 name=""ta eh larga este fogon"""	NAME-POLLUTION
+una banda de minutos para el asado, tipo cuarenta	AR-BA	wispr	human means 40min/2400s -- FAILS ENTIRELY: 'banda' breaks the number-unit pairing so the trailing bare 'cuarenta' has no unit of its own	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""una banda el asado tipo"""	GAP
+una banda de minutos, este, para el asado, tipo cuarenta	AR-BA	parakeet	human means 40min/2400s -- FAILS ENTIRELY: 'banda' breaks the number-unit pairing so the trailing bare 'cuarenta' has no unit of its own	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""una banda este el asado"""	GAP
+posta, quince minutos de mate y ya	AR-BA	wispr	900s; 'posta ya' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""posta mate ya"""	NAME-POLLUTION
+posta, eh, quince minutos, este, de mate y ya	AR-BA	parakeet	900s; 'posta ya' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""posta eh este mate ya"""	NAME-POLLUTION
+de una, diez minutos de bondi y ta	UY	wispr	600s; orphan 'una' + 'ta' leak	"ok=OK kind=COUNTDOWN duration_s=600 name=""una bondi ta"""	NAME-POLLUTION
+de una, eh, diez minutos, este, de bondi y ta	UY	parakeet	600s; orphan 'una' + 'ta' leak	"ok=OK kind=COUNTDOWN duration_s=600 name=""una eh este bondi ta"""	NAME-POLLUTION
+en banda, treinta minutos de asado	AR-BA	wispr	1800s; 'en banda' leaks ('en' deliberately not filler in ES)	"ok=OK kind=COUNTDOWN duration_s=1800 name=""en banda asado"""	NAME-POLLUTION
+en banda, eh, treinta minutos, este, de asado	AR-BA	parakeet	1800s; 'en banda' leaks ('en' deliberately not filler in ES)	"ok=OK kind=COUNTDOWN duration_s=1800 name=""en banda eh este asado"""	NAME-POLLUTION
+pucha, quince minutos nomas para el truco	AR-BA	wispr	900s; 'pucha nomas' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""pucha nomas el truco"""	NAME-POLLUTION
+pucha, eh, quince minutos, este, nomas para el truco	AR-BA	parakeet	900s; 'pucha nomas' leaks	"ok=OK kind=COUNTDOWN duration_s=900 name=""pucha eh este nomas el """	NAME-POLLUTION
+anda, veinte minutos de asado	UY	wispr	1200s; 'anda' leaks	"ok=OK kind=COUNTDOWN duration_s=1200 name=""anda asado"""	NAME-POLLUTION
+anda, eh, veinte minutos, este, de asado	UY	parakeet	1200s; 'anda' leaks	"ok=OK kind=COUNTDOWN duration_s=1200 name=""anda eh este asado"""	NAME-POLLUTION
+dale que son cinco minutos nomas	AR-BA	wispr	300s; 'dale que son nomas' leaks	"ok=OK kind=COUNTDOWN duration_s=300 name=""dale que son nomas"""	NAME-POLLUTION
+dale que son, eh, cinco minutos, este, nomas	AR-BA	parakeet	300s; 'dale que son nomas' leaks	"ok=OK kind=COUNTDOWN duration_s=300 name=""dale que son eh este no"""	NAME-POLLUTION
+dale que ta, diez minutos	UY	wispr	600s; 'dale que ta' leaks	"ok=OK kind=COUNTDOWN duration_s=600 name=""dale que ta"""	NAME-POLLUTION
+dale que ta, eh, diez minutos, este	UY	parakeet	600s; 'dale que ta' leaks	"ok=OK kind=COUNTDOWN duration_s=600 name=""dale que ta eh este"""	NAME-POLLUTION
+dale, arranca el cronometro	AR-BA	wispr	kind=STOPWATCH correctly detected; minor residue ('dale arranca el'), no duration expected	"ok=OK kind=STOPWATCH duration_s=0 name=""dale arranca el"""	CORRECT
+dale, eh, arranca, este, el cronometro	AR-BA	parakeet	kind=STOPWATCH correctly detected; minor residue ('dale arranca el'), no duration expected	"ok=OK kind=STOPWATCH duration_s=0 name=""dale eh arranca este el"""	CORRECT
+dale, date una vuelta con el cronometro	AR-BA	wispr	kind=STOPWATCH correctly detected; minor residue	"ok=OK kind=STOPWATCH duration_s=0 name=""dale date vuelta con el"""	CORRECT
+dale, eh, date una vuelta, este, con el cronometro	AR-BA	parakeet	kind=STOPWATCH correctly detected; minor residue	"ok=OK kind=STOPWATCH duration_s=0 name=""dale eh date vuelta est"""	CORRECT
+dale que, ponele un cronometro	UY	wispr	kind=STOPWATCH correctly detected ('un' swept as kind-article); residue 'dale que ponele'	"ok=OK kind=STOPWATCH duration_s=0 name=""dale que ponele"""	CORRECT
+dale que, eh, ponele, este, un cronometro	UY	parakeet	kind=STOPWATCH correctly detected ('un' swept as kind-article); residue 'dale que ponele'	"ok=OK kind=STOPWATCH duration_s=0 name=""dale que eh ponele este"""	CORRECT
+diez minutos de truco	AR-BA	wispr	600s clean control	"ok=OK kind=COUNTDOWN duration_s=600 name=""truco"""	CORRECT
+diez minutos, este, de truco	AR-BA	parakeet	600s clean control	"ok=OK kind=COUNTDOWN duration_s=600 name=""este truco"""	CORRECT
+media hora de parrillada	AR-BA	wispr	1800s clean control	"ok=OK kind=COUNTDOWN duration_s=1800 name=""parrillada"""	CORRECT
+media hora, este, de parrillada	AR-BA	parakeet	1800s clean control	"ok=OK kind=COUNTDOWN duration_s=1800 name=""este parrillada"""	CORRECT
+veinte minutos para el asado	UY	wispr	1200s clean control	"ok=OK kind=COUNTDOWN duration_s=1200 name=""el asado"""	CORRECT
+veinte minutos, este, para el asado	UY	parakeet	1200s clean control	"ok=OK kind=COUNTDOWN duration_s=1200 name=""este el asado"""	CORRECT
+cuarenta minutos de asado a la parrilla	AR-BA	wispr	2400s clean control	"ok=OK kind=COUNTDOWN duration_s=2400 name=""asado la parrilla"""	CORRECT
+cuarenta minutos, este, de asado a la parrilla	AR-BA	parakeet	2400s clean control	"ok=OK kind=COUNTDOWN duration_s=2400 name=""este asado la parrilla"""	CORRECT
+quince minutos de bondi hasta el trabajo	UY	wispr	900s clean control	"ok=OK kind=COUNTDOWN duration_s=900 name=""bondi hasta el trabajo"""	CORRECT
+quince minutos, este, de bondi hasta el trabajo	UY	parakeet	900s clean control	"ok=OK kind=COUNTDOWN duration_s=900 name=""este bondi hasta el tra"""	CORRECT
+una hora de siesta despues del asado	AR-BA	wispr	3600s clean control	"ok=OK kind=COUNTDOWN duration_s=3600 name=""siesta despues del asad"""	CORRECT
+una hora, este, de siesta despues del asado	AR-BA	parakeet	3600s clean control	"ok=OK kind=COUNTDOWN duration_s=3600 name=""este siesta despues del"""	CORRECT
+repetilo cada diez minutos	AR-BA	wispr	REPEAT 600s correct kind+duration; 'repetilo' leaks	"ok=OK kind=REPEAT duration_s=600 name=""repetilo"""	NAME-POLLUTION
+repetilo, eh, cada diez minutos, este	AR-BA	parakeet	REPEAT 600s correct kind+duration; 'repetilo' leaks	"ok=OK kind=REPEAT duration_s=600 name=""repetilo eh este"""	NAME-POLLUTION
+ta, avisame cada quince minutos	UY	wispr	REPEAT 900s correct; 'ta avisame' leaks	"ok=OK kind=REPEAT duration_s=900 name=""ta avisame"""	NAME-POLLUTION
+ta, eh, avisame, este, cada quince minutos	UY	parakeet	REPEAT 900s correct; 'ta avisame' leaks	"ok=OK kind=REPEAT duration_s=900 name=""ta eh avisame este"""	NAME-POLLUTION
+date una vuelta de cronometro, dale	AR-BA	wispr	kind=STOPWATCH correctly detected; minor residue	"ok=OK kind=STOPWATCH duration_s=0 name=""date vuelta dale"""	CORRECT
+date una vuelta, eh, de cronometro, este, dale	AR-BA	parakeet	kind=STOPWATCH correctly detected; minor residue	"ok=OK kind=STOPWATCH duration_s=0 name=""date vuelta eh este dal"""	CORRECT
+pone un timer que se repita cada media hora	AR-BA	wispr	REPEAT 1800s correct ('un' swept before kind word 'timer'); 'pone que se repita' leaks	"ok=OK kind=REPEAT duration_s=1800 name=""pone que se repita"""	NAME-POLLUTION
+pone, eh, un timer que se repita, este, cada media hora	AR-BA	parakeet	REPEAT 1800s correct ('un' swept before kind word 'timer'); 'pone que se repita' leaks	"ok=OK kind=REPEAT duration_s=1800 name=""pone eh que se repita e"""	NAME-POLLUTION
+cronometrame esto	UY	wispr	human clearly wants a STOPWATCH -- FAILS: 'cronometrame' (verb form) isn't in KIND_STOPWATCH_WORDS, only the noun 'cronometro' is	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""cronometrame esto"""	GAP
+cronometrame, eh, esto, este	UY	parakeet	human clearly wants a STOPWATCH -- FAILS: 'cronometrame' (verb form) isn't in KIND_STOPWATCH_WORDS, only the noun 'cronometro' is	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""cronometrame eh esto es"""	GAP
+despertame a las siete de la manana	AR-BA	wispr	clock 7:00 AM correct	"ok=OK kind=COUNTDOWN clock=7:00 (hour24_known=1) -> resolves to 07:00 (68400s from noon) name=""despertame"""	NAME-POLLUTION
+despertame, eh, a las siete de la manana, este	AR-BA	parakeet	clock 7:00 AM correct	"ok=OK kind=COUNTDOWN clock=7:00 (hour24_known=1) -> resolves to 07:00 (68400s from noon) name=""despertame eh este"""	NAME-POLLUTION
+alarma a la una y cuarto de la tarde	UY	wispr	clock 1:15 PM correct	"ok=OK kind=COUNTDOWN clock=13:15 (hour24_known=1) -> resolves to 13:15 (4500s from noon) name="""""	CORRECT
+alarma, eh, a la una y cuarto de la tarde, este	UY	parakeet	clock 1:15 PM correct	"ok=OK kind=COUNTDOWN clock=13:15 (hour24_known=1) -> resolves to 13:15 (4500s from noon) name=""eh este"""	CORRECT
+levantame a las seis y media	AR-BA	wispr	clock 6:30 correct; 'levantame' leaks	"ok=OK kind=COUNTDOWN clock=6:30 (hour24_known=0) -> resolves to 18:30 (23400s from noon) name=""levantame"""	NAME-POLLUTION
+levantame, eh, a las seis y media, este	AR-BA	parakeet	clock 6:30 correct; 'levantame' leaks	"ok=OK kind=COUNTDOWN clock=6:30 (hour24_known=0) -> resolves to 18:30 (23400s from noon) name=""levantame eh este"""	NAME-POLLUTION
+pone la alarma a las ocho en punto	AR-BA	wispr	clock 8:00 correct (value unaffected -- 'en punto' just isn't recognized, but adds nothing to lose); 'pone la en punto' leaks	"ok=OK kind=COUNTDOWN clock=8:00 (hour24_known=0) -> resolves to 20:00 (28800s from noon) name=""pone la en punto"""	NAME-POLLUTION
+pone, eh, la alarma a las ocho en punto, este	AR-BA	parakeet	clock 8:00 correct (value unaffected -- 'en punto' just isn't recognized, but adds nothing to lose); 'pone la en punto' leaks	"ok=OK kind=COUNTDOWN clock=8:00 (hour24_known=0) -> resolves to 20:00 (28800s from noon) name=""pone eh la en punto est"""	NAME-POLLUTION
+alarma a las diecinueve treinta	UY	wispr	clock 19:30 correct control (explicit 24h word-form minute)	"ok=OK kind=COUNTDOWN clock=19:30 (hour24_known=1) -> resolves to 19:30 (27000s from noon) name="""""	CORRECT
+alarma, eh, a las diecinueve treinta, este	UY	parakeet	clock 19:30 correct control (explicit 24h word-form minute)	"ok=OK kind=COUNTDOWN clock=19:30 (hour24_known=1) -> resolves to 19:30 (27000s from noon) name=""eh este"""	CORRECT
+no me despiertes hasta recien las nueve	AR-BA	wispr	clock 9:00 correct (recien doesn't block the 'las N' match); 'no me despiertes hasta recien' leaks	"ok=OK kind=COUNTDOWN clock=9:00 (hour24_known=0) -> resolves to 21:00 (32400s from noon) name=""no me despiertes hasta """	NAME-POLLUTION
+no me despiertes, eh, hasta recien las nueve, este	AR-BA	parakeet	clock 9:00 correct (recien doesn't block the 'las N' match); 'no me despiertes hasta recien' leaks	"ok=OK kind=COUNTDOWN clock=9:00 (hour24_known=0) -> resolves to 21:00 (32400s from noon) name=""no me despiertes eh has"""	NAME-POLLUTION
+ta, recien a las diez me levanto	UY	wispr	clock 10:00 correct; 'ta recien me levanto' leaks	"ok=OK kind=COUNTDOWN clock=10:00 (hour24_known=0) -> resolves to 22:00 (36000s from noon) name=""ta recien me levanto"""	NAME-POLLUTION
+ta, eh, recien a las diez, este, me levanto	UY	parakeet	clock 10:00 correct; 'ta recien me levanto' leaks	"ok=OK kind=COUNTDOWN clock=10:00 (hour24_known=0) -> resolves to 22:00 (36000s from noon) name=""ta eh recien este me le"""	NAME-POLLUTION
+ya, en cinco minutos estoy	AR-BA	wispr	300s correct; 'ya en estoy' leaks (ES 'en' deliberately not a filler, unlike EN 'in')	"ok=OK kind=COUNTDOWN duration_s=300 name=""ya en estoy"""	NAME-POLLUTION
+ya, eh, en cinco minutos, este, estoy	AR-BA	parakeet	300s correct; 'ya en estoy' leaks (ES 'en' deliberately not a filler, unlike EN 'in')	"ok=OK kind=COUNTDOWN duration_s=300 name=""ya eh en este estoy"""	NAME-POLLUTION

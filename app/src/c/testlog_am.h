@@ -8,7 +8,7 @@
 // channel; the pure line formatter + retry queue live in src/c/lib/testlog.{c,h}.
 // Under EMU_TEST_HOOKS (a PEBBLE_EMU_TEST_HOOKS=1 build only -- see wscript's
 // build()), this same file also owns the ONE inbound key this app ever reads
-// (10001/10002, sent via a harness action script's generic `send_appmessage`
+// (10001/10002/10003, sent via a harness action script's generic `send_appmessage`
 // action), routing it to dictation_am.c's dictation_am_inject(). Release builds
 // register no inbox handler.
 #pragma once

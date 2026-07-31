@@ -46,10 +46,6 @@ ViewPrefixKind view_value_prefix(ViewHeroBranch branch) {
   }
 }
 
-bool view_no_bg_alarm(int32_t cookie, const SchedPlan *plan) {
-  return sched_is_unschedulable(plan, cookie);
-}
-
 ViewHomeValueSize view_home_value_size(int timer_count) {
   if (timer_count <= 1) return VIEW_HOME_SIZE_XLARGE;
   if (timer_count <= 2) return VIEW_HOME_SIZE_LARGE;

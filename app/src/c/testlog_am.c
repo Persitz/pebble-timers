@@ -27,6 +27,9 @@
 // itself has no knowledge of them.
 #define INJECT_TRANSCRIPT_KEY 10001
 #define INJECT_STATUS_KEY 10002
+#define DROP_PRIMARY_KEY 10003
+
+#include "wakeup_adapter.h"
 #endif
 
 // If app_message_outbox_begin()/_send() fails SYNCHRONOUSLY (no sent/failed
@@ -100,6 +103,11 @@ static void outbox_failed_handler(DictionaryIterator *iterator, AppMessageResult
 #ifdef EMU_TEST_HOOKS
 static void inbox_received_handler(DictionaryIterator *iterator, void *context) {
   (void)context;
+  Tuple *drop_primary_tuple = dict_find(iterator, DROP_PRIMARY_KEY);
+  if (drop_primary_tuple != NULL && drop_primary_tuple->type == TUPLE_INT) {
+    testlog("wakeup:test_drop_primary", wakeup_adapter_test_drop_primary() ? "ok" : "none");
+    return;
+  }
   Tuple *transcript_tuple = dict_find(iterator, INJECT_TRANSCRIPT_KEY);
   if (transcript_tuple == NULL || transcript_tuple->type != TUPLE_CSTRING) return;
   Tuple *status_tuple = dict_find(iterator, INJECT_STATUS_KEY);

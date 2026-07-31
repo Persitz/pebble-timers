@@ -1,0 +1,211 @@
+utterance	country	engine	expected	actual	class
+10 minutos	MX	wispr	DUR 600	OK COUNTDOWN 600s	CORRECT
+15 minutos para la pasta	MX	wispr	DUR 900 name:pasta	OK COUNTDOWN 900s name='la pasta'	CORRECT
+5 minutos para los huevos	CO	wispr	DUR 300 name:huevos	OK COUNTDOWN 300s name='los huevos'	CORRECT
+20 minutos de arroz	CO	wispr	DUR 1200 name:arroz	OK COUNTDOWN 1200s name='arroz'	CORRECT
+3 minutos para el mate	AR	wispr	DUR 180 name:mate	OK COUNTDOWN 180s name='el mate'	CORRECT
+45 minutos de asado	AR	wispr	DUR 2700 name:asado	OK COUNTDOWN 2700s name='asado'	CORRECT
+30 minutos lavadora	MX	wispr	DUR 1800 name:lavadora	OK COUNTDOWN 1800s name='lavadora'	CORRECT
+1 hora de siesta	AR	wispr	DUR 3600 name:siesta	OK COUNTDOWN 3600s name='siesta'	CORRECT
+2 horas de parquimetro	CO	wispr	DUR 7200 name:parquimetro	OK COUNTDOWN 7200s name='parquimetro'	CORRECT
+8 minutos de plancha	MX	wispr	DUR 480 name:plancha	OK COUNTDOWN 480s name='plancha'	CORRECT
+este pon diez minutos	MX	parakeet	DUR 600	OK COUNTDOWN 600s name='este'	NAME-POLLUTION
+eh, timer de cinco minutos para el arroz	CO	parakeet	DUR 300 name:arroz	OK COUNTDOWN 300s name='eh el arroz'	CORRECT
+o sea, poné veinte minutos para el asado	AR	parakeet	DUR 1200 name:asado	OK COUNTDOWN 1200s name='o sea poné el asado'	CORRECT
+este... este quince minutos para la pasta	MX	parakeet	DUR 900 name:pasta	OK COUNTDOWN 900s name='este este la pasta'	CORRECT
+eh este, treinta minutos lavadora	CO	parakeet	DUR 1800 name:lavadora	OK COUNTDOWN 1800s name='eh este lavadora'	CORRECT
+che, este, diez minutos de mate	AR	parakeet	DUR 600 name:mate	OK COUNTDOWN 600s name='che este mate'	CORRECT
+mmm cinco minutos para los huevos	MX	parakeet	DUR 300 name:huevos	OK COUNTDOWN 300s name='mmm los huevos'	CORRECT
+digo, ocho minutos de plancha	CO	parakeet	DUR 480 name:plancha	OK COUNTDOWN 480s name='digo plancha'	CORRECT
+bueno este, cuarenta minutos siesta	AR	parakeet	DUR 2400 name:siesta	OK COUNTDOWN 2400s name='bueno este siesta'	CORRECT
+eh una hora de parquimetro	MX	parakeet	DUR 3600 name:parquimetro	OK COUNTDOWN 3600s name='eh parquimetro'	CORRECT
+seis y cuarto	MX	wispr	CLOCK 6:15	FAIL (name residue: 'seis cuarto')	GAP
+son las seis y cuarto	MX	wispr	CLOCK 6:15	CLOCK 6:15 (12h-ambig)	CORRECT
+a las seis y cuarto	MX	wispr	CLOCK 6:15	CLOCK 6:15 (12h-ambig)	CORRECT
+a las cinco y media	AR	wispr	CLOCK 5:30	CLOCK 5:30 (12h-ambig)	CORRECT
+cinco y media	CO	wispr	CLOCK 5:30	FAIL (name residue: 'cinco media')	GAP
+un cuarto para las seis	MX	wispr	CLOCK 5:45	CLOCK 6:00 (12h-ambig)	SILENT-WRONG
+un cuarto para las seis	MX	parakeet	CLOCK 5:45	CLOCK 6:00 (12h-ambig)	SILENT-WRONG
+veinte para las cinco	CO	wispr	CLOCK 4:40	CLOCK 5:00 (12h-ambig)	SILENT-WRONG
+veinte para las cinco	CO	parakeet	CLOCK 4:40	CLOCK 5:00 (12h-ambig)	SILENT-WRONG
+diez para las ocho	AR	wispr	CLOCK 7:50	CLOCK 8:00 (12h-ambig)	SILENT-WRONG
+faltan diez para las ocho	AR	parakeet	CLOCK 7:50	CLOCK 8:00 (12h-ambig)	SILENT-WRONG
+un cuarto para las tres de la tarde	MX	wispr	CLOCK 14:45	CLOCK 15:00	SILENT-WRONG
+cinco para las nueve	CO	wispr	CLOCK 8:55	CLOCK 9:00 (12h-ambig)	SILENT-WRONG
+menos cuarto para las diez	MX	parakeet	CLOCK 9:45	CLOCK 10:00 (12h-ambig)	SILENT-WRONG
+a la una menos veinte	AR	wispr	CLOCK 12:40	CLOCK 1:00 (12h-ambig)	SILENT-WRONG
+alarma a las siete menos cuarto	CO	wispr	CLOCK 6:45	CLOCK 7:00 (12h-ambig)	SILENT-WRONG
+despiertame a las seis y veinte	AR	parakeet	CLOCK 6:20	CLOCK 6:00 (12h-ambig)	SILENT-WRONG
+ponme la alarma a las ocho en punto	MX	wispr	CLOCK 8:00	CLOCK 8:00 (12h-ambig)	CORRECT
+alarma a las diez de la noche	CO	wispr	CLOCK 22:00	CLOCK 22:00	CORRECT
+a las seis cuarenta y cinco	MX	wispr	DUR 405	CLOCK 6:45 (12h-ambig)	SILENT-WRONG
+tipo 10 minutos	AR	wispr	DUR 600	OK COUNTDOWN 600s name='tipo'	NAME-POLLUTION
+tipo 10 minutos	AR	parakeet	DUR 600	OK COUNTDOWN 600s name='tipo'	NAME-POLLUTION
+como 20 minutos para el asado	AR	wispr	DUR 1200 name:asado	OK COUNTDOWN 1200s name='el asado'	CORRECT
+unos veinte minutitos	MX	wispr	DUR 1200	OK COUNTDOWN 1200s	CORRECT
+unos veinte minutitos para la siesta	MX	parakeet	DUR 1200 name:siesta	OK COUNTDOWN 1200s name='la siesta'	CORRECT
+diez minutos y pico	CO	wispr	DUR 600ish	OK COUNTDOWN 600s name='pico'	NAME-POLLUTION
+diez minutos y pico para el arroz	CO	parakeet	DUR 600ish name:arroz	OK COUNTDOWN 600s name='pico el arroz'	NAME-POLLUTION
+cinco minutos y pico de mate	AR	wispr	DUR 300ish name:mate	OK COUNTDOWN 300s name='pico mate'	NAME-POLLUTION
+un rato como diez minutos	MX	parakeet	DUR 600	OK COUNTDOWN 600s name='un rato'	NAME-POLLUTION
+algo asi como quince minutos	CO	wispr	DUR 900	OK COUNTDOWN 900s name='algo asi'	NAME-POLLUTION
+como unos cinco minutitos	MX	wispr	DUR 300	OK COUNTDOWN 300s	CORRECT
+mas o menos diez minutos	AR	wispr	DUR 600	OK COUNTDOWN 600s name='mas o menos'	NAME-POLLUTION
+veinte minutos y pico de lavadora	MX	parakeet	DUR 1200ish name:lavadora	OK COUNTDOWN 1200s name='pico lavadora'	NAME-POLLUTION
+ponme veinte	MX	wispr	DUR 1200 AMBIGUOUS-unit	FAIL (name residue: 'veinte')	GAP
+ponme veinte minutos	MX	wispr	DUR 1200	OK COUNTDOWN 1200s	CORRECT
+dale 15	AR	wispr	DUR 900 AMBIGUOUS-unit	FAIL (name residue: 'dale 15')	GAP
+dale 15 minutos	AR	wispr	DUR 900	OK COUNTDOWN 900s name='dale'	NAME-POLLUTION
+dale 15 minutos para el asado	AR	wispr	DUR 900 name:asado	OK COUNTDOWN 900s name='dale el asado'	CORRECT
+poné 10 minutos	AR	wispr	DUR 600	OK COUNTDOWN 600s name='poné'	NAME-POLLUTION
+poné 10 minutos para el mate	AR	wispr	DUR 600 name:mate	OK COUNTDOWN 600s name='poné el mate'	CORRECT
+che poné 10 minutos	AR	wispr	DUR 600	OK COUNTDOWN 600s name='che poné'	NAME-POLLUTION
+che, poné 10 minutos para el asado	AR	parakeet	DUR 600 name:asado	OK COUNTDOWN 600s name='che poné el asado'	CORRECT
+fijate en diez minutos	AR	wispr	DUR 600	OK COUNTDOWN 600s name='fijate en'	NAME-POLLUTION
+avisame en veinte minutos	AR	wispr	DUR 1200	OK COUNTDOWN 1200s name='avisame en'	NAME-POLLUTION
+avisame en veinte minutos de mate	AR	parakeet	DUR 1200 name:mate	OK COUNTDOWN 1200s name='avisame en mate'	CORRECT
+pone diez minutos	CO	parakeet	DUR 600	OK COUNTDOWN 600s name='pone'	NAME-POLLUTION
+hazme un timer de diez minutos	MX	wispr	DUR 600	OK COUNTDOWN 600s name='hazme'	NAME-POLLUTION
+hagame un timer de diez minutos	CO	wispr	DUR 600	OK COUNTDOWN 600s name='hagame'	NAME-POLLUTION
+me pones cinco minutos porfa	MX	wispr	DUR 300	OK COUNTDOWN 300s name='me pones porfa'	NAME-POLLUTION
+me poné cinco minutitos porfa	AR	parakeet	DUR 300	OK COUNTDOWN 300s name='me poné porfa'	NAME-POLLUTION
+ahorita 5 minutos	MX	wispr	DUR 300	OK COUNTDOWN 300s name='ahorita'	NAME-POLLUTION
+orita 5 minutos	MX	wispr	DUR 300	OK COUNTDOWN 300s name='orita'	NAME-POLLUTION
+ahorita ponme 10 minutos	MX	wispr	DUR 600	OK COUNTDOWN 600s name='ahorita'	NAME-POLLUTION
+orita me avisas en diez minutos	MX	parakeet	DUR 600	OK COUNTDOWN 600s name='orita me avisas en'	NAME-POLLUTION
+ahorita este, diez minutos para la pasta	MX	parakeet	DUR 600 name:pasta	OK COUNTDOWN 600s name='ahorita este la pasta'	CORRECT
+nomas ahorita cinco minutitos	MX	parakeet	DUR 300	OK COUNTDOWN 300s name='nomas ahorita'	NAME-POLLUTION
+al ratito diez minutos	MX	wispr	DUR 600	OK COUNTDOWN 600s name='al ratito'	NAME-POLLUTION
+al ratito me avisas en diez minutos	MX	parakeet	DUR 600	OK COUNTDOWN 600s name='al ratito me avisas en'	NAME-POLLUTION
+che, cebame el mate en tres minutos	AR	wispr	DUR 180	OK COUNTDOWN 180s name='che cebame el mate en'	NAME-POLLUTION
+poneme un timer de tres minutos para el mate	AR	wispr	DUR 180 name:mate	OK COUNTDOWN 180s name='poneme el mate'	CORRECT
+dale poné cuarenta minutos para el asado	AR	parakeet	DUR 2400 name:asado	OK COUNTDOWN 2400s name='dale poné el asado'	CORRECT
+che avisame cuando pasen quince minutos del choripan	AR	parakeet	DUR 900 name:choripan	OK COUNTDOWN 900s name='che avisame cuando pase'	NAME-POLLUTION
+poneme diez minutos, el asado	AR	wispr	DUR 600 name:asado	OK COUNTDOWN 600s name='poneme el asado'	CORRECT
+che vos poné veinte minutos	AR	wispr	DUR 1200	OK COUNTDOWN 1200s name='che vos poné'	NAME-POLLUTION
+dale, veinte minutos de parrilla	AR	wispr	DUR 1200 name:parrilla	OK COUNTDOWN 1200s name='dale parrilla'	CORRECT
+este, che, poneme cinco minutos del mate	AR	parakeet	DUR 300 name:mate	OK COUNTDOWN 300s name='este che poneme del mat'	NAME-POLLUTION
+cinco minuticos	CO	wispr	DUR 300	FAIL (name residue: 'cinco minuticos')	GAP
+un ratico de diez minutos	CO	wispr	DUR 600	OK COUNTDOWN 600s name='un ratico'	NAME-POLLUTION
+dame un momentico, diez minutos	CO	parakeet	DUR 600	OK COUNTDOWN 600s name='dame un momentico'	NAME-POLLUTION
+parce, ponme diez minuticos	CO	parakeet	DUR 600	FAIL (name residue: 'parce diez minuticos')	GAP
+hagame el paro con diez minuticos	CO	parakeet	DUR 600	FAIL (name residue: 'hagame el paro con diez')	GAP
+de una, diez minutos para el arroz	CO	wispr	DUR 600 name:arroz	OK COUNTDOWN 600s name='una el arroz'	CORRECT
+listo, quince minuticos de lavadora	CO	wispr	DUR 900 name:lavadora	FAIL (name residue: 'listo quince minuticos ')	GAP
+parcero, diez minutos porfa	CO	wispr	DUR 600	OK COUNTDOWN 600s name='parcero porfa'	NAME-POLLUTION
+un segundito	MX	wispr	DUR 1 AMBIGUOUS-tiny	OK COUNTDOWN 1s	CORRECT
+diez segunditos	AR	wispr	DUR 10	OK COUNTDOWN 10s	CORRECT
+una horita	MX	wispr	DUR 3600	OK COUNTDOWN 3600s	CORRECT
+una horita de siesta	MX	parakeet	DUR 3600 name:siesta	OK COUNTDOWN 3600s name='siesta'	CORRECT
+cinco minutitos nada mas	CO	wispr	DUR 300	OK COUNTDOWN 300s name='nada mas'	NAME-POLLUTION
+dame cinco minutitos	AR	wispr	DUR 300	OK COUNTDOWN 300s name='dame'	NAME-POLLUTION
+dos horitas de parquimetro	CO	wispr	DUR 7200 name:parquimetro	OK COUNTDOWN 7200s name='parquimetro'	CORRECT
+una hora y veinte	MX	wispr	DUR 4800	OK COUNTDOWN 4800s	CORRECT
+hora y veinte para el asado	AR	wispr	DUR 4800 name:asado	FAIL (name residue: 'veinte el asado')	GAP
+media hora	CO	wispr	DUR 1800	OK COUNTDOWN 1800s	CORRECT
+media hora de lavadora	CO	wispr	DUR 1800 name:lavadora	OK COUNTDOWN 1800s name='lavadora'	CORRECT
+un cuarto de hora	MX	wispr	DUR 900	OK COUNTDOWN 900s	CORRECT
+un cuarto de hora para la pasta	MX	wispr	DUR 900 name:pasta	OK COUNTDOWN 900s name='la pasta'	CORRECT
+tres cuartos de hora	AR	wispr	DUR 2700	OK COUNTDOWN 2700s	CORRECT
+hora y media de siesta	MX	wispr	DUR 5400 name:siesta	OK COUNTDOWN 5400s name='siesta'	CORRECT
+media hora y pico	CO	parakeet	DUR 1800ish	OK COUNTDOWN 1800s name='pico'	NAME-POLLUTION
+cuarenta y cinco minutos y medio	AR	wispr	DUR 2730	OK COUNTDOWN 2730s	CORRECT
+cronometro	MX	wispr	STOPWATCH	OK STOPWATCH	CORRECT
+pon un cronometro	CO	wispr	STOPWATCH	OK STOPWATCH	CORRECT
+arranca el cronometro	AR	wispr	STOPWATCH	OK STOPWATCH	CORRECT
+temporizador repetitivo de diez minutos	MX	wispr	REPEAT 600	OK COUNTDOWN 600s name='repetitivo'	SILENT-WRONG
+repite cada diez minutos	CO	wispr	REPEAT 600	OK REPEAT 600s name='repite'	CORRECT
+que se repita cada cinco minutos	AR	wispr	REPEAT 300	OK REPEAT 300s name='que se repita'	CORRECT
+cuenta atras de diez minutos	MX	wispr	DUR 600	OK COUNTDOWN 600s	CORRECT
+alarma cuenta regresiva de veinte minutos	CO	wispr	DUR 1200	OK COUNTDOWN 1200s	CORRECT
+timer de ejercicio de un minuto	MX	wispr	DUR 60 name:ejercicio	OK COUNTDOWN 60s name='ejercicio'	CORRECT
+treinta segundos de plancha, descanso de diez	CO	wispr	DUR 30 name:plancha descanso de diez	OK COUNTDOWN 30s name='plancha descanso diez'	CORRECT
+este, treinta segundos de intervalos	AR	parakeet	DUR 30 name:intervalos	OK COUNTDOWN 30s name='este intervalos'	CORRECT
+cinco minutos de descanso entre series	MX	wispr	DUR 300 name:descanso entre series	OK COUNTDOWN 300s name='descanso entre series'	CORRECT
+veinte minutos de parquimetro en el centro	CO	wispr	DUR 1200 name:parquimetro en el centro	OK COUNTDOWN 1200s name='parquimetro en el centr'	CORRECT
+una hora de parquimetro este, en el centro	AR	parakeet	DUR 3600 name:centro	OK COUNTDOWN 3600s name='parquimetro este en el '	NAME-POLLUTION
+cuarenta minutos de lavadora, ciclo rapido	MX	wispr	DUR 2400 name:lavadora ciclo rapido	OK COUNTDOWN 2400s name='lavadora ciclo rapido'	CORRECT
+este, cuarenta minutos, este, de lavadora	CO	parakeet	DUR 2400 name:lavadora	OK COUNTDOWN 2400s name='este este lavadora'	CORRECT
+diez minutos de siesta nomas	MX	wispr	DUR 600	OK COUNTDOWN 600s name='siesta nomas'	NAME-POLLUTION
+veinte minutos de mate con la familia	AR	wispr	DUR 1200 name:mate con la familia	OK COUNTDOWN 1200s name='mate con la familia'	CORRECT
+cinco, no, diez minutos	MX	parakeet	SELFCORRECT->600	OK COUNTDOWN 600s name='cinco no'	CORRECT
+veinte, digo, treinta minutos	AR	parakeet	SELFCORRECT->1800	OK COUNTDOWN 1800s name='veinte digo'	CORRECT
+quince minutos, mejor dicho, veinte	CO	parakeet	SELFCORRECT->1200 AMBIGUOUS-unit	OK COUNTDOWN 900s name='mejor dicho veinte'	SILENT-WRONG
+diez minutos, este, mejor cinco	MX	parakeet	SELFCORRECT->300	OK COUNTDOWN 600s name='este mejor cinco'	SILENT-WRONG
+cinco no espera diez minutos	AR	parakeet	SELFCORRECT->600	OK COUNTDOWN 600s name='cinco no espera'	CORRECT
+Pon 10 minutos.	MX	wispr	DUR 600	OK COUNTDOWN 600s	CORRECT
+Timer de 20 minutos para el arroz.	CO	wispr	DUR 1200 name:arroz	OK COUNTDOWN 1200s name='el arroz'	CORRECT
+Cronómetro.	AR	wispr	STOPWATCH	OK STOPWATCH	CORRECT
+Alarma a las 6:45.	MX	wispr	CLOCK 6:45	FAIL (name residue: 'las 6:45')	GAP
+Dale 15 minutos para el asado.	AR	wispr	DUR 900 name:asado	OK COUNTDOWN 900s name='Dale el asado'	CORRECT
+10 minutos para el arroz	CO	parakeet	DUR 600 name:arroz	OK COUNTDOWN 600s name='el arroz'	CORRECT
+diez minutos para el arroz	CO	parakeet	DUR 600 name:arroz	OK COUNTDOWN 600s name='el arroz'	CORRECT
+6:45 de la tarde	MX	parakeet	CLOCK 18:45	FAIL (name residue: '6:45 la tarde')	GAP
+seis cuarenta y cinco de la tarde	MX	parakeet	CLOCK 18:45	OK COUNTDOWN 405s name='la tarde'	SILENT-WRONG
+20 minutos y pico	CO	parakeet	DUR 1200ish	OK COUNTDOWN 1200s name='pico'	NAME-POLLUTION
+eh 20 minutos y pico este de lavadora	CO	parakeet	DUR 1200ish name:lavadora	OK COUNTDOWN 1200s name='eh pico este lavadora'	NAME-POLLUTION
+veintitres minutos	MX	wispr	DUR 1380	OK COUNTDOWN 1380s	CORRECT
+treinta y cinco minutos	AR	wispr	DUR 2100	OK COUNTDOWN 2100s	CORRECT
+cien segundos	CO	wispr	DUR 100 [culled-v0.1.13: hundred-composite capability removed for size (1,063B ARM / 10 corpus rows); now REFUSE -- hundred_present guard forces fail-soft]	FAIL (name residue: 'cien')	FAIL-SOFT (culled-v0.1.13)
+ciento veinte segundos	MX	wispr	DUR 120 [culled-v0.1.13: hundred-composite capability removed for size (1,063B ARM / 10 corpus rows); now REFUSE -- hundred_present guard forces fail-soft]	FAIL (name residue: 'ciento veinte')	FAIL-SOFT (culled-v0.1.13)
+doscientos segundos	AR	wispr	DUR 200	FAIL (name residue: 'doscientos')	GAP
+noventa minutos	CO	wispr	DUR 5400	OK COUNTDOWN 5400s	CORRECT
+dos horas de parquimetro porfa	MX	wispr	DUR 7200	OK COUNTDOWN 7200s name='parquimetro porfa'	NAME-POLLUTION
+che, poneme una hora de parquimetro	AR	wispr	DUR 3600	OK COUNTDOWN 3600s name='che poneme parquimetro'	NAME-POLLUTION
+una hora y media de parquimetro	CO	wispr	DUR 5400	OK COUNTDOWN 5400s name='parquimetro'	NAME-POLLUTION
+tipo dos horas de parquimetro	AR	wispr	DUR 7200	OK COUNTDOWN 7200s name='tipo parquimetro'	NAME-POLLUTION
+este, una hora de parquimetro nomas	MX	parakeet	DUR 3600	OK COUNTDOWN 3600s name='este parquimetro nomas'	NAME-POLLUTION
+cincuenta minutos de lavadora	MX	wispr	DUR 3000	OK COUNTDOWN 3000s name='lavadora'	NAME-POLLUTION
+un ciclo de lavadora de cuarenta minutos	CO	wispr	DUR 2400 name:ciclo de lavadora	OK COUNTDOWN 2400s name='un ciclo lavadora'	CORRECT
+che, la lavadora, treinta minutos	AR	parakeet	DUR 1800 name:lavadora	OK COUNTDOWN 1800s name='che la lavadora'	CORRECT
+tipo cuarenta minutos de lavadora	CO	wispr	DUR 2400	OK COUNTDOWN 2400s name='tipo lavadora'	NAME-POLLUTION
+una siesta de veinte minutos	AR	wispr	DUR 1200 name:siesta	OK COUNTDOWN 1200s name='una siesta'	CORRECT
+veinte minutitos de siesta nomas	MX	parakeet	DUR 1200 name:siesta	OK COUNTDOWN 1200s name='siesta nomas'	CORRECT
+una horita de siesta, porfa	CO	wispr	DUR 3600 name:siesta	OK COUNTDOWN 3600s name='siesta porfa'	CORRECT
+dejame dormir una horita	MX	wispr	DUR 3600	OK COUNTDOWN 3600s name='dejame dormir'	NAME-POLLUTION
+un minuto de plancha	CO	wispr	DUR 60 name:plancha	OK COUNTDOWN 60s name='plancha'	CORRECT
+treinta segundos de descanso	AR	wispr	DUR 30 name:descanso	OK COUNTDOWN 30s name='descanso'	CORRECT
+che dale treinta segundos de sentadillas	AR	parakeet	DUR 30 name:sentadillas	OK COUNTDOWN 30s name='che dale sentadillas'	CORRECT
+cinco minutos de cardio	MX	wispr	DUR 300 name:cardio	OK COUNTDOWN 300s name='cardio'	CORRECT
+este, cuarenta y cinco segundos de plancha	CO	parakeet	DUR 45 name:plancha	OK COUNTDOWN 45s name='este plancha'	CORRECT
+veinte	MX	wispr	DUR 1200 AMBIGUOUS-unit	FAIL (name residue: 'veinte')	GAP
+diez	AR	wispr	DUR 600 AMBIGUOUS-unit	FAIL (name residue: 'diez')	GAP
+quince	CO	wispr	DUR 900 AMBIGUOUS-unit	FAIL (name residue: 'quince')	GAP
+pone 20	CO	parakeet	DUR 1200 AMBIGUOUS-unit	FAIL (name residue: 'pone 20')	GAP
+dale 10	AR	wispr	DUR 600 AMBIGUOUS-unit	FAIL (name residue: 'dale 10')	GAP
+despertame a las siete y cuarto para el gym	AR	wispr	CLOCK 7:15 name:gym	CLOCK 7:15 (12h-ambig)	CORRECT
+alarma para las seis menos veinte de la manana	MX	wispr	CLOCK 5:40	CLOCK 6:00 (12h-ambig)	SILENT-WRONG
+ponme la alarma a la una y pico	CO	wispr	CLOCK 1ish	CLOCK 1:00 (12h-ambig)	FAIL-SOFT
+a eso de las seis y media	AR	wispr	CLOCK 6:30ish	CLOCK 6:30 (12h-ambig)	FAIL-SOFT
+1. cinco minutos	MX	wispr	DUR 300	OK COUNTDOWN 300s	CORRECT
+2. diez minutos para el te	CO	wispr	DUR 600 name:te	OK COUNTDOWN 600s name='2 el te'	CORRECT
+poné el timer en quince minutos	AR	wispr	DUR 900	OK COUNTDOWN 900s name='poné el en'	NAME-POLLUTION
+fijate vos en diez minutos	AR	wispr	DUR 600	OK COUNTDOWN 600s name='fijate vos en'	NAME-POLLUTION
+che poneme diez minutitos de mate porfa	AR	parakeet	DUR 600 name:mate	OK COUNTDOWN 600s name='che poneme mate porfa'	CORRECT
+dale, ponemé un cuarto de hora	AR	parakeet	DUR 900	OK COUNTDOWN 900s name='dale ponemé'	NAME-POLLUTION
+orale ponme diez minutos	MX	wispr	DUR 600	OK COUNTDOWN 600s name='orale'	NAME-POLLUTION
+va, diez minutos para la pasta	MX	wispr	DUR 600 name:pasta	OK COUNTDOWN 600s name='va la pasta'	CORRECT
+nomas diez minutitos porfa	MX	wispr	DUR 600	OK COUNTDOWN 600s name='nomas porfa'	NAME-POLLUTION
+ahorita nomas cinco minutos de huevos	MX	parakeet	DUR 300 name:huevos	OK COUNTDOWN 300s name='ahorita nomas huevos'	CORRECT
+listo parce diez minutos porfa	CO	wispr	DUR 600	OK COUNTDOWN 600s name='listo parce porfa'	NAME-POLLUTION
+hagale diez minuticos	CO	wispr	DUR 600	FAIL (name residue: 'hagale diez minuticos')	GAP
+de una vez diez minutos para el arroz	CO	parakeet	DUR 600 name:arroz	OK COUNTDOWN 600s name='una vez el arroz'	CORRECT
+sumerce ponga diez minutos porfa	CO	wispr	DUR 600	OK COUNTDOWN 600s name='sumerce ponga porfa'	NAME-POLLUTION
+este, eh, poné como diez minutos	AR	parakeet	DUR 600	OK COUNTDOWN 600s name='este eh poné'	NAME-POLLUTION
+eh, cinco, este, minutos para el mate	AR	parakeet	DUR 300 name:mate	FAIL (name residue: 'eh cinco este el mate')	GAP
+mmm, quince minutos, este, de lavadora	MX	parakeet	DUR 900 name:lavadora	OK COUNTDOWN 900s name='mmm este lavadora'	CORRECT
+eh este, un cuarto de hora nomas	CO	parakeet	DUR 900	OK COUNTDOWN 900s name='eh este nomas'	NAME-POLLUTION
+este, ahorita, cinco minutos	MX	parakeet	DUR 300	OK COUNTDOWN 300s name='este ahorita'	NAME-POLLUTION
+eh, tipo veinte minutos, este, de asado	AR	parakeet	DUR 1200 name:asado	OK COUNTDOWN 1200s name='eh tipo este asado'	CORRECT
+este, dale quince minutitos	AR	parakeet	DUR 900	OK COUNTDOWN 900s name='este dale'	NAME-POLLUTION
+eh, parce, este, diez minuticos	CO	parakeet	DUR 600	FAIL (name residue: 'eh parce este diez minu')	GAP
+este, seis y cuarto	MX	parakeet	CLOCK 6:15	FAIL (name residue: 'este seis cuarto')	GAP
+eh, un cuarto para las ocho, este	CO	parakeet	CLOCK 7:45	CLOCK 8:00 (12h-ambig)	SILENT-WRONG
+este, treinta minutos y pico de siesta	MX	parakeet	DUR 1800ish name:siesta	OK COUNTDOWN 1800s name='este pico siesta'	NAME-POLLUTION
+eh, cronometro, este	CO	parakeet	STOPWATCH	OK STOPWATCH	CORRECT
+este, repite cada diez minutos, eh	AR	parakeet	REPEAT 600	OK REPEAT 600s name='este repite eh'	CORRECT
+eh, dos horas, este, de parquimetro	MX	parakeet	DUR 7200	OK COUNTDOWN 7200s name='eh este parquimetro'	NAME-POLLUTION
+este, cincuenta minutos, eh, lavadora	CO	parakeet	DUR 3000 name:lavadora	OK COUNTDOWN 3000s name='este eh lavadora'	CORRECT
+eh, une, digo, una hora veinte	AR	parakeet	SELFCORRECT->4800	OK COUNTDOWN 4800s name='eh une digo'	CORRECT
+este, hazme, eh, un timer de ocho minutos	MX	parakeet	DUR 480	OK COUNTDOWN 480s name='este hazme eh'	NAME-POLLUTION
+eh, che, dale, este, diez minutos	AR	parakeet	DUR 600	OK COUNTDOWN 600s name='eh che dale este'	NAME-POLLUTION

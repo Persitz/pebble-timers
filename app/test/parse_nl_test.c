@@ -12,8 +12,89 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../resources/generated/nl_tables.h"
+
+#define NL_BLOB(name, literal) static const char expected_##name[] = literal;
+#include "../src/c/lib/parse_nl_vocab.def"
+#undef NL_BLOB
+
+typedef struct {
+  const char *name;
+  const uint8_t *expected;
+  size_t expected_size;
+  size_t offset;
+  size_t generated_size;
+} ExpectedBlob;
+
+static const ExpectedBlob kExpectedBlobs[] = {
+#define NL_BLOB(name, literal) \
+  {#name, (const uint8_t *)expected_##name, sizeof(expected_##name), \
+   NL_OFFSET_##name, NL_SIZE_##name},
+#include "../src/c/lib/parse_nl_vocab.def"
+#undef NL_BLOB
+};
+
+static uint8_t s_generated_vocabulary[NL_TABLES_TOTAL];
+
+static void assert_parse(const char *transcript, bool exp_ok, TimerKind exp_kind,
+                         int32_t exp_duration_s, const char *exp_name);
+
+static void load_generated_vocabulary(void) {
+  FILE *fp = fopen("../resources/generated/nl_tables.bin", "rb");
+  if (fp == NULL) fp = fopen("resources/generated/nl_tables.bin", "rb");
+  TEST_ASSERT_NOT_NULL_MESSAGE(fp, "could not open generated nl_tables.bin");
+  size_t read_size = fread(s_generated_vocabulary, 1, sizeof s_generated_vocabulary, fp);
+  TEST_ASSERT_EQUAL_UINT32(NL_TABLES_TOTAL, read_size);
+  TEST_ASSERT_EQUAL_INT_MESSAGE(EOF, fgetc(fp), "generated nl_tables.bin has trailing bytes");
+  fclose(fp);
+}
+
 void setUp(void) {}
 void tearDown(void) {}
+
+void test_generated_vocabulary_matches_all_source_definitions(void) {
+  load_generated_vocabulary();
+
+  TEST_ASSERT_EQUAL_UINT32(NL_TABLES_BLOB_COUNT,
+                           sizeof kExpectedBlobs / sizeof kExpectedBlobs[0]);
+  TEST_ASSERT_EQUAL_UINT32(NL_TABLES_TOTAL, parse_nl_vocabulary_size());
+  for (size_t i = 0; i < sizeof kExpectedBlobs / sizeof kExpectedBlobs[0]; i++) {
+    const ExpectedBlob *blob = &kExpectedBlobs[i];
+    TEST_ASSERT_EQUAL_UINT32_MESSAGE(blob->expected_size, blob->generated_size, blob->name);
+    TEST_ASSERT_TRUE_MESSAGE(blob->offset + blob->generated_size <= NL_TABLES_TOTAL, blob->name);
+    TEST_ASSERT_EQUAL_MEMORY_MESSAGE(blob->expected,
+                                     s_generated_vocabulary + blob->offset,
+                                     blob->generated_size, blob->name);
+  }
+
+  TEST_ASSERT_TRUE(parse_nl_vocabulary_set(s_generated_vocabulary,
+                                            sizeof s_generated_vocabulary));
+  TEST_ASSERT_TRUE(parse_nl_vocabulary_available());
+  assert_parse("five minutes", true, KIND_COUNTDOWN, 300, "");
+}
+
+void test_vocabulary_rejects_wrong_size_and_checksum_as_unavailable(void) {
+  load_generated_vocabulary();
+
+  TEST_ASSERT_FALSE(parse_nl_vocabulary_set(s_generated_vocabulary,
+                                             sizeof s_generated_vocabulary - 1));
+  TEST_ASSERT_FALSE(parse_nl_vocabulary_available());
+
+  NlParse parse;
+  TEST_ASSERT_FALSE(parse_nl("five minutes", &parse));
+  TEST_ASSERT_FALSE(parse.ok);
+  TEST_ASSERT_EQUAL_INT(KIND_COUNTDOWN, parse.kind);
+
+  s_generated_vocabulary[0] ^= 1u;
+  TEST_ASSERT_FALSE(parse_nl_vocabulary_set(s_generated_vocabulary,
+                                             sizeof s_generated_vocabulary));
+  TEST_ASSERT_FALSE(parse_nl_vocabulary_available());
+  s_generated_vocabulary[0] ^= 1u;
+
+  TEST_ASSERT_TRUE(parse_nl_vocabulary_set(s_generated_vocabulary,
+                                            sizeof s_generated_vocabulary));
+  TEST_ASSERT_TRUE(parse_nl_vocabulary_available());
+}
 
 // Asserts parse_nl(transcript) produces exactly {exp_ok, exp_kind,
 // exp_duration_s, exp_name}. `_MESSAGE` variants are used throughout so a
@@ -516,8 +597,8 @@ void test_unitless_fractional_durations_unsupported(void) {
 // identical to ES "once"=11. The immediate-adjacency requirement for a
 // number-run mostly protects against this in practice (a filler breaks
 // adjacency, as in "once a minute" below), but a directly-adjacent
-// phrasing does resolve to 11x -- a known, narrow, accepted trade-off of
-// this cross-language vocabulary collision.
+// phrasing does resolve to 11x -- a narrow trade-off of this
+// cross-language vocabulary collision.
 void test_once_en_es_collision(void) {
   assert_parse("once minutes", true, KIND_COUNTDOWN, 660, "");   // es "once"=11 -- 11 min
   assert_parse("once a minute", false, KIND_COUNTDOWN, 0, "once");  // filler breaks adjacency
@@ -2274,6 +2355,8 @@ void test_subtractive_b_preserves_already_explicit_minute(void) {
 
 int main(void) {
   UNITY_BEGIN();
+  RUN_TEST(test_generated_vocabulary_matches_all_source_definitions);
+  RUN_TEST(test_vocabulary_rejects_wrong_size_and_checksum_as_unavailable);
   RUN_TEST(test_en_basic_number_unit_pairs);
   RUN_TEST(test_es_basic_number_unit_pairs);
   RUN_TEST(test_en_repeat_kind_position_independent);

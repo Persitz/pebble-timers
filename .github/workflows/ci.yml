@@ -3,17 +3,34 @@
 #
 # CI for the C-SDK Pebble Time 2 app.
 #
-# Runs host tests, builds the watch app, checks its size, and retains the resulting PBW as a CI
-# artifact.
+# Runs host tests, builds the watch app, verifies the produced .pbw's binary header/UUID/
+# relocation table are structurally valid (app/scripts/check_pbw_integrity.py -- independent of
+# whether LTO is enabled; see wscript's -Wl,-u,__pbl_app_info comment for why this exists), checks
+# its size, and retains the resulting PBW as a CI artifact.
+#
+# Two ARM builds run side by side: `watch-build` (LTO, the shipped configuration -- its size gate
+# is the one that's enforced) and `watch-build-no-lto` (PEBBLE_NO_LTO=1, see wscript). The second
+# exists because LTO's whole-program view both can surface warnings a per-TU build wouldn't and can
+# suppress warnings a per-TU build would have caught (a code path LTO deletes via internalization/
+# DCE never reaches the diagnostic pass at all) -- building only one way loses whichever class of
+# signal that configuration doesn't produce. `watch-build-no-lto` is diagnostic, not a release gate:
+# it still fails on a real problem (a compiler warning under -Werror, a failing host test, or a
+# corrupt artifact per check_pbw_integrity.py), but it does not enforce the byte-budget size gate --
+# the non-LTO image is expected to be larger than the shipped LTO one, and that expected difference
+# must not block a PR. It still reports its own `dec` so both series stay comparable over time.
 
 name: CI
 
+# TRIGGERS. Pull requests run the same host tests, watch builds, integrity
+# gate, and size gate as main and tags so every proposed artifact is
+# mechanically validated before merge.
 on:
   push:
     branches:
       - main
     tags:
       - "v*"
+  pull_request:
   workflow_dispatch:
 
 concurrency:
@@ -89,6 +106,17 @@ jobs:
         working-directory: app
         run: pebble build
 
+      # Both gates also run INSIDE `pebble build` itself (app/wscript's
+      # _gate_artifact post-build function --
+      # `pebble publish` rebuilds and uploads its own .pbw, so a gate that lives
+      # only in a CI step never sees the artifact users receive). These steps are
+      # therefore a deliberate second, redundant invocation: they keep the
+      # pass/fail visible as its own named CI step, and they would still catch a
+      # regression that removed or weakened the in-build hook.
+      - name: Artifact integrity gate (npm run check:pbw)
+        working-directory: app
+        run: npm run check:pbw
+
       - name: Size gate (npm run size:c)
         working-directory: app
         run: npm run size:c
@@ -97,5 +125,87 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: app-pbw
+          path: app/build/app.pbw
+          retention-days: 30
+
+  watch-build-no-lto:
+    name: Watch build, no LTO (diagnostic signal)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Cache uv-managed Python and pebble-tool
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.local/share/uv
+            ~/.cache/uv
+          key: uv-pebble-tool-${{ env.PEBBLE_TOOL_VERSION }}-${{ runner.os }}
+
+      - name: Cache Pebble SDK
+        uses: actions/cache@v4
+        with:
+          path: ~/.local/share/pebble-sdk
+          key: pebble-sdk-4.17-${{ runner.os }}
+
+      - name: Install uv
+        run: curl -LsSf https://astral.sh/uv/install.sh | sh
+
+      - name: Install uv-managed Python
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          uv python install "$PYTHON_VERSION"
+
+      - name: Install pebble-tool
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          uv tool install "pebble-tool==$PEBBLE_TOOL_VERSION" --python "$PYTHON_VERSION" --reinstall
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+          pebble --version
+
+      - name: Install Pebble SDK
+        run: |
+          if pebble sdk list 2>/dev/null | grep -q '(active)'; then
+            echo "SDK already installed: $(pebble sdk list 2>/dev/null | grep '(active)')"
+          else
+            pebble sdk install latest
+          fi
+
+      - name: npm run test:c (make -C test test)
+        working-directory: app
+        run: npm run test:c
+
+      # PEBBLE_NO_LTO=1 (see wscript's build()) skips the -flto CFLAGS/LINKFLAGS block entirely --
+      # a plain per-translation-unit build under the same -Wall -Wextra -Werror the LTO build uses.
+      # This is the diagnostic-signal build, not the release artifact: it must fail on any warning
+      # (a real problem), but its size is expected to differ from the shipped LTO build and must
+      # not gate anything here (see the size-report step below).
+      - name: pebble build (PEBBLE_NO_LTO=1)
+        working-directory: app
+        env:
+          PEBBLE_NO_LTO: "1"
+        run: pebble build
+
+      - name: Artifact integrity gate (npm run check:pbw)
+        working-directory: app
+        run: npm run check:pbw
+
+      # Informational only -- deliberately NOT a gate (continue-on-error). scripts/size.sh's
+      # FAIL/WARN thresholds are calibrated against the shipped LTO artifact; a non-LTO build is
+      # expected to run several KB larger (no whole-program reclaim), and that expected gap must
+      # not block a PR (see this workflow's top-of-file comment). Reusing the unmodified size
+      # gate script here (rather than a separate report path) keeps the LTO and non-LTO `dec`
+      # figures in the same format, so the two series stay directly comparable over time.
+      - name: Size report, non-LTO (npm run size:c -- informational, does not gate)
+        working-directory: app
+        continue-on-error: true
+        run: npm run size:c
+
+      - name: Upload non-LTO PBW artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-pbw-no-lto
           path: app/build/app.pbw
           retention-days: 30

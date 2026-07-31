@@ -160,6 +160,101 @@ void test_should_rebuzz_true_just_under_cap(void) {
   TEST_ASSERT_TRUE(app_state_should_rebuzz(1000, 1010, APP_STATE_REALERT_CAP_S - 1));
 }
 
+// --- decaying cadence past the cap -----------------------------------------
+//
+// The "last 10s-cadence re-alert before decay kicks in" case is already
+// pinned by test_should_rebuzz_true_just_under_cap above. The two cases were
+// assertion-identical: the same app_state_should_rebuzz(1000, 1010,
+// APP_STATE_REALERT_CAP_S - 1) call and the same TRUE assertion. The
+// duplicate was removed rather than kept as a second name for one fact.
+
+void test_should_rebuzz_false_10s_after_alert_once_capped(void) {
+  // At/after the cap, a mere 10s since the last alert is NOT enough anymore
+  // -- cadence has decayed to 60s. This is the behavioral difference from
+  // the old "stop forever at the cap" rule: it no longer returns false
+  // forever, but it also no longer re-buzzes at the old 10s rate.
+  TEST_ASSERT_FALSE(app_state_should_rebuzz(1000, 1010, APP_STATE_REALERT_CAP_S));
+}
+
+void test_should_rebuzz_true_at_first_60s_interval_once_capped(void) {
+  // At/after the cap, re-alert resumes at the decayed 60s cadence --
+  // indefinitely, never permanently silent.
+  TEST_ASSERT_TRUE(app_state_should_rebuzz(1000, 1000 + APP_STATE_REALERT_DECAY_S,
+                                            APP_STATE_REALERT_CAP_S));
+}
+
+void test_should_rebuzz_true_far_past_cap_still_decays_forever(void) {
+  // Long after the cap (e.g. an hour of overrun): still re-alerts every 60s
+  // -- no upper bound cuts it off, unlike the old cap-stops-nagging rule.
+  TEST_ASSERT_TRUE(app_state_should_rebuzz(1000, 1000 + APP_STATE_REALERT_DECAY_S,
+                                            APP_STATE_REALERT_CAP_S + 3600));
+}
+
+// --- realert_pulses_backlight ----------------------------------------------
+
+void test_realert_pulses_backlight_true_under_cap(void) {
+  TEST_ASSERT_TRUE(app_state_realert_pulses_backlight(APP_STATE_REALERT_CAP_S - 1));
+}
+
+void test_realert_pulses_backlight_false_at_cap(void) {
+  // The boundary itself: exactly at the cap, the backlight must not pulse
+  // -- matches should_rebuzz's own >= cap boundary for switching cadence.
+  TEST_ASSERT_FALSE(app_state_realert_pulses_backlight(APP_STATE_REALERT_CAP_S));
+}
+
+void test_realert_pulses_backlight_false_well_past_cap(void) {
+  TEST_ASSERT_FALSE(app_state_realert_pulses_backlight(APP_STATE_REALERT_CAP_S + 3600));
+}
+
+// --- app_state_needs_catchup_nav -------------------------------------------
+
+void test_catchup_nav_true_when_already_fired_before_scan_and_scan_fired_nothing(void) {
+  // The genuine catch-up case: fired before AND after (the scan didn't
+  // touch THIS cookie, since it was already fired) AND the scan fired
+  // nothing else either -- this is the ONE place that should navigate for
+  // it; nothing else has claimed the single startup navigation decision.
+  TEST_ASSERT_TRUE(app_state_needs_catchup_nav(true, true, false));
+}
+
+void test_catchup_nav_false_when_scan_just_fired_it(void) {
+  // The double-navigation regression: NOT fired before, IS fired after,
+  // scan DID
+  // fire something (this same cookie) -- the scan itself already navigated
+  // internally. A second navigation here would double-navigate.
+  TEST_ASSERT_FALSE(app_state_needs_catchup_nav(false, true, true));
+}
+
+void test_catchup_nav_false_when_not_fired_at_all(void) {
+  // Not fired before or after, scan fired nothing -- a legitimately early
+  // wakeup; the per-second tick will ring it exactly on time. Never
+  // navigate here.
+  TEST_ASSERT_FALSE(app_state_needs_catchup_nav(false, false, false));
+}
+
+void test_catchup_nav_false_when_impossible_state(void) {
+  // Fired before but somehow not after cannot happen in practice (nothing
+  // un-fires a timer) -- still must not navigate, since the predicate
+  // requires BOTH before/after conditions regardless of scan_fired_any_new.
+  TEST_ASSERT_FALSE(app_state_needs_catchup_nav(true, false, false));
+}
+
+// --- sibling-firing navigation ownership ----------------------------------
+
+void test_catchup_nav_false_when_scan_fired_a_sibling_not_the_launch_cookie(void) {
+  // The launch cookie (A) was ALREADY
+  // fired before this launch even started (was_fired_before=true) and
+  // remains fired after the scan (is_fired_after=true) -- by the OLD
+  // two-argument predicate, this alone would return true. But the scan DID
+  // fire something this call (scan_fired_any_new=true) -- a DIFFERENT,
+  // newly-due SIBLING timer (B), not A -- and already navigated internally
+  // for B. Routing again here for A would silently override B's correct
+  // navigation with A, a cookie that (being fired in a PRIOR session, not
+  // this scan) is not even in the real RAM-only ringing set. Single
+  // ownership means this MUST be false regardless of A's own before/after
+  // state once the scan has already routed navigation for anything.
+  TEST_ASSERT_FALSE(app_state_needs_catchup_nav(true, true, true));
+}
+
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_init_is_empty);
@@ -175,5 +270,16 @@ int main(void) {
   RUN_TEST(test_should_rebuzz_true_at_interval);
   RUN_TEST(test_should_rebuzz_false_once_capped);
   RUN_TEST(test_should_rebuzz_true_just_under_cap);
+  RUN_TEST(test_should_rebuzz_false_10s_after_alert_once_capped);
+  RUN_TEST(test_should_rebuzz_true_at_first_60s_interval_once_capped);
+  RUN_TEST(test_should_rebuzz_true_far_past_cap_still_decays_forever);
+  RUN_TEST(test_realert_pulses_backlight_true_under_cap);
+  RUN_TEST(test_realert_pulses_backlight_false_at_cap);
+  RUN_TEST(test_realert_pulses_backlight_false_well_past_cap);
+  RUN_TEST(test_catchup_nav_true_when_already_fired_before_scan_and_scan_fired_nothing);
+  RUN_TEST(test_catchup_nav_false_when_scan_just_fired_it);
+  RUN_TEST(test_catchup_nav_false_when_not_fired_at_all);
+  RUN_TEST(test_catchup_nav_false_when_impossible_state);
+  RUN_TEST(test_catchup_nav_false_when_scan_fired_a_sibling_not_the_launch_cookie);
   return UNITY_END();
 }

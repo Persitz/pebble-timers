@@ -16,9 +16,6 @@
 #include "testlog_am.h"
 #include "vibes_adapter.h"
 #include "wakeup_adapter.h"
-#ifdef GALLERY_MODE
-#include "gallery.h"
-#endif
 
 // Countdown action rows. The repeat-toggle row switches the timer to a
 // repeating timer via timer_toggle_repeat. Rename sits directly above the
@@ -73,9 +70,6 @@
 // (render.h) for why this can no longer rely on the SDK's own
 // un-overridden default (measured taller than intended, and the
 // cause of the ALARM-options 4th row sitting below the fold).
-#define SCROLL_INDICATOR_WIDTH 3
-#define SCROLL_INDICATOR_MARGIN 3
-
 // Held-Down carry-through: a Down hold begun on a HERO carries through
 // into ACTIONS and keeps auto-scrolling down (use case: hold Down to zip
 // to Delete at the bottom). See screen_actions_arm_carry_scroll's/
@@ -603,73 +597,43 @@ static void strip_update_proc(Layer *layer, GContext *ctx) {
 // repeated MenuLayer create/destroy churn is a classic source of heap
 // fragmentation on this platform's limited RAM.
 Window *screen_actions_create(void) {
-  s_window = window_create();
-  window_set_background_color(s_window, RENDER_COLOR_PAPER);
   // Our OWN complete click config provider (see the long comment above),
   // wired the ordinary way -- NOT via menu_layer_set_click_
   // config_onto_window(), which this window deliberately does not call.
-#ifdef GALLERY_MODE
-  // Screen gallery (inner loop, src/c/gallery.c) -- see screen_set.c's
-  // matching comment. Never compiled into a release build.
-  window_set_click_config_provider(s_window, gallery_click_config_provider);
-#else
-  window_set_click_config_provider(s_window, click_config_provider);
-#endif
-  window_set_window_handlers(s_window, (WindowHandlers){
-                                            .appear = window_appear,
-                                        });
-
-  Layer *root = window_get_root_layer(s_window);
-  GRect bounds = layer_get_bounds(root);
-
-  // Floating colored strip, replacing an earlier plain clock strip -- still
-  // the same reasoning as elsewhere in this file: a MenuLayer's draw_row can
-  // only paint inside a cell, so this needs its own sibling Layer above the
-  // menu.
-  s_strip = layer_create(GRect(0, 0, bounds.size.w, RENDER_STRIP_H));
-  layer_set_update_proc(s_strip, strip_update_proc);
-  layer_add_child(root, s_strip);
-
-  s_menu = menu_layer_create(GRect(0, RENDER_STRIP_H, bounds.size.w, bounds.size.h - RENDER_STRIP_H));
-  // See screen_home.c's matching fix -- the SDK's MenuLayer defaults
-  // highlight background to full-cell black; this makes the un-inset
-  // margin around render_menu_row()'s own smaller pill read as paper
-  // instead.
-  menu_layer_set_highlight_colors(s_menu, RENDER_COLOR_PAPER, GColorBlack);
-  // Deliberately no .select_click callback here: menu_layer_set_click_
-  // config_onto_window() is never called on this window (see the click
-  // config provider's comment above), so this field would never be invoked
-  // by anything. This looks exactly like the live, wired-up pattern shown in
-  // typical MenuLayer usage, which makes it tempting to "simplify" by
-  // deleting select_click_handler's explicit call above as apparently
-  // redundant -- doing so would silently reintroduce a dead-Select
-  // regression, since Select is only ever driven through the custom click
-  // config provider, not through this callback.
-  menu_layer_set_callbacks(s_menu, NULL,
-                            (MenuLayerCallbacks){
-                                .get_num_rows = get_num_rows,
-                                .get_cell_height = get_cell_height,
-                                .draw_row = draw_row,
-                            });
-  layer_add_child(root, menu_layer_get_layer(s_menu));
-
-  s_scroll_indicator = layer_create(GRect(bounds.size.w - SCROLL_INDICATOR_WIDTH - SCROLL_INDICATOR_MARGIN,
-                                           RENDER_STRIP_H, SCROLL_INDICATOR_WIDTH,
-                                           bounds.size.h - RENDER_STRIP_H));
-  layer_set_update_proc(s_scroll_indicator, scroll_indicator_update_proc);
-  layer_add_child(root, s_scroll_indicator);
-
+  // Deliberately no .select_click callback in the MenuLayerCallbacks below:
+  // menu_layer_set_click_config_onto_window() is never called on this
+  // window, so that field would never be invoked by anything. This looks
+  // exactly like the live, wired-up pattern shown in typical MenuLayer
+  // usage, which makes it tempting to "simplify" by deleting
+  // select_click_handler's explicit call above as apparently redundant --
+  // doing so would silently reintroduce a dead-Select regression, since
+  // Select is only ever driven through the custom click config provider, not
+  // through this callback.
+  RenderMenuScreen screen = render_build_menu_screen(&(RenderMenuScreenSpec){
+      .window_bg = RENDER_COLOR_PAPER,
+      .click_config_provider = click_config_provider,
+      .window_handlers = (WindowHandlers){.appear = window_appear},
+      .header_height = RENDER_STRIP_H,
+      .header_update_proc = strip_update_proc,
+      .get_num_rows = get_num_rows,
+      .get_cell_height = get_cell_height,
+      .draw_row = draw_row,
+      .with_scroll_indicator = true,
+      .scroll_indicator_update_proc = scroll_indicator_update_proc,
+  });
+  s_window = screen.window;
+  s_strip = screen.header;
+  s_menu = screen.menu;
+  s_scroll_indicator = screen.scroll_indicator;
   return s_window;
 }
 
 void screen_actions_destroy(void) {
-  layer_destroy(s_scroll_indicator);
+  render_destroy_menu_screen(&(RenderMenuScreen){
+      .window = s_window, .header = s_strip, .menu = s_menu, .scroll_indicator = s_scroll_indicator});
   s_scroll_indicator = NULL;
-  menu_layer_destroy(s_menu);
   s_menu = NULL;
-  layer_destroy(s_strip);
   s_strip = NULL;
-  window_destroy(s_window);
   s_window = NULL;
 }
 

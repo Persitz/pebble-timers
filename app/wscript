@@ -8,9 +8,19 @@
 #
 import os
 import os.path
+import subprocess
+import sys
 
 top = '.'
 out = 'build'
+
+# Generate parser-vocabulary artifacts before the Pebble SDK reads
+# package.json's raw resource or compiles the generated offsets header.
+_app_root = os.path.abspath('.')
+subprocess.check_call(
+    [sys.executable, os.path.join(_app_root, 'scripts', 'generate_nl_tables.py')],
+    cwd=_app_root,
+)
 
 
 def options(ctx):
@@ -61,6 +71,22 @@ def build(ctx):
     if emu_test_hooks:
         app_defines.append('EMU_TEST_HOOKS=1')
 
+    # Non-LTO build toggle: mirrors the same env-var-not-CLI-flag shape as
+    # GALLERY_MODE/EMU_TEST_HOOKS above. LTO is ON by default (see the
+    # per-platform loop below) -- this is the opt-OUT switch, not opt-in,
+    # because the shipped release artifact must stay the LTO build. Its
+    # purpose is CI: a whole-program LTO build can both surface warnings a
+    # per-TU build wouldn't (whole-program view) AND suppress warnings a
+    # per-TU build would surface (LTO's internalization/DCE can eliminate a
+    # code path -- and any diagnostic tied to it -- before the diagnostic
+    # pass ever sees it); building both ways in CI keeps both classes of
+    # signal instead of only whichever one the shipped configuration happens
+    # to produce. Set PEBBLE_NO_LTO=1 to build without it (plain, undecorated
+    # per-TU compilation, no -Wl,-u,__pbl_app_info either -- that flag exists
+    # solely to save a symbol LTO would otherwise delete, so it has nothing
+    # to do in a non-LTO build and adding it there would just be noise).
+    lto_enabled = os.environ.get('PEBBLE_NO_LTO') != '1'
+
     # A gallery build
     # adds gallery.c + ~270 gated lines on TOP of a release image that already
     # sits only a few hundred bytes below the 65535-byte virtual_size uint16
@@ -101,6 +127,61 @@ def build(ctx):
     cached_env = ctx.env
     for platform in ctx.env.TARGET_PLATFORMS:
         ctx.env = ctx.all_envs[platform]
+
+        # Link-time optimization: -3,052 B measured against current source
+        # (65012 -> 61960). -flto must be on both CFLAGS (compile
+        # -- each TU emits LTO bytecode instead of native object code) and
+        # LINKFLAGS (LTO's real optimization happens at link time, when gcc
+        # is re-invoked as the LTO driver). LINKFLAGS does NOT also need an
+        # explicit -Os: the SDK's own `pebble_sdk_gcc.py` configure() step
+        # already prepends -Os to LINKFLAGS for every platform env
+        # (`pebble_linkflags` includes -Os, added via
+        # `conf.env.prepend_value('LINKFLAGS', pebble_linkflags)`) before
+        # this build() function's per-platform loop ever runs -- confirmed
+        # by reading the installed SDK's own
+        # waflib/extras/pebble_sdk_gcc.py. An earlier version of this
+        # comment implied that omitting a LINKFLAGS -Os here would leave the
+        # LTO backend unoptimised -- that is not true; the SDK's -Os is
+        # already on LINKFLAGS regardless of what this block appends, so
+        # adding a second one here was a no-op duplicate, now removed.
+        # Default partitioning only -- DO NOT add -flto-partition=none: it
+        # measures smaller but drops all ELF relocations (num_reloc_entries
+        # 9 -> 0) and crashes the app immediately on real firmware; testing
+        # observed 12 `App fault!` signatures.
+        # `-Wl,-u,__pbl_app_info` is NOT a style choice, it is LOAD-BEARING:
+        # the generated `appinfo.auto.c` PebbleProcessInfo header object has
+        # no C references. Whole-program LTO therefore deletes it before the
+        # linker script's `KEEP(*(.pbl_header))` ever sees it. The build
+        # stays green, a .pbw is still produced, but its `.header` section is
+        # gone and its UUID is corrupt, so the firmware cannot load it. This
+        # one flag prevents that silent-corruption class. Do not remove it
+        # without rebuilding, checking integrity, and validating on firmware.
+        # If a future target adds its own
+        # `__attribute__((section(...)))` object (e.g. a
+        # background worker's `__pbl_worker_info`), it needs the same `-u`
+        # treatment or the same corruption class recurs for it.
+        #
+        # This toolchain's default is SLIM LTO objects -- verified directly
+        # (arm-none-eabi-size / readelf -S on a build/**/*.c.9.o): .text is 0
+        # bytes and the object's real content is a set of .gnu.lto_* sections
+        # (GIMPLE bytecode), not native machine code. That's fine as long as
+        # the only link path is `arm-none-eabi-gcc` via waf/pbl_build (which
+        # recognizes those sections and invokes the LTO plugin to generate
+        # real code at link time), but it would silently break a future step
+        # that `ar`s these objects into a static library for a raw `ld`/`nm`
+        # consumer that doesn't go through the gcc LTO driver/plugin -- such
+        # a consumer would see empty .text and no usable symbols in them.
+        #
+        # PEBBLE_NO_LTO=1 (see above) skips this block entirely, producing a
+        # plain per-translation-unit build -- the diagnostic-signal build CI
+        # runs alongside this one, never the shipped artifact.
+        if lto_enabled:
+            ctx.env.append_value('CFLAGS', ['-flto'])
+            ctx.env.append_value(
+                'LINKFLAGS',
+                ['-flto', '-Wl,-u,__pbl_app_info'],
+            )
+
         ctx.set_group(ctx.env.PLATFORM_NAME)
         app_elf = '{}/pebble-app.elf'.format(ctx.env.BUILD_DIR)
         ctx.pbl_build(source=app_sources, target=app_elf, bin_type='app',
@@ -118,3 +199,68 @@ def build(ctx):
 
     ctx.set_group('bundle')
     ctx.pbl_bundle(binaries=binaries)
+
+    # -- Artifact gates, attached to the BUILD rather than to a CI step -----
+    #
+    # Running these checks only as separate `npm run check:pbw` / `npm run
+    # size:c` steps after an explicit `pebble build` leaves the artifact
+    # users actually receive ungated, because `pebble publish` does NOT
+    # upload a prebuilt .pbw. Its PublishCommand.__call__() calls
+    # `self._build_project(args)` unconditionally (pebble_tool/commands/
+    # publish.py), which runs BuildCommand and then uploads whatever that
+    # build just wrote to build/app.pbw -- a separate, unchecked build that
+    # bypasses any gate that only runs around a prior, explicit `pebble
+    # build`.
+    #
+    # Gating the BUILD closes it for every producer at once: this project's
+    # own `pebble build`, CI's, and the one inside `pebble publish` -- there
+    # is no build path that reaches a .pbw without passing here.
+    #
+    # WHICH gate runs where, and why they differ:
+    #   * The integrity check runs on EVERY build. It is the LTO
+    #     silent-corruption class (a PBLAPP-less, UUID-corrupt, or
+    #     virtual_size-corrupt image from a green build) and is cheap,
+    #     configuration-independent, and always correct to enforce.
+    #   * The byte-budget size gate runs ONLY for the shipped release
+    #     configuration. Its thresholds are calibrated against the LTO
+    #     release image, and both the PEBBLE_NO_LTO diagnostic build (several
+    #     KB larger by design -- see ci.yml's own comment refusing to gate
+    #     it) and the GALLERY_MODE build (a visual-verification tool, never
+    #     shipped) would fail it for reasons that say nothing about the
+    #     artifact users get.
+    def _gate_artifact(bld):
+        import glob as _glob
+        pbws = _glob.glob(os.path.join(bld.out_dir, '*.pbw'))
+        if not pbws:
+            return  # not a bundling build (e.g. `pebble clean`) -- nothing to gate
+        pbw = pbws[0]
+        scripts_dir = os.path.join(_app_root, 'scripts')
+
+        cmd = [sys.executable, os.path.join(scripts_dir, 'check_pbw_integrity.py'), pbw]
+        for b in binaries:
+            cmd += ['--elf', '{}={}'.format(b['platform'],
+                                            os.path.join(bld.out_dir, b['platform'],
+                                                         'pebble-app.elf'))]
+        if subprocess.call(cmd) != 0:
+            # waf has already written the .pbw by the time a post-build
+            # function runs, so a non-zero exit alone would leave a corrupt
+            # bundle sitting at the exact path every downstream consumer
+            # (`pebble install`, `pebble publish`, a CI upload step) looks
+            # for. Delete it: the failure must not be survivable by a caller
+            # that ignores the exit code.
+            try:
+                os.remove(pbw)
+            except OSError:
+                pass
+            bld.fatal('artifact-integrity gate FAILED -- corrupt .pbw removed rather than '
+                      'left where a publish/install step could pick it up '
+                      '(see app/scripts/check_pbw_integrity.py)')
+
+        if gallery_mode or not lto_enabled:
+            return
+        for b in binaries:
+            elf = os.path.join(bld.out_dir, b['platform'], 'pebble-app.elf')
+            if subprocess.call([os.path.join(scripts_dir, 'size.sh'), elf]) != 0:
+                bld.fatal('size gate FAILED for {} -- see app/scripts/size.sh'.format(b['platform']))
+
+    ctx.add_post_fun(_gate_artifact)

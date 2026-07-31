@@ -1,0 +1,40 @@
+// SPDX-License-Identifier: Apache-2.0
+// Copyright 2026 Herman Persitz
+
+// Single source of truth for parse_nl's 26 NUL-separated word blobs.
+//
+// Every literal ends with the final word's explicit NUL. As with the former
+// `static const char ...[]` declarations, the C literal contributes one
+// additional implicit NUL; the generator preserves that byte in the raw
+// resource and reports its size in nl_tables.h.
+//
+// Define NL_BLOB(name, literal) before including this file. The build-time
+// generator parses these same invocations to emit nl_tables.bin,
+// nl_tables.h, and the host-test byte include.
+
+NL_BLOB(NUMBER_WORDS_BLOB, "zero\0one\0two\0three\0four\0five\0six\0seven\0eight\0nine\0ten\0eleven\0twelve\0thirteen\0fourteen\0fifteen\0sixteen\0seventeen\0eighteen\0nineteen\0twenty\0thirty\0forty\0fifty\0sixty\0seventy\0eighty\0ninety\0couple\0cero\0un\0uno\0una\0dos\0tres\0cuatro\0cinco\0seis\0siete\0ocho\0nueve\0diez\0once\0doce\0trece\0catorce\0quince\0dieciseis\0diecisiete\0dieciocho\0diecinueve\0veinte\0veintiuno\0veintiuna\0veintidos\0veintitres\0veinticuatro\0veinticinco\0veintiseis\0veintisiete\0veintiocho\0veintinueve\0treinta\0cuarenta\0cincuenta\0sesenta\0setenta\0ochenta\0noventa\0")
+NL_BLOB(UNIT_WORDS_BLOB, "second\0seconds\0sec\0secs\0segundo\0segundos\0seg\0segs\0minute\0minutes\0min\0mins\0minuto\0minutos\0hour\0hours\0hr\0hrs\0hora\0horas\0minutito\0minutitos\0horita\0horitas\0segundito\0segunditos\0minutillo\0minutillos\0segundillo\0segundillos\0horilla\0horillas\0minutico\0minuticos\0segundico\0segundicos\0horica\0horicas\0")
+NL_BLOB(KIND_REPEAT_WORDS_BLOB, "repeat\0repeating\0every\0interval\0recurring\0repetir\0cada\0intervalo\0recurrente\0recurrentes\0repetitivo\0repetitivos\0repite\0repites\0")
+NL_BLOB(KIND_STOPWATCH_WORDS_BLOB, "stopwatch\0chrono\0chronometer\0cronometro\0crono\0cronometrame\0cronometra\0")
+NL_BLOB(KIND_COUNTDOWN_WORDS_BLOB, "timer\0countdown\0alarm\0temporizador\0cuenta\0atras\0alarma\0regresiva\0regresivo\0")
+NL_BLOB(JOINER_WORDS_BLOB, "y\0and\0")
+NL_BLOB(FILLER_WORDS_BLOB, "for\0of\0a\0an\0de\0por\0para\0set\0pon\0ponme\0in\0within\0")
+NL_BLOB(APPROX_DROP_WORDS_BLOB, "unos\0unas\0como\0about\0around\0like\0roughly\0")
+NL_BLOB(NAMEDROP_WORDS_BLOB, "please\0just\0kindly\0only\0itself\0revert\0give\0me\0need\0want\0have\0could\0would\0let\0us\0lets\0uh\0um\0hmm\0so\0okay\0ok\0maybe\0see\0well\0dale\0pone\0ponga\0poned\0echa\0echad\0quitad\0activad\0fijate\0avisame\0hazme\0hagame\0dame\0che\0parce\0parcero\0listo\0ahorita\0orita\0orale\0nomas\0sumerce\0venga\0este\0eh\0pues\0bueno\0ver\0tipo\0boludo\0ta\0bo\0posta\0pucha\0ponele\0capaz\0banda\0largo\0larga\0largos\0punto\0repente\0pico\0monedas\0")
+NL_BLOB(MAGNITUDE_WORDS_BLOB, "hundreds\0thousand\0thousands\0million\0millions\0billion\0billions\0mil\0miles\0millon\0millones\0billon\0billones\0")
+NL_BLOB(HUNDRED_WORDS_BLOB, "hundred\0cien\0ciento\0cientos\0")
+NL_BLOB(CLOCK_PREP_WORDS_EN_BLOB, "at\0until\0til\0till\0")
+NL_BLOB(CLOCK_ART_WORDS_ES_BLOB, "las\0la\0")
+NL_BLOB(CLOCK_PM_WORDS_BLOB, "pm\0tarde\0noche\0")
+NL_BLOB(CLOCK_AM_WORDS_BLOB, "am\0manana\0")
+NL_BLOB(CLOCK_NOON_WORDS_BLOB, "noon\0mediodia\0")
+NL_BLOB(CLOCK_MIDNIGHT_WORDS_BLOB, "midnight\0medianoche\0")
+NL_BLOB(CLOCK_HEDGE_TAIL_WORDS_BLOB, "pico\0algo\0monedas\0")
+NL_BLOB(CLOCK_ALARM_CUE_WORDS_BLOB, "alarm\0alarma\0wake\0despiertame\0tonight\0")
+NL_BLOB(QUARTER_WORDS_BLOB, "cuarto\0cuartos\0quarter\0quarters\0cuartito\0cuartitos\0")
+NL_BLOB(HALF_WORDS_BLOB, "medio\0media\0half\0")
+NL_BLOB(DEFINITE_ARTICLE_WORDS_BLOB, "the\0el\0la\0los\0las\0")
+NL_BLOB(RANGE_CONN_WORDS_BLOB, "to\0or\0a\0")
+NL_BLOB(CREATE_CUE_WORDS_BLOB, "ponme\0pon\0dale\0hazme\0hagame\0set\0echa\0give\0pone\0")
+NL_BLOB(CORRECTION_MARKER_WORDS_BLOB, "actually\0wait\0no\0mean\0rather\0mejor\0digo\0espera\0perdon\0dicho\0")
+NL_BLOB(HOMOPHONE_BLOB, "for\0four\0to\0two\0too\0two\0ate\0eight\0won\0one\0")

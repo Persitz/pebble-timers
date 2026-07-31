@@ -5,6 +5,45 @@
 
 #include <string.h>
 
+#ifdef PBL_PLATFORM_EMERY
+static const uint8_t *s_vocabulary;
+#else
+#include "../../../resources/generated/nl_tables_host.inc"
+static const uint8_t *s_vocabulary = NL_TABLES_HOST_DATA;
+#endif
+
+#define NL_TABLES_BASE s_vocabulary
+#include "../../../resources/generated/nl_tables.h"
+
+static uint32_t vocabulary_crc32(const uint8_t *data, size_t size) {
+  uint32_t crc = 0xffffffffu;
+  for (size_t i = 0; i < size; i++) {
+    crc ^= data[i];
+    for (int bit = 0; bit < 8; bit++) {
+      uint32_t low_bit = crc & 1u;
+      crc >>= 1;
+      if (low_bit != 0u) crc ^= 0xedb88320u;
+    }
+  }
+  return crc ^ 0xffffffffu;
+}
+
+bool parse_nl_vocabulary_set(const uint8_t *data, size_t size) {
+  s_vocabulary = NULL;
+  if (data == NULL || size != NL_TABLES_TOTAL) return false;
+  if (vocabulary_crc32(data, size) != NL_TABLES_CRC32) return false;
+  s_vocabulary = data;
+  return true;
+}
+
+size_t parse_nl_vocabulary_size(void) {
+  return NL_TABLES_TOTAL;
+}
+
+bool parse_nl_vocabulary_available(void) {
+  return s_vocabulary != NULL;
+}
+
 // -- Tunables -----------------------------------------------------------
 // 12 was tight enough that a realistic politeness preamble ("please could
 // you kindly go ahead and just set a timer for exactly five minutes
@@ -79,6 +118,9 @@ typedef struct {
 } NlToken;
 
 // -- Vocabulary tables (merged es/en) ----------------------------------
+// The 26 byte definitions live in parse_nl_vocab.def. The generated header
+// above maps every historical *_BLOB identifier to its checked offset in
+// the one installed resource span, so the grammar below is unchanged.
 
 // NUMBER_WORDS used to be a `{const char*, value}` pointer-struct array --
 // `.data.rel.ro` (552 B: 69 pointers + 69 relocations) for a payload that's
@@ -93,35 +135,6 @@ typedef struct {
 // en 0-19 + tens; es 0-29 (veinti- forms are single lexicalized tokens) + tens.
 // The accumulator below handles compounding ("twenty five" / "treinta y
 // cinco") uniformly -- this table only needs the individual atoms.
-static const char NUMBER_WORDS_BLOB[] =
-    // en ones/teens
-    "zero\0" "one\0" "two\0" "three\0" "four\0"
-    "five\0" "six\0" "seven\0" "eight\0" "nine\0"
-    "ten\0" "eleven\0" "twelve\0" "thirteen\0" "fourteen\0"
-    "fifteen\0" "sixteen\0" "seventeen\0" "eighteen\0" "nineteen\0"
-    // en tens
-    "twenty\0" "thirty\0" "forty\0" "fifty\0"
-    "sixty\0" "seventy\0" "eighty\0" "ninety\0"
-    // "couple" = 2 (en only -- "a couple of minutes" is common everyday
-    // timer phrasing; "par"/"pair" (es/en) deliberately NOT added, collision
-    // risk with real name content; "dozen" also deliberately skipped, too
-    // rare for a timer). is_tens_word_value(2) is false, so this never
-    // triggers the tens+ones compounding path -- it resolves to exactly one
-    // token, like any other ones-range number word.
-    "couple\0"
-    // es ones/teens (accent-folded forms -- normalize() produces these)
-    "cero\0" "un\0" "uno\0" "una\0" "dos\0" "tres\0"
-    "cuatro\0" "cinco\0" "seis\0" "siete\0" "ocho\0" "nueve\0"
-    "diez\0" "once\0" "doce\0" "trece\0" "catorce\0"
-    "quince\0" "dieciseis\0" "diecisiete\0" "dieciocho\0" "diecinueve\0"
-    // es veinti- (21-29, single tokens) + veinte
-    "veinte\0" "veintiuno\0" "veintiuna\0" "veintidos\0"
-    "veintitres\0" "veinticuatro\0" "veinticinco\0" "veintiseis\0"
-    "veintisiete\0" "veintiocho\0" "veintinueve\0"
-    // es tens
-    "treinta\0" "cuarenta\0" "cincuenta\0"
-    "sesenta\0" "setenta\0" "ochenta\0" "noventa\0";
-
 // Parallel to NUMBER_WORDS_BLOB, same word order -- index `i` here is the
 // value for the i-th blob entry (0-based ordinal, per blob_find_index).
 static const int8_t NUMBER_VALUES[] = {
@@ -140,35 +153,22 @@ static const int8_t NUMBER_VALUES[] = {
     60, 70, 80, 90,
 };
 
+// The generator's own checks (blob count, ASCII, trailing NUL,
+// whole-payload CRC) have no idea NUMBER_WORDS_BLOB's
+// word order must stay in lockstep with this hand-maintained array -- a
+// `.def` edit that reorders NUMBER_WORDS_BLOB at equal word count would
+// pass every existing check and silently mis-index NUMBER_VALUES at
+// runtime. This closes the COUNT half mechanically: an edit that adds/
+// removes a word without updating this array now fails the BUILD instead of
+// misbehaving at runtime. It cannot catch a reorder at equal count -- that
+// half would require moving the values into the .def beside their words.
+_Static_assert(ARRLEN(NUMBER_VALUES) == NL_WORD_COUNT_NUMBER_WORDS_BLOB,
+               "NUMBER_VALUES must have exactly one entry per NUMBER_WORDS_BLOB word, in the same order");
+
 // Same blob+parallel-array conversion as NUMBER_WORDS above, for UNIT_WORDS.
 // Every mult value is one of exactly 3 constants (1/60/3600), so the
 // parallel array stores a small `int8_t` INDEX into UNIT_MULTS rather than
 // the seconds-per-unit value itself.
-static const char UNIT_WORDS_BLOB[] =
-    "second\0" "seconds\0" "sec\0" "secs\0"
-    "segundo\0" "segundos\0" "seg\0" "segs\0"
-    "minute\0" "minutes\0" "min\0" "mins\0"
-    "minuto\0" "minutos\0"
-    "hour\0" "hours\0" "hr\0" "hrs\0"
-    "hora\0" "horas\0"
-    // es diminutive unit synonyms (colloquial) -- same multiplier as the
-    // base unit, just an additional spelling. Singular/plural pairs,
-    // matching every other unit entry's own shape.
-    "minutito\0" "minutitos\0"
-    "horita\0" "horitas\0"
-    "segundito\0" "segunditos\0"
-    // The Spain "-illo" and Colombia/Andean "-ico" diminutive-unit synonym
-    // families -- pure closed-vocab additions (same multiplier as the base
-    // unit), no new logic. "rato"/"raticos" deliberately left OUT --
-    // "rato" is a vague short-duration noun with no defined seconds, the
-    // same class as the deliberately-OUT "un toque"/"un cacho".
-    "minutillo\0" "minutillos\0"
-    "segundillo\0" "segundillos\0"
-    "horilla\0" "horillas\0"
-    "minutico\0" "minuticos\0"
-    "segundico\0" "segundicos\0"
-    "horica\0" "horicas\0";
-
 static const int32_t UNIT_MULTS[] = {1, 60, 3600};
 
 // Parallel to UNIT_WORDS_BLOB, same word order -- index into UNIT_MULTS.
@@ -190,6 +190,11 @@ static const int8_t UNIT_MULT_IDX[] = {
     2, 2,
 };
 
+// Same rationale as NUMBER_VALUES's own _Static_assert above -- closes the
+// count half for UNIT_WORDS_BLOB/UNIT_MULT_IDX mechanically.
+_Static_assert(ARRLEN(UNIT_MULT_IDX) == NL_WORD_COUNT_UNIT_WORDS_BLOB,
+               "UNIT_MULT_IDX must have exactly one entry per UNIT_WORDS_BLOB word, in the same order");
+
 // "recurrente"/"recurrentes" (es) and "recurring" (en; "repeating" was already present) were
 // added as single-token, position-independent kind keywords, same cost/risk tier as
 // every other entry in this table. "ciclo"/"cycle" were deliberately NOT added: they collide
@@ -202,27 +207,15 @@ static const int8_t UNIT_MULT_IDX[] = {
 // "repetitivo(s)"/"repite"/"repites" -- pure closed-vocab additions, no
 // logic; governed by the clause-scoped kind-resolution walk like every other kind
 // keyword.
-static const char KIND_REPEAT_WORDS_BLOB[] =
-    "repeat\0" "repeating\0" "every\0" "interval\0" "recurring\0"
-    "repetir\0" "cada\0" "intervalo\0" "recurrente\0" "recurrentes\0"
-    "repetitivo\0" "repetitivos\0" "repite\0" "repites\0";
 // "cronometrame"/"cronometra" -- the voseo stopwatch-verb forms (the most
 // natural voseo stopwatch verb); KIND_STOPWATCH_WORDS previously had only
 // noun forms.
-static const char KIND_STOPWATCH_WORDS_BLOB[] =
-    "stopwatch\0" "chrono\0" "chronometer\0" "cronometro\0" "crono\0"
-    "cronometrame\0" "cronometra\0";
 // Explicit/optional -- redundant with the countdown default; listed so these
 // tokens are consumed (never leak into the name residue) rather than treated
 // as unclassified WORD tokens. "regresiva"/"regresivo" added alongside
 // "cuenta"/"atras" (same vocab addition as KIND_REPEAT_WORDS above) --
 // "cuenta regresiva" is the other common es phrasing for "countdown"
 // alongside the already-covered "cuenta atras".
-static const char KIND_COUNTDOWN_WORDS_BLOB[] =
-    "timer\0" "countdown\0" "alarm\0" "temporizador\0"
-    "cuenta\0" "atras\0" "alarma\0" "regresiva\0"
-    "regresivo\0";
-static const char JOINER_WORDS_BLOB[] = "y\0" "and\0";
 // "set" (as in "set a timer for...", arguably THE canonical assistant
 // phrasing) was missing -- it pollutes the name residue on the single most
 // common real phrasing. "pon"/"ponme" are the casual es equivalents ("pon
@@ -247,10 +240,6 @@ static const char JOINER_WORDS_BLOB[] = "y\0" "and\0";
 // ("te en hebras", "pollo en salsa") than duration glue, and es already has
 // "de"/"por"/"para" -- the same reasoning that already kept "para" a
 // filler without coercing "en" the same way.
-static const char FILLER_WORDS_BLOB[] =
-    "for\0" "of\0" "a\0" "an\0" "de\0" "por\0"
-    "para\0" "set\0" "pon\0" "ponme\0" "in\0" "within\0";
-
 // Approximation markers -- dropped from the name residue (consumed, like a
 // filler) but deliberately kept OUT of FILLER_WORDS (see the CLS_APPROX
 // comment on the enum above and the FILLER-minimality invariant comment
@@ -260,9 +249,6 @@ static const char FILLER_WORDS_BLOB[] =
 // menos" is a deliberate, still-open scope gap (needs different,
 // multi-token matching, not a same-shape table entry) rather than a
 // silent omission -- not added.
-static const char APPROX_DROP_WORDS_BLOB[] =
-    "unos\0" "unas\0" "como\0" "about\0" "around\0" "like\0" "roughly\0";
-
 // The CLS_NAMEDROP pollution vocabulary -- a curated word list built from
 // observed name-pollution phrasings, not freelanced or extended beyond what
 // those phrasings required. Semantics identical to APPROX_DROP_WORDS above
@@ -289,34 +275,9 @@ static const char APPROX_DROP_WORDS_BLOB[] =
 // naming it -- "menos" is load-bearing string content read directly (by norm
 // text, not class) by the subtractive-clock grammar
 // (parse_subtractive_n_expr/match_subtractive_shape_b); reclassifying it
-// risks that family's own pinned regression locks for a low-severity
+// risks that family's own pinned regression locks for a small
 // hedge-cleanliness gain. A residual "menos" may still surface in a
-// non-clock "mas o menos" duration utterance's name (a known, accepted gap).
-static const char NAMEDROP_WORDS_BLOB[] =
-    // en carriers/politeness.
-    "please\0" "just\0" "kindly\0" "only\0" "itself\0" "revert\0" "give\0" "me\0"
-    "need\0" "want\0" "have\0" "could\0" "would\0" "let\0" "us\0" "lets\0"
-    // en disfluency.
-    "uh\0" "um\0" "hmm\0" "so\0" "okay\0" "ok\0" "maybe\0" "see\0" "well\0"
-    // es imperatives/particles -- accent-folded forms only; nl_normalize
-    // already folds e.g. "poné"->"pone", "órale"->"orale" before lookup, so
-    // no separate accented entry is needed.
-    "dale\0" "pone\0" "ponga\0" "poned\0" "echa\0" "echad\0" "quitad\0" "activad\0" "fijate\0"
-    "avisame\0" "hazme\0" "hagame\0" "dame\0" "che\0" "parce\0" "parcero\0" "listo\0"
-    "ahorita\0" "orita\0" "orale\0" "nomas\0" "sumerce\0" "venga\0" "este\0" "eh\0"
-    "pues\0" "bueno\0" "ver\0" "tipo\0" "boludo\0"
-    // es Rioplatense.
-    "ta\0" "bo\0" "posta\0" "pucha\0" "ponele\0" "capaz\0" "banda\0" "largo\0"
-    "larga\0" "largos\0"
-    // "en punto" / "de repente": "en"/"de" already resolve via
-    // other means ("de" is already FILLER; "en" is deliberately NOT filler,
-    // and is left as an accepted low-severity residual -- see this table's
-    // own top comment) -- only the phrase's own content
-    // word needs to join NAMEDROP for the hedge to (mostly) vanish.
-    "punto\0" "repente\0"
-    // Single-token hedge members ("tipo"/"capaz" already listed above).
-    "pico\0" "monedas\0";
-
+// non-clock "mas o menos" duration utterance's name.
 // The COMPLETE en+es magnitude-morpheme inventory (>99, outside
 // this app's 0-99 word-form grammar -- see NUMBER_WORDS). Unlike an
 // open-ended fuzzy-match target set, this class is closed and finite --
@@ -345,10 +306,6 @@ static const char NAMEDROP_WORDS_BLOB[] =
 // UNCHANGED -- there is no composer for them either, following this table's
 // own "enumerate a closed class to completion; never chase an open one"
 // principle.
-static const char MAGNITUDE_WORDS_BLOB[] =
-    "hundreds\0" "thousand\0" "thousands\0" "million\0" "millions\0" "billion\0" "billions\0"
-    "mil\0" "miles\0" "millon\0" "millones\0" "billon\0" "billones\0";
-
 // The hundred-CLASS word set -- narrower than MAGNITUDE_WORDS above (see
 // that table's own comment for why these four are kept separate from it).
 // The positive composer that used to read this list
@@ -358,8 +315,6 @@ static const char MAGNITUDE_WORDS_BLOB[] =
 // instead of an unrelated number+unit pair elsewhere silently "rescuing" it
 // into a wrong value (e.g. misreading "ciento veinte segundos" as "veinte
 // segundos"=20s).
-static const char HUNDRED_WORDS_BLOB[] = "hundred\0" "cien\0" "ciento\0" "cientos\0";
-
 // The clock-target discriminator's own closed word sets -- kept separate
 // from every other vocab table above since they are never number/unit/
 // kind/filler/joiner content, only clock-specific markers
@@ -369,35 +324,24 @@ static const char HUNDRED_WORDS_BLOB[] = "hundred\0" "cien\0" "ciento\0" "ciento
 // una"), consumed only when it actually precedes a valid clock expression
 // (see that function's own doc comment for why a bare "la"/"a" elsewhere is
 // never affected).
-static const char CLOCK_PREP_WORDS_EN_BLOB[] = "at\0" "until\0" "til\0" "till\0";
-static const char CLOCK_ART_WORDS_ES_BLOB[] = "las\0" "la\0";
 // am/pm meridiem markers -- en single tokens; es "tarde"/"noche"/"manana"
 // used after an optional "de"/"la"/"el" (match_clock_expr skips those,
 // itself, not via a FILLER_WORDS addition -- keeps this discipline scoped
 // to the clock sub-grammar only, never affecting the clause-scoped kind-resolution walk or the
 // ordinary duration grammar's residue).
-static const char CLOCK_PM_WORDS_BLOB[] = "pm\0" "tarde\0" "noche\0";
-static const char CLOCK_AM_WORDS_BLOB[] = "am\0" "manana\0";
-
 // Standalone clock-noun words -- each resolves to a full clock target on
 // its own, no hour/minute grammar needed (match_clock_expr's own preamble,
 // below).
-static const char CLOCK_NOON_WORDS_BLOB[] = "noon\0" "mediodia\0";
-static const char CLOCK_MIDNIGHT_WORDS_BLOB[] = "midnight\0" "medianoche\0";
 // A trailing "y pico"/"y algo"/"y monedas" hedge after a resolved clock
 // hour -- consumed and dropped (the resolved target is kept exactly as-is;
 // there is no unambiguous "a bit past" value to add), so it neither leaks
 // into the name nor derails the meridiem check that follows it inside
 // match_clock_expr.
-static const char CLOCK_HEDGE_TAIL_WORDS_BLOB[] = "pico\0" "algo\0" "monedas\0";
 // "set an alarm for six thirty" promotes an otherwise-ordinary unit-less
 // two-number-group DURATION pair to a clock target only when one of these
 // alarm/wake cues is present somewhere in the utterance (see
 // match_alarm_cue_clock's own doc comment for the full reasoning -- "for"
 // itself is deliberately never promoted to a generic clock preposition).
-static const char CLOCK_ALARM_CUE_WORDS_BLOB[] =
-    "alarm\0" "alarma\0" "wake\0" "despiertame\0" "tonight\0";
-
 // The fractions engine's two fraction-word families. Denominator-4 words
 // ("cuarto(s)"/"quarter(s)") combine with an optional preceding NUMBER
 // (default 1 if absent, via match_fraction_at below) to form N/4 -- one
@@ -409,10 +353,6 @@ static const char CLOCK_ALARM_CUE_WORDS_BLOB[] =
 // "cuartito"/"cuartitos" (the diminutive quarter-hour form) added alongside
 // the base QUARTER_WORDS -- same pure-vocab addition as the UNIT_WORDS
 // diminutives above.
-static const char QUARTER_WORDS_BLOB[] = "cuarto\0" "cuartos\0" "quarter\0" "quarters\0"
-                                          "cuartito\0" "cuartitos\0";
-static const char HALF_WORDS_BLOB[] = "medio\0" "media\0" "half\0";
-
 // The pair-rule's own definite-article precondition -- a "the NN NN"/
 // "el/la/los/las NN NN" shape is a named entity (a cricket match, a train),
 // never a spoken duration (no one says "the six forty five" to mean 405s).
@@ -420,14 +360,10 @@ static const char HALF_WORDS_BLOB[] = "medio\0" "media\0" "half\0";
 // spoken-M:SS pair's own first group, below -- never added to FILLER_WORDS
 // (these are ordinary CLS_WORD name content everywhere else, e.g. "set the
 // parking meter for an hour").
-static const char DEFINITE_ARTICLE_WORDS_BLOB[] = "the\0" "el\0" "la\0" "los\0" "las\0";
-
 // The range-connective word set read directly by norm text against the
 // token before a winning duration match's own first bound (see the usage
 // site, further down, for why "and" needs its own extra "between"
 // precondition rather than living in this table too).
-static const char RANGE_CONN_WORDS_BLOB[] = "to\0" "or\0" "a\0";
-
 // Closed create/imperative-cue set, read by norm text regardless of
 // class/consumed -- "pon"/"ponme"/"set" are FILLER, "dale"/"hazme"/
 // "hagame"/"pone"/"echa" are NAMEDROP, all consumed either way; matched
@@ -449,19 +385,12 @@ static const char RANGE_CONN_WORDS_BLOB[] = "to\0" "or\0" "a\0";
 // (matching this rule's own doc comment) as a second, independent guarantee
 // -- belt-and-suspenders: a future cue word added to this blob but not the
 // vocab tables still can't re-trigger this bug.
-static const char CREATE_CUE_WORDS_BLOB[] =
-    "ponme\0" "pon\0" "dale\0" "hazme\0" "hagame\0" "set\0" "echa\0" "give\0" "pone\0";
-
 // Closed correction-marker set -- structural marker ("marker between two
 // number-groups"), read by norm text only, NEVER added to FILLER (protects
 // the clause-scoped kind-resolution walk's clause-boundary detection).
 // Verified none of these words appear in
 // NAMEDROP_WORDS_BLOB/FILLER_WORDS_BLOB (they must stay CLS_WORD so the
 // !consumed[mk] check further down can see them).
-static const char CORRECTION_MARKER_WORDS_BLOB[] =
-    "actually\0" "wait\0" "no\0" "mean\0" "rather\0"
-    "mejor\0" "digo\0" "espera\0" "perdon\0" "dicho\0";
-
 // A cheap "at most one edit away" check (substitution, OR a single
 // insertion/deletion) -- NOT general-vocabulary fuzzy matching (this file
 // has no `nl_levenshtein`/classify-time fuzzy correction at all); this is a
@@ -524,13 +453,6 @@ static bool word_near_magnitude_lexicon(const char *word) {
 // heard/canonical pairs, walked two entries at a time by homophone_lookup
 // (below, near apply_homophone_coercion, its only caller) -- retires this
 // file's pointer-table category entirely.
-static const char HOMOPHONE_BLOB[] =
-    "for\0" "four\0"
-    "to\0" "two\0"
-    "too\0" "two\0"
-    "ate\0" "eight\0"
-    "won\0" "one\0";
-
 // -- Small pure helpers ---------------------------------------------------
 
 static bool is_ascii_alnum(unsigned char c) {
@@ -2009,6 +1931,8 @@ bool parse_nl(const char *transcript, NlParse *out) {
   memset(out, 0, sizeof(*out));
   out->kind = KIND_COUNTDOWN;
 
+  if (!parse_nl_vocabulary_available()) return false;
+
   if (transcript == NULL || transcript[0] == '\0') {
     out->ok = false;
     return false;
@@ -2434,8 +2358,8 @@ bool parse_nl(const char *transcript, NlParse *out) {
   // other fraction rule in this file, generalized to an arbitrary number of
   // fractional digits (`10^frac_digits` denominator, e.g. "1.25"->den 100).
   // A bare decimal with no unit fail-softs -- "6.45" (no unit) no longer
-  // coincidentally resolves via the old split-into-pair path (an accepted,
-  // documented behavior change; the word form "six forty five"->405 and
+  // coincidentally resolves via the old split-into-pair path (a deliberate
+  // behavior change; the word form "six forty five"->405 and
   // the colon form "6:45"->405 both still give the same value another way).
   if (!ct_matched && !has_duration && !magnitude_adjacent && !hundred_present) {
     for (int i = 0; i < count; i++) {

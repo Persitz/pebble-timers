@@ -1,0 +1,207 @@
+utterance	region	engine	expected	actual	class
+half six	UK	WISPR	6:30 clock (UK idiom) -- genuinely ambiguous w/o unit; parser abstains safely	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""half six"""	FAIL-GAP
+um half six	UK	PARAKEET	6:30 clock (UK idiom)	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""um half six"""	FAIL-GAP
+half seven	IE	WISPR	7:30 clock (UK/IE idiom)	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""half seven"""	FAIL-GAP
+half seven this evening	IE	PARAKEET	7:30 clock (UK/IE idiom)	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""half seven this evening"""	FAIL-GAP
+quarter to seven	UK	WISPR	6:45 clock -- 'quarter to H' not recognized by this grammar	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""quarter to seven"""	FAIL-GAP
+quarter to seven uh	UK	PARAKEET	6:45 clock (not recognized by this grammar)	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""quarter to seven uh"""	FAIL-GAP
+quarter past six	IE	WISPR	6:15 clock -- 'quarter past H' not in match_clock_expr's grammar	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""quarter past six"""	FAIL-GAP
+quarter past six	IE	PARAKEET	6:15 clock (not recognized by this grammar)	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""quarter past six"""	FAIL-GAP
+quarter past	UK	WISPR	incomplete utterance, no hour stated -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""quarter past"""	FAIL-ACCEPT
+quarter past	UK	PARAKEET	incomplete utterance	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""quarter past"""	FAIL-ACCEPT
+ten to six	AU	WISPR	5:50 clock -- bare subtractive form, no preposition to even attempt CT	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""ten to six"""	FAIL-GAP
+ten to six	AU	PARAKEET	5:50 clock	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""ten to six"""	FAIL-GAP
+ten to	AU	WISPR	incomplete utterance, no hour stated	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""ten to"""	FAIL-ACCEPT
+ten to	AU	PARAKEET	incomplete utterance	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""ten to"""	FAIL-ACCEPT
+twenty to five	UK	WISPR	4:40 clock -- subtractive form unsupported	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""twenty to five"""	FAIL-GAP
+twenty to five	UK	PARAKEET	4:40 clock	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""twenty to five"""	FAIL-GAP
+five to nine	IE	WISPR	8:50 clock -- subtractive form unsupported	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""five to nine"""	FAIL-GAP
+five to nine	IE	PARAKEET	8:50 clock	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""five to nine"""	FAIL-GAP
+until half seven	UK	WISPR	7:30 clock -- 'until'+half still blocked by half-before-number order	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""until half seven"""	FAIL-GAP
+until half seven	UK	PARAKEET	7:30 clock	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""until half seven"""	FAIL-GAP
+half past five	UK	WISPR	5:30 clock (UK idiom, no unit/prep to anchor on)	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""half past five"""	FAIL-GAP
+half past five	UK	PARAKEET	5:30 clock	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""half past five"""	FAIL-GAP
+at half six	UK	WISPR	6:30 clock intended -- 'at' present but 'half' precedes the hour, and match_clock_expr requires the token right after the preposition to itself be the NUMBER (hour-first only), so 'half' blocks the match before it can even try; correctly fails rather than guessing	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""at half six"""	FAIL-GAP
+at half six	UK	PARAKEET	6:30 clock -- same	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""at half six"""	FAIL-GAP
+by quarter to eight	IE	WISPR	7:45 clock -- 'by' isn't even in CLOCK_PREP_WORDS_EN, plus quarter-to unsupported	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""by quarter to eight"""	FAIL-GAP
+by quarter to eight	IE	PARAKEET	7:45 clock	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""by quarter to eight"""	FAIL-GAP
+wake me up at half six	UK	WISPR	6:30 clock reminder	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""wake me up at half six"""	FAIL-GAP
+wake me up at half six	UK	PARAKEET	6:30 clock reminder	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""wake me up at half six"""	FAIL-GAP
+set an alarm for quarter past seven	UK	WISPR	7:15 clock alarm -- uses 'for' not 'at/until', AND quarter-past unsupported (double gap)	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""quarter past seven"""	FAIL-GAP
+set an alarm for quarter past seven, uh	UK	PARAKEET	7:15 clock alarm	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""quarter past seven uh"""	FAIL-GAP
+ring me at ten to six	IE	WISPR	5:50 clock intended (ring at ten-to-six) -- parser confidently resolves clock=10:00, silently dropping 'to six' entirely	"ok=OK clock=10:00 (hour24_known=0) -> resolves to 22:00 (36000s from noon) name=""ring me to six"""	SILENT-WRONG
+ring us at ten to six	IE	PARAKEET	5:50 clock intended -- same misfire	"ok=OK clock=10:00 (hour24_known=0) -> resolves to 22:00 (36000s from noon) name=""ring us to six"""	SILENT-WRONG
+put the timer on for half six	UK	WISPR	ambiguous/nonsensical as duration; 'half six' has no unit so correctly fails rather than guessing	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""put the on half six"""	FAIL-ACCEPT
+put the timer on for half six	UK	PARAKEET	ambiguous/nonsensical as duration	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""put the on half six"""	FAIL-ACCEPT
+give us a shout at half seven	AU	WISPR	7:30 clock (AU idiom)	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""give us shout at half s"""	FAIL-GAP
+give us a shout at half seven, like	AU	PARAKEET	7:30 clock (AU idiom)	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""give us shout at half s"""	FAIL-GAP
+dinner's at half six	UK	WISPR	6:30 clock (UK idiom)	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""dinner's at half six"""	FAIL-GAP
+dinners at half six	UK	PARAKEET	6:30 clock (UK idiom)	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""dinners at half six"""	FAIL-GAP
+remind me at twenty to nine	AU	WISPR	8:40 clock intended (remind at twenty-to-nine) -- resolves clock=20:00 (8pm), silently dropping 'to nine'	"ok=OK clock=20:00 (hour24_known=1) -> resolves to 20:00 (28800s from noon) name=""remind me to nine"""	SILENT-WRONG
+remind me at twenty to nine	AU	PARAKEET	8:40 clock intended -- same misfire	"ok=OK clock=20:00 (hour24_known=1) -> resolves to 20:00 (28800s from noon) name=""remind me to nine"""	SILENT-WRONG
+at six thirty	UK	WISPR	6:30 clock -- control case, works as designed	"ok=OK clock=6:30 (hour24_known=0) -> resolves to 18:30 (23400s from noon) name="""""	CORRECT
+at 6:30	UK	WISPR	6:30 clock -- literal digit 'H:MM' shape (the canonical Wispr Flow output shape) is not split into hour+minute at all; ':' is stripped as punctuation with no boundary, '6:30' collapses to token '630' (out of 0-23 hour range, no unit) -- total miss on Wispr's own headline transcript format	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""at 6:30"""	FAIL-GAP
+six forty five	UK	WISPR	405s duration -- deliberate behavior: bare 'H M' pair with no clock preposition defaults to a duration reading, not a clock target	"ok=OK kind=COUNTDOWN duration_s=405 name="""""	CORRECT
+six forty five	UK	PARAKEET	405s duration -- same deliberate default	"ok=OK kind=COUNTDOWN duration_s=405 name="""""	CORRECT
+at six forty five	UK	WISPR	6:45 clock -- control case	"ok=OK clock=6:45 (hour24_known=0) -> resolves to 18:45 (24300s from noon) name="""""	CORRECT
+at six forty five	UK	PARAKEET	6:45 clock	"ok=OK clock=6:45 (hour24_known=0) -> resolves to 18:45 (24300s from noon) name="""""	CORRECT
+until six	IE	WISPR	6:00 clock -- control case	"ok=OK clock=6:00 (hour24_known=0) -> resolves to 18:00 (21600s from noon) name="""""	CORRECT
+until six	IE	PARAKEET	6:00 clock	"ok=OK clock=6:00 (hour24_known=0) -> resolves to 18:00 (21600s from noon) name="""""	CORRECT
+at six am	UK	WISPR	6:00 clock, AM known	"ok=OK clock=6:00 (hour24_known=1) -> resolves to 06:00 (64800s from noon) name="""""	CORRECT
+at six pm	UK	PARAKEET	18:00 clock, PM known	"ok=OK clock=18:00 (hour24_known=1) -> resolves to 18:00 (21600s from noon) name="""""	CORRECT
+at six and a half	UK	WISPR	6:30 clock via 'H and a half'	"ok=OK clock=6:30 (hour24_known=0) -> resolves to 18:30 (23400s from noon) name="""""	CORRECT
+at six and a half	UK	PARAKEET	6:30 clock	"ok=OK clock=6:30 (hour24_known=0) -> resolves to 18:30 (23400s from noon) name="""""	CORRECT
+at six and a quarter	IE	WISPR	6:15 clock via 'H and a quarter'	"ok=OK clock=6:15 (hour24_known=0) -> resolves to 18:15 (22500s from noon) name="""""	CORRECT
+until six thirty	UK	WISPR	6:30 clock via 'until H thirty'	"ok=OK clock=6:30 (hour24_known=0) -> resolves to 18:30 (23400s from noon) name="""""	CORRECT
+until six thirty	UK	PARAKEET	6:30 clock	"ok=OK clock=6:30 (hour24_known=0) -> resolves to 18:30 (23400s from noon) name="""""	CORRECT
+half a mo	UK	WISPR	~a few seconds/short pause (UK slang 'mo'=moment) -- unsupported unit word	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""half mo"""	FAIL-GAP
+just half a mo	UK	PARAKEET	same -- 'mo' unsupported	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""just half mo"""	FAIL-GAP
+a tick	IE	WISPR	very short duration (IE/UK slang 'tick') -- unsupported	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""tick"""	FAIL-GAP
+give me a tick	IE	PARAKEET	same	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""give me tick"""	FAIL-GAP
+a jiffy	AU	WISPR	very short/whimsical duration (AU slang 'jiffy'), no number present, no real value to extract -- fine to fail	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""jiffy"""	FAIL-ACCEPT
+two jiffies	AU	PARAKEET	'two jiffies' is not really a well-formed duration phrase either way	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""two jiffies"""	FAIL-ACCEPT
+five-ish minutes	UK	WISPR	~300s (approx 5 min) -- '-ish' SUFFIX approximation entirely unsupported, unlike prefix 'about/around/roughly'	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""five ish"""	FAIL-GAP
+five ish minutes	UK	PARAKEET	~300s -- same suffix-approx gap	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""five ish"""	FAIL-GAP
+about five-ish minutes	UK	WISPR	~300s -- leading 'about' present but trailing '-ish' still breaks N-U adjacency, same gap persists	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""five ish"""	FAIL-GAP
+twenty odd minutes	UK	WISPR	~1200s (approx 20 min) -- British/Irish 'odd' suffix approximation unsupported	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""twenty odd"""	FAIL-GAP
+twenty odd minutes	UK	PARAKEET	~1200s -- same	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""twenty odd"""	FAIL-GAP
+twenty-odd minutes please	IE	WISPR	~1200s -- same, hyphenated form	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""twenty odd please"""	FAIL-GAP
+a fortnight	UK	WISPR	14 days -- correctly out of scope/unsupported unit, fails safe rather than guessing at days	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""fortnight"""	FAIL-ACCEPT
+set a timer for a fortnight	UK	PARAKEET	14 days -- same, correctly rejected	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""fortnight"""	FAIL-ACCEPT
+ten minutes or so	IE	WISPR	600s duration correct, but residue 'or so' (itself an approximation marker) leaks into the timer name instead of being dropped like 'about/roughly'	"ok=OK kind=COUNTDOWN duration_s=600 name=""or so"""	NAME-POLLUTION
+ten minutes or so	IE	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=600 name=""or so"""	NAME-POLLUTION
+a couple of minutes	AU	WISPR	120s duration, clean name	"ok=OK kind=COUNTDOWN duration_s=120 name="""""	CORRECT
+a couple of minutes	AU	PARAKEET	120s	"ok=OK kind=COUNTDOWN duration_s=120 name="""""	CORRECT
+quarter of an hour	UK	WISPR	900s duration, clean name	"ok=OK kind=COUNTDOWN duration_s=900 name="""""	CORRECT
+quarter of an hour	UK	PARAKEET	900s	"ok=OK kind=COUNTDOWN duration_s=900 name="""""	CORRECT
+three quarters of an hour	IE	WISPR	2700s duration, clean name	"ok=OK kind=COUNTDOWN duration_s=2700 name="""""	CORRECT
+three quarters of an hour	IE	PARAKEET	2700s	"ok=OK kind=COUNTDOWN duration_s=2700 name="""""	CORRECT
+an hour and a bit	UK	WISPR	3600s intended ('an hour') -- fails entirely: this app's grammar requires an explicit accompanying number/half-word for ANY unit-only phrase (confirmed via direct probe: bare 'an hour' alone also fails), so a trailing '...and a bit' never even gets the chance to matter here	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""bit"""	FAIL-GAP
+an hour and a bit	UK	PARAKEET	same	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""bit"""	FAIL-GAP
+half an hour	UK	WISPR	1800s duration, clean name	"ok=OK kind=COUNTDOWN duration_s=1800 name="""""	CORRECT
+half an hour	UK	PARAKEET	1800s	"ok=OK kind=COUNTDOWN duration_s=1800 name="""""	CORRECT
+donkey's minutes	AU	WISPR	made-up/obscure AU slang unit with no explicit number -- correctly unresolvable	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""donkey's"""	FAIL-ACCEPT
+yonks	AU	PARAKEET	obscure AU/UK slang for 'a long time', no number present -- correctly fails	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""yonks"""	FAIL-ACCEPT
+a good ten minutes	UK	WISPR	600s duration correct, but intensifier 'good' leaks into name	"ok=OK kind=COUNTDOWN duration_s=600 name=""good"""	NAME-POLLUTION
+a good ten minutes	UK	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=600 name=""good"""	NAME-POLLUTION
+just a mo, five minutes	IE	PARAKEET	300s duration correct via the second clause; residue 'just mo' is a reasonable byproduct of a genuinely disjointed utterance, not a real bug	"ok=OK kind=COUNTDOWN duration_s=300 name=""just mo"""	FAIL-ACCEPT
+put the kettle timer on for three minutes	UK	WISPR	180s, kettle scenario	"ok=OK kind=COUNTDOWN duration_s=180 name=""put the kettle on"""	CORRECT
+put the kettle timer on for three minutes	UK	PARAKEET	180s	"ok=OK kind=COUNTDOWN duration_s=180 name=""put the kettle on"""	CORRECT
+kettle's on, give it four minutes	UK	WISPR	240s, kettle scenario	"ok=OK kind=COUNTDOWN duration_s=240 name=""kettle's on give it"""	CORRECT
+kettle's on give it four minutes	UK	PARAKEET	240s	"ok=OK kind=COUNTDOWN duration_s=240 name=""kettle's on give it"""	CORRECT
+pop the kettle on for a cuppa, three minutes	IE	WISPR	180s, tea/kettle scenario	"ok=OK kind=COUNTDOWN duration_s=180 name=""pop the kettle on cuppa"""	CORRECT
+pop the kettle on for a cuppa three minutes	IE	PARAKEET	180s	"ok=OK kind=COUNTDOWN duration_s=180 name=""pop the kettle on cuppa"""	CORRECT
+timer for the tea, five minutes	UK	WISPR	300s, tea scenario	"ok=OK kind=COUNTDOWN duration_s=300 name=""the tea"""	CORRECT
+timer for the tea five minutes	UK	PARAKEET	300s	"ok=OK kind=COUNTDOWN duration_s=300 name=""the tea"""	CORRECT
+let the tea steep for three minutes	IE	WISPR	180s, tea steep scenario	"ok=OK kind=COUNTDOWN duration_s=180 name=""let the tea steep"""	CORRECT
+let the tea steep for three minutes	IE	PARAKEET	180s	"ok=OK kind=COUNTDOWN duration_s=180 name=""let the tea steep"""	CORRECT
+brew for four minutes	UK	WISPR	240s, brew scenario	"ok=OK kind=COUNTDOWN duration_s=240 name=""brew"""	CORRECT
+brew for four minutes	UK	PARAKEET	240s	"ok=OK kind=COUNTDOWN duration_s=240 name=""brew"""	CORRECT
+roast timer for twenty five minutes	UK	WISPR	1500s, roast scenario	"ok=OK kind=COUNTDOWN duration_s=1500 name=""roast"""	CORRECT
+roast timer for twenty five minutes	UK	PARAKEET	1500s	"ok=OK kind=COUNTDOWN duration_s=1500 name=""roast"""	CORRECT
+put the joint in for two hours	UK	WISPR	7200s, roast/joint scenario	"ok=OK kind=COUNTDOWN duration_s=7200 name=""put the joint"""	CORRECT
+put the joint in for two hours	UK	PARAKEET	7200s	"ok=OK kind=COUNTDOWN duration_s=7200 name=""put the joint"""	CORRECT
+timer for the roast potatoes, forty minutes	UK	WISPR	2400s, roast potatoes scenario	"ok=OK kind=COUNTDOWN duration_s=2400 name=""the roast potatoes"""	CORRECT
+timer for the roast potatoes forty minutes	UK	PARAKEET	2400s	"ok=OK kind=COUNTDOWN duration_s=2400 name=""the roast potatoes"""	CORRECT
+sunday roast, ninety minutes	UK	WISPR	5400s, Sunday roast scenario	"ok=OK kind=COUNTDOWN duration_s=5400 name=""sunday roast"""	CORRECT
+sunday roast ninety minutes	UK	PARAKEET	5400s	"ok=OK kind=COUNTDOWN duration_s=5400 name=""sunday roast"""	CORRECT
+footy halftime, fifteen minutes	AU	WISPR	900s, footy halftime scenario	"ok=OK kind=COUNTDOWN duration_s=900 name=""footy halftime"""	CORRECT
+footy halftime fifteen minutes	AU	PARAKEET	900s	"ok=OK kind=COUNTDOWN duration_s=900 name=""footy halftime"""	CORRECT
+set a timer for the footy half time break	AU	WISPR	no number stated at all ('the footy half time break' alone) -- correctly fails, no number to extract	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""the footy half time bre"""	FAIL-ACCEPT
+set a timer for the footy half time break, fifteen minutes	AU	PARAKEET	900s, footy halftime with explicit duration	"ok=OK kind=COUNTDOWN duration_s=900 name=""the footy half time bre"""	CORRECT
+timer for the match halftime, ten minutes	IE	WISPR	600s, match halftime scenario (IE)	"ok=OK kind=COUNTDOWN duration_s=600 name=""the match halftime"""	CORRECT
+timer for the match halftime ten minutes	IE	PARAKEET	600s	"ok=OK kind=COUNTDOWN duration_s=600 name=""the match halftime"""	CORRECT
+parking timer, two hours	UK	WISPR	7200s, parking scenario	"ok=OK kind=COUNTDOWN duration_s=7200 name=""parking"""	CORRECT
+parking timer two hours	UK	PARAKEET	7200s	"ok=OK kind=COUNTDOWN duration_s=7200 name=""parking"""	CORRECT
+set the parking meter for an hour	UK	WISPR	3600s intended ('an hour') -- same bare-unit-only gap as row 78/79; 'set the parking meter for an hour' is very natural phrasing that fails entirely	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""the parking meter"""	FAIL-GAP
+set the parking meter for an hour	UK	PARAKEET	same	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""the parking meter"""	FAIL-GAP
+car park's two hours, set a timer	IE	WISPR	7200s, parking scenario (IE)	"ok=OK kind=COUNTDOWN duration_s=7200 name=""car park's"""	CORRECT
+car parks two hours set a timer	IE	PARAKEET	7200s	"ok=OK kind=COUNTDOWN duration_s=7200 name=""car parks"""	CORRECT
+nap timer, twenty minutes	AU	WISPR	1200s, nap scenario	"ok=OK kind=COUNTDOWN duration_s=1200 name=""nap"""	CORRECT
+nap timer twenty minutes	AU	PARAKEET	1200s	"ok=OK kind=COUNTDOWN duration_s=1200 name=""nap"""	CORRECT
+just a quick kip, fifteen minutes	UK	WISPR	900s, nap/kip scenario (UK)	"ok=OK kind=COUNTDOWN duration_s=900 name=""just quick kip"""	CORRECT
+just a quick kip fifteen minutes	UK	PARAKEET	900s	"ok=OK kind=COUNTDOWN duration_s=900 name=""just quick kip"""	CORRECT
+power nap for half an hour	AU	WISPR	1800s, power nap scenario (AU)	"ok=OK kind=COUNTDOWN duration_s=1800 name=""power nap"""	CORRECT
+power nap for half an hour	AU	PARAKEET	1800s	"ok=OK kind=COUNTDOWN duration_s=1800 name=""power nap"""	CORRECT
+ten overs, set a timer	IE	WISPR	cricket 'overs' is not a real time unit -- no duration is actually implied by '10 overs' alone; correctly out of scope, fails safe	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""ten overs"""	FAIL-ACCEPT
+ten overs set a timer	IE	PARAKEET	same	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""ten overs"""	FAIL-ACCEPT
+cricket, twenty overs	AU	WISPR	'overs' alone conveys no duration either -- correctly fails	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""cricket twenty overs"""	FAIL-ACCEPT
+cricket twenty overs	AU	PARAKEET	same	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""cricket twenty overs"""	FAIL-ACCEPT
+timer for a session of overs, forty minutes	AU	WISPR	2400s -- explicit 'forty minutes' present alongside 'overs', correctly extracted	"ok=OK kind=COUNTDOWN duration_s=2400 name=""session overs"""	CORRECT
+timer for a session of overs forty minutes	AU	PARAKEET	2400s	"ok=OK kind=COUNTDOWN duration_s=2400 name=""session overs"""	CORRECT
+set a timer for the twenty20	AU	WISPR	'twenty20' is a cricket format name, not a duration -- digit-joined token unrecognized, correctly fails	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""the twenty20"""	FAIL-ACCEPT
+set a timer for the twenty twenty	AU	PARAKEET	'the twenty twenty' (T20 cricket format reference, no duration intended at all) is silently parsed as a 1220s (20m20s) duration via the spoken-M:SS-pair fallback -- two adjacent 'twenty' NUMBER tokens with no unit anywhere get read as MM:SS; a real name-only phrase produces a confident, wrong timer	"ok=OK kind=COUNTDOWN duration_s=1220 name=""the"""	SILENT-WRONG
+do the needful in 5 minutes	IN	WISPR	300s, Indian English 'do the needful' idiom -- name residue 'do the needful' reads naturally	"ok=OK kind=COUNTDOWN duration_s=300 name=""do the needful"""	CORRECT
+do the needful in five minutes	IN	PARAKEET	300s	"ok=OK kind=COUNTDOWN duration_s=300 name=""do the needful"""	CORRECT
+kindly set a timer for ten minutes only	IN	WISPR	600s duration correct, but 'kindly' and 'only' (Indian English politeness/emphasis particles) both leak into name	"ok=OK kind=COUNTDOWN duration_s=600 name=""kindly only"""	NAME-POLLUTION
+kindly set a timer for ten minutes only	IN	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=600 name=""kindly only"""	NAME-POLLUTION
+please do the needful, set a timer for ten minutes	IN	WISPR	600s duration correct ('please do the needful' becomes the name) -- 'please' is NOT in FILLER_WORDS despite 'set/pon' being there, so it survives into the name even though it's pure command glue	"ok=OK kind=COUNTDOWN duration_s=600 name=""please do the needful"""	NAME-POLLUTION
+please do the needful set a timer for ten minutes	IN	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=600 name=""please do the needful"""	NAME-POLLUTION
+revert with a timer of fifteen minutes	IN	WISPR	900s duration correct, but 'revert with' (Indian English 'revert'='reply/get back to') leaks into name	"ok=OK kind=COUNTDOWN duration_s=900 name=""revert with"""	NAME-POLLUTION
+revert with a timer of fifteen minutes	IN	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=900 name=""revert with"""	NAME-POLLUTION
+prepone the alarm by five minutes	IN	WISPR	AMBIGUOUS: 'prepone' (Indian English for 'reschedule earlier') implies MODIFYING an existing alarm by -5min, but this parser only creates new timers (no modify-existing concept exists anywhere in its grammar) -- it extracts the literal '5 minutes' as a fresh 300s countdown, which is a defensible reading of the literal duration phrase but silently discards the 'prepone'/reschedule semantics entirely; flagged as an out-of-scope gap, not a misparse of a stated duration	"ok=OK kind=COUNTDOWN duration_s=300 name=""prepone the by"""	NAME-POLLUTION/GAP
+prepone the alarm by five minutes	IN	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=300 name=""prepone the by"""	NAME-POLLUTION/GAP
+i will revert in ten minutes itself	IN	WISPR	600s duration correct, but 'i will revert' and 'itself' (Indian English emphatic particle) leak into name	"ok=OK kind=COUNTDOWN duration_s=600 name=""i will revert itself"""	NAME-POLLUTION
+i will revert in ten minutes itself	IN	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=600 name=""i will revert itself"""	NAME-POLLUTION
+set a timer for ten minutes only	IN	WISPR	600s duration correct, but 'only' (Indian English emphatic particle, common in 'ten minutes only'-style phrasing) leaks into name	"ok=OK kind=COUNTDOWN duration_s=600 name=""only"""	NAME-POLLUTION
+set a timer for ten minutes only	IN	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=600 name=""only"""	NAME-POLLUTION
+timer for five minutes itself	IN	WISPR	300s duration correct, but 'itself' leaks into name	"ok=OK kind=COUNTDOWN duration_s=300 name=""itself"""	NAME-POLLUTION
+timer for five minutes itself	IN	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=300 name=""itself"""	NAME-POLLUTION
+please set timer for twenty minutes, thanking you	IN	WISPR	1200s duration correct, but 'please' + 'thanking you' (Indian English closing) leak into name	"ok=OK kind=COUNTDOWN duration_s=1200 name=""please thanking you"""	NAME-POLLUTION
+please set timer for twenty minutes thanking you	IN	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=1200 name=""please thanking you"""	NAME-POLLUTION
+do the needful and set a countdown for two minutes	IN	WISPR	120s, 'do the needful' idiom again -- clean extraction	"ok=OK kind=COUNTDOWN duration_s=120 name=""do the needful"""	CORRECT
+do the needful and set a countdown for two minutes	IN	PARAKEET	120s	"ok=OK kind=COUNTDOWN duration_s=120 name=""do the needful"""	CORRECT
+kindly revert with alarm of half an hour	IN	WISPR	1800s duration correct, but 'kindly revert with' leaks into name	"ok=OK kind=COUNTDOWN duration_s=1800 name=""kindly revert with"""	NAME-POLLUTION
+kindly revert with alarm of half an hour	IN	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=1800 name=""kindly revert with"""	NAME-POLLUTION
+set a timer for five minutes this arvo	AU	WISPR	300s, AU 'arvo' slang -- 'this arvo' becomes part of the (reasonable) name, no functional issue	"ok=OK kind=COUNTDOWN duration_s=300 name=""this arvo"""	CORRECT
+set a timer for five minutes this arvo	AU	PARAKEET	300s	"ok=OK kind=COUNTDOWN duration_s=300 name=""this arvo"""	CORRECT
+this arvo, timer for twenty minutes	AU	WISPR	1200s, AU 'arvo' scenario	"ok=OK kind=COUNTDOWN duration_s=1200 name=""this arvo"""	CORRECT
+this arvo timer for twenty minutes	AU	PARAKEET	1200s	"ok=OK kind=COUNTDOWN duration_s=1200 name=""this arvo"""	CORRECT
+arvo tea timer, ten minutes	AU	WISPR	600s, AU 'arvo tea' scenario	"ok=OK kind=COUNTDOWN duration_s=600 name=""arvo tea"""	CORRECT
+arvo tea timer ten minutes	AU	PARAKEET	600s	"ok=OK kind=COUNTDOWN duration_s=600 name=""arvo tea"""	CORRECT
+brekkie's in ten minutes, set a timer	AU	WISPR	600s, AU 'brekkie' scenario	"ok=OK kind=COUNTDOWN duration_s=600 name=""brekkie's"""	CORRECT
+brekkies in ten minutes set a timer	AU	PARAKEET	600s	"ok=OK kind=COUNTDOWN duration_s=600 name=""brekkies"""	CORRECT
+timer for smoko, fifteen minutes	AU	WISPR	900s, AU 'smoko' scenario	"ok=OK kind=COUNTDOWN duration_s=900 name=""smoko"""	CORRECT
+timer for smoko fifteen minutes	AU	PARAKEET	900s	"ok=OK kind=COUNTDOWN duration_s=900 name=""smoko"""	CORRECT
+servo run, timer for five minutes	AU	WISPR	300s, AU 'servo' scenario	"ok=OK kind=COUNTDOWN duration_s=300 name=""servo run"""	CORRECT
+servo run timer for five minutes	AU	PARAKEET	300s	"ok=OK kind=COUNTDOWN duration_s=300 name=""servo run"""	CORRECT
+set a timer for arvo kip, half an hour	AU	WISPR	1800s, AU 'arvo kip' scenario	"ok=OK kind=COUNTDOWN duration_s=1800 name=""arvo kip"""	CORRECT
+set a timer for arvo kip half an hour	AU	PARAKEET	1800s	"ok=OK kind=COUNTDOWN duration_s=1800 name=""arvo kip"""	CORRECT
+barbie's ready in twenty minutes, set a timer	AU	WISPR	1200s, AU 'barbie' scenario	"ok=OK kind=COUNTDOWN duration_s=1200 name=""barbie's ready"""	CORRECT
+barbies ready in twenty minutes set a timer	AU	PARAKEET	1200s	"ok=OK kind=COUNTDOWN duration_s=1200 name=""barbies ready"""	CORRECT
+esky's packed, timer for five minutes	AU	WISPR	300s, AU 'esky' scenario	"ok=OK kind=COUNTDOWN duration_s=300 name=""esky's packed"""	CORRECT
+eskys packed timer for five minutes	AU	PARAKEET	300s	"ok=OK kind=COUNTDOWN duration_s=300 name=""eskys packed"""	CORRECT
+set a timer for five minutes at half six this arvo	AU	WISPR	300s -- 'at half six this arvo' is inert residue (half-six's own idiom is unrealized, known gap, but NOT double-counted or misfired here since it never matches anything); duration correctly comes from the explicit '5 minutes' clause alone	"ok=OK kind=COUNTDOWN duration_s=300 name=""at half six this arvo"""	CORRECT
+set a timer for five minutes at half six this arvo	AU	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=300 name=""at half six this arvo"""	CORRECT
+set a stopwatch	UK	WISPR	stopwatch, no duration expected	"ok=OK kind=STOPWATCH duration_s=0 name="""""	CORRECT
+start the stopwatch	UK	PARAKEET	stopwatch -- 'start the' leaks as name (minor, 'start'/'the' not filler-listed) but kind is right	"ok=OK kind=STOPWATCH duration_s=0 name=""start the"""	CORRECT
+set a timer for 5 minutes, actually 10	UK	WISPR	10 minutes intended (self-correction 'actually 10' should win, last-value-wins) -- parser keeps the FIRST number (300s) and drops the correction into the name residue ('actually 10'); note: a real Wispr Flow transcript would already resolve this upstream (this exact two-number shape is really the Parakeet-engine case; see row 178 for the faithful rendering) -- kept as a defense-in-depth check on this engine label too	"ok=OK kind=COUNTDOWN duration_s=300 name=""actually 10"""	SILENT-WRONG
+set a timer for five minutes uh actually ten minutes	UK	PARAKEET	10 minutes intended -- Parakeet preserves both numbers in this shape, leaving the correction unresolved -- parser has no last-value-wins rule at all; keeps first (300s), 'actually ten' dropped to name	"ok=OK kind=COUNTDOWN duration_s=300 name=""uh actually ten"""	SILENT-WRONG
+timer for ten minutes, no wait, fifteen	IE	WISPR	15 minutes intended (self-correction 'no wait, fifteen') -- same missing last-value-wins rule, keeps first (600s)	"ok=OK kind=COUNTDOWN duration_s=600 name=""no wait fifteen"""	SILENT-WRONG
+timer for ten minutes no wait fifteen minutes	IE	PARAKEET	15 minutes intended -- same, Parakeet-realistic (no comma) rendering	"ok=OK kind=COUNTDOWN duration_s=600 name=""no wait fifteen"""	SILENT-WRONG
+set a repeat timer for twenty minutes	UK	WISPR	1200s REPEAT	"ok=OK kind=REPEAT duration_s=1200 name="""""	CORRECT
+set a repeating timer for twenty minutes	UK	PARAKEET	1200s REPEAT	"ok=OK kind=REPEAT duration_s=1200 name="""""	CORRECT
+every half an hour	IE	WISPR	1800s REPEAT via 'every half an hour'	"ok=OK kind=REPEAT duration_s=1800 name="""""	CORRECT
+every half an hour	IE	PARAKEET	1800s	"ok=OK kind=REPEAT duration_s=1800 name="""""	CORRECT
+set an alarm for elevenses, quarter to eleven	UK	WISPR	7:15 clock alarm intended -- 'elevenses' unsupported vocab + quarter-to unsupported (double gap), correctly fails safe	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""elevenses quarter to el"""	FAIL-GAP
+set an alarm for elevenses quarter to eleven	UK	PARAKEET	same	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""elevenses quarter to el"""	FAIL-GAP
+knock off time, set an alarm for five o'clock	AU	WISPR	5:00 clock alarm intended -- uses 'for' (not 'at/until'), so CT discriminator never even attempts the match; same 'for + H o'clock' gap as row 191/192	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""knock off time five o'c"""	FAIL-GAP
+knock off time set an alarm for five o'clock	AU	PARAKEET	same	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""knock off time five o'c"""	FAIL-GAP
+tea's up at six o'clock	UK	WISPR	6:00 clock -- 'at' + 'o'clock' works fine, 'o'clock' just becomes inert name residue	"ok=OK clock=6:00 (hour24_known=0) -> resolves to 18:00 (21600s from noon) name=""tea's up o'clock"""	CORRECT
+teas up at six o'clock	UK	PARAKEET	same	"ok=OK clock=6:00 (hour24_known=0) -> resolves to 18:00 (21600s from noon) name=""teas up o'clock"""	CORRECT
+set an alarm for six o'clock sharp	UK	WISPR	6:00 clock alarm intended -- 'for' (not 'at/until') blocks CT match entirely; extremely natural phrasing ('set an alarm for six o'clock') silently gets nothing	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""six o'clock sharp"""	FAIL-GAP
+set an alarm for six o'clock sharp	UK	PARAKEET	same	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""six o'clock sharp"""	FAIL-GAP
+bin day reminder at half seven	IE	WISPR	7:30 reminder intended -- half-family gap	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""bin day reminder at hal"""	FAIL-GAP
+bin day reminder at half seven	IE	PARAKEET	same	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""bin day reminder at hal"""	FAIL-GAP
+match kicks off at quarter past three	UK	WISPR	3:15 intended -- quarter-past family gap (safe fail, 'quarter' isn't CLS_NUMBER)	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""match kicks off at quar"""	FAIL-GAP
+match kicks off at quarter past three	UK	PARAKEET	same	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""match kicks off at quar"""	FAIL-GAP
+train's at ten to eight	UK	WISPR	7:50 clock intended ('train's at ten to eight') -- resolves clock=10:00, dropping 'to eight' entirely; a genuinely common commuting/reminder phrase, high real-world hit rate	"ok=OK clock=10:00 (hour24_known=0) -> resolves to 22:00 (36000s from noon) name=""train's to eight"""	SILENT-WRONG
+trains at ten to eight	UK	PARAKEET	same	"ok=OK clock=10:00 (hour24_known=0) -> resolves to 22:00 (36000s from noon) name=""trains to eight"""	SILENT-WRONG
+pop it on for a mo	UK	WISPR	very short duration ('a mo') -- unsupported slang unit, consistent with rows 56/57	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""pop it on mo"""	FAIL-GAP
+pop it on for a mo	UK	PARAKEET	same	"ok=FAIL kind=COUNTDOWN duration_s=0 name=""pop it on mo"""	FAIL-GAP
+set a timer for five minutes, ta	AU	WISPR	300s duration correct, but 'ta' (UK/AU informal thanks) leaks into name	"ok=OK kind=COUNTDOWN duration_s=300 name=""ta"""	NAME-POLLUTION
+set a timer for five minutes ta	AU	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=300 name=""ta"""	NAME-POLLUTION
+timer for five minutes, cheers	UK	WISPR	300s duration correct, but 'cheers' (UK informal thanks) leaks into name	"ok=OK kind=COUNTDOWN duration_s=300 name=""cheers"""	NAME-POLLUTION
+timer for five minutes cheers	UK	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=300 name=""cheers"""	NAME-POLLUTION
+timer for five minutes, grand	IE	WISPR	300s duration correct, but 'grand' (IE informal 'great/thanks') leaks into name	"ok=OK kind=COUNTDOWN duration_s=300 name=""grand"""	NAME-POLLUTION
+timer for five minutes grand	IE	PARAKEET	same	"ok=OK kind=COUNTDOWN duration_s=300 name=""grand"""	NAME-POLLUTION

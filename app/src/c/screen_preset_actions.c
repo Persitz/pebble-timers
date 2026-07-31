@@ -22,9 +22,6 @@
 #include "persist_preset_adapter.h"
 #include "render.h"
 #include "testlog_am.h"
-#ifdef GALLERY_MODE
-#include "gallery.h"
-#endif
 
 #define ROW_EDIT 0
 #define ROW_RENAME 1
@@ -45,9 +42,6 @@ static int s_index;  // preset index this sheet acts on (index-addressed, no coo
 // to prevent a stale pending row from a previous Rename attempt leaking onto an
 // unrelated later visit.
 static int s_pending_row = -1;
-
-#define SCROLL_INDICATOR_WIDTH 3
-#define SCROLL_INDICATOR_MARGIN 3
 
 static uint16_t get_num_rows(MenuLayer *menu_layer, uint16_t section_index, void *context) {
   (void)menu_layer;
@@ -196,55 +190,33 @@ static void scroll_indicator_update_proc(Layer *layer, GContext *ctx) {
 }
 
 Window *screen_preset_actions_create(void) {
-  s_window = window_create();
-  window_set_background_color(s_window, RENDER_COLOR_PAPER);
-#ifdef GALLERY_MODE
-  // Screen gallery (inner loop, src/c/gallery.c) -- see screen_set.c's
-  // matching comment. Never compiled into a release build.
-  window_set_click_config_provider(s_window, gallery_click_config_provider);
-#else
-  window_set_click_config_provider(s_window, click_config_provider);
-#endif
-  window_set_window_handlers(s_window, (WindowHandlers){
-                                            .appear = window_appear,
-                                        });
-
-  Layer *root = window_get_root_layer(s_window);
-  GRect bounds = layer_get_bounds(root);
-
-  s_strip = layer_create(GRect(0, 0, bounds.size.w, RENDER_STRIP_H));
-  layer_set_update_proc(s_strip, strip_update_proc);
-  layer_add_child(root, s_strip);
-
-  s_menu = menu_layer_create(GRect(0, RENDER_STRIP_H, bounds.size.w, bounds.size.h - RENDER_STRIP_H));
-  // Disable the SDK's default pad_bottom (required for all MenuLayer instances).
-  menu_layer_pad_bottom_enable(s_menu, false);
-  menu_layer_set_highlight_colors(s_menu, RENDER_COLOR_PAPER, GColorBlack);
-  menu_layer_set_callbacks(s_menu, NULL,
-                            (MenuLayerCallbacks){
-                                .get_num_rows = get_num_rows,
-                                .get_cell_height = get_cell_height,
-                                .draw_row = draw_row,
-                            });
-  layer_add_child(root, menu_layer_get_layer(s_menu));
-
-  s_scroll_indicator = layer_create(GRect(bounds.size.w - SCROLL_INDICATOR_WIDTH - SCROLL_INDICATOR_MARGIN,
-                                           RENDER_STRIP_H, SCROLL_INDICATOR_WIDTH,
-                                           bounds.size.h - RENDER_STRIP_H));
-  layer_set_update_proc(s_scroll_indicator, scroll_indicator_update_proc);
-  layer_add_child(root, s_scroll_indicator);
-
+  RenderMenuScreen screen = render_build_menu_screen(&(RenderMenuScreenSpec){
+      .window_bg = RENDER_COLOR_PAPER,
+      .click_config_provider = click_config_provider,
+      .window_handlers = (WindowHandlers){.appear = window_appear},
+      .header_height = RENDER_STRIP_H,
+      .header_update_proc = strip_update_proc,
+      // Disable the SDK's default pad_bottom (required for all MenuLayer instances).
+      .pad_bottom_disable = true,
+      .get_num_rows = get_num_rows,
+      .get_cell_height = get_cell_height,
+      .draw_row = draw_row,
+      .with_scroll_indicator = true,
+      .scroll_indicator_update_proc = scroll_indicator_update_proc,
+  });
+  s_window = screen.window;
+  s_strip = screen.header;
+  s_menu = screen.menu;
+  s_scroll_indicator = screen.scroll_indicator;
   return s_window;
 }
 
 void screen_preset_actions_destroy(void) {
-  layer_destroy(s_scroll_indicator);
+  render_destroy_menu_screen(&(RenderMenuScreen){
+      .window = s_window, .header = s_strip, .menu = s_menu, .scroll_indicator = s_scroll_indicator});
   s_scroll_indicator = NULL;
-  menu_layer_destroy(s_menu);
   s_menu = NULL;
-  layer_destroy(s_strip);
   s_strip = NULL;
-  window_destroy(s_window);
   s_window = NULL;
 }
 

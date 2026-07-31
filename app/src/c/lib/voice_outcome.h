@@ -14,6 +14,7 @@
 typedef enum {
   VOICE_OK,          // status Success + parse ok        -> confirm/edit preview
   VOICE_PARSE_FAIL,  // status Success + parse !ok        -> "Didn't catch a time"
+  VOICE_DATA_UNAVAILABLE, // parser resource unavailable -> "Voice data unavailable"
   VOICE_NO_PHONE,    // create()==NULL or Connectivity(5) -> "Voice needs your phone"
   VOICE_NO_SPEECH,   // NoSpeechDetected(4)               -> "Didn't hear you"
   VOICE_DISABLED,    // Disabled(6)                       -> "Turn on voice in the Pebble app"

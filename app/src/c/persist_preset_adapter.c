@@ -34,15 +34,21 @@ void persist_preset_adapter_load(PresetStore *out) {
 void persist_preset_adapter_save(const PresetStore *store) {
   uint8_t buf[PRESET_SERIALIZE_WIRE_SIZE];
   size_t n = serialize_presets(store, buf, sizeof buf);
-  if (n > 0) {
-    persist_write_data(PERSIST_KEY_PRESETS, buf, n);
-  } else {
+  if (n == 0) {
     // Serialize_presets() returning 0 means `buf` was too small for the current
     // store->count. Structurally unreachable today (preset_store_add caps at MAX_PRESETS
     // and this buffer is always sized at PRESET_SERIALIZE_WIRE_SIZE), but represents
     // enforcement of the 256-byte hard fit guarantee. If a future change (e.g. bumping
     // PRESET_NAME_MAX or MAX_PRESETS) blows that budget, the math must be re-derived.
     testlog("preset_persist_fail", "overflow");
+    return;
+  }
+
+  // pebble.h: "The number of bytes written if successful, a value from
+  // StatusCode otherwise." A complete write is the only successful save.
+  if (persist_write_data(PERSIST_KEY_PRESETS, buf, n) != (int)n) {
+    testlog("preset_persist_fail", "write");
+    return;
   }
 
   char data[8];

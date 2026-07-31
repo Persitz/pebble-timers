@@ -9,7 +9,10 @@
 // one adapter file allowed into the host build, specifically for this test).
 #include "testlog_am.h"
 
+#include <stdio.h>
 #include <string.h>
+
+#include "testlog.h"  // TESTLOG_QUEUE_CAPACITY
 
 #include "fff.h"
 #include "pebble.h"  // test/fakes/pebble.h -- see test/Makefile's -I ordering
@@ -161,6 +164,48 @@ void test_async_outbox_failed_retries_same_line_without_new_timer(void) {
   TEST_ASSERT_EQUAL_INT(0, app_timer_register_fake.call_count);
 }
 
+// --- burst capacity ---------------------------------------------------
+
+// A single wakeup_adapter_replan() call can synchronously push several
+// lines before the FIRST one's async AppMessage round-trip ever completes
+// (nothing pops the queue until the outbox_sent callback fires) --
+// TESTLOG_QUEUE_CAPACITY must be sized for that real burst, not an
+// arbitrary guess. lib/testlog.h's own comment now derives (and openly
+// discloses the shortfall against) the TRUE worst case -- 16 for the replan
+// alone, 20 across a full production call chain, since
+// sched_candidates()'s old 8-cap was removed. Capacity is 8, so this test
+// proves AT LEAST that smaller, still-real bound is honored exactly, not
+// that 8 is sufficient for every production burst.
+void test_burst_at_full_capacity_without_a_send_callback_drops_nothing(void) {
+  // Keep every send perpetually "in flight" (never call the sent/failed
+  // callback) -- exactly the synchronous-burst-before-any-callback
+  // condition described above.
+  char tag[16];
+  for (int i = 0; i < TESTLOG_QUEUE_CAPACITY; i++) {
+    snprintf(tag, sizeof tag, "line%d", i);
+    testlog(tag, NULL);
+  }
+
+  // Only the FIRST push actually reaches the outbox (begin+send); every
+  // later push queues behind it without a new outbox attempt.
+  TEST_ASSERT_EQUAL_INT(1, app_message_outbox_begin_fake.call_count);
+  TEST_ASSERT_EQUAL_STRING("line0", dict_write_cstring_fake.arg2_val);
+
+  // Drain the queue one line at a time (simulating each real async
+  // outbox_sent callback) and confirm every one of the TESTLOG_QUEUE_CAPACITY
+  // lines is sent, in order, ending on the LAST one pushed -- i.e. nothing
+  // within the proven worst-case burst was ever dropped, which is exactly
+  // what capacity 4 could not guarantee.
+  AppMessageOutboxSent sent_cb = app_message_register_outbox_sent_fake.arg0_val;
+  TEST_ASSERT_NOT_NULL(sent_cb);
+  for (int i = 0; i < TESTLOG_QUEUE_CAPACITY - 1; i++) {
+    sent_cb(NULL, NULL);  // pops the just-sent line, sends the next queued one
+  }
+  char last_tag[16];
+  snprintf(last_tag, sizeof last_tag, "line%d", TESTLOG_QUEUE_CAPACITY - 1);
+  TEST_ASSERT_EQUAL_STRING(last_tag, dict_write_cstring_fake.arg2_val);
+}
+
 int main(void) {
   UNITY_BEGIN();
   RUN_TEST(test_happy_path_sends_immediately_no_retry_scheduled);
@@ -168,5 +213,6 @@ int main(void) {
   RUN_TEST(test_synchronous_send_failure_self_schedules_retry);
   RUN_TEST(test_repeated_synchronous_failures_do_not_double_schedule_retry_timer);
   RUN_TEST(test_async_outbox_failed_retries_same_line_without_new_timer);
+  RUN_TEST(test_burst_at_full_capacity_without_a_send_callback_drops_nothing);
   return UNITY_END();
 }

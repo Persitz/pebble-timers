@@ -23,7 +23,35 @@ static void sort_candidates(Candidate *c, int n) {
   }
 }
 
-void sched_plan(const TimerStore *store, time_t now, SchedPlan *out) {
+bool sched_negative_rung_eligible(time_t requested_at, time_t now) {
+  return (requested_at - SCHED_MIN_SPACING_S) >= now + SCHED_MIN_LEAD_S;
+}
+
+time_t sched_fallback_at(time_t requested_at, time_t now, int fallback_index) {
+  if (sched_negative_rung_eligible(requested_at, now)) {
+    return (fallback_index == 0) ? requested_at - SCHED_MIN_SPACING_S
+                                  : requested_at + SCHED_MIN_SPACING_S;
+  }
+  // Forward-only substitute: {+60, +120}. fallback_index 0/1 -> *1/*2.
+  return requested_at + (time_t)(fallback_index + 1) * SCHED_MIN_SPACING_S;
+}
+
+time_t sched_redundant_at(time_t armed_at, time_t known_failed_at) {
+  time_t at = armed_at + SCHED_MIN_SPACING_S;
+  if (at == known_failed_at) at += SCHED_MIN_SPACING_S;
+  return at;
+}
+
+bool sched_spacing_allows(time_t at, const time_t *accepted, int accepted_count) {
+  for (int i = 0; i < accepted_count; i++) {
+    time_t diff = at - accepted[i];
+    if (diff < 0) diff = -diff;
+    if (diff < SCHED_MIN_SPACING_S) return false;
+  }
+  return true;
+}
+
+void sched_candidates(const TimerStore *store, time_t now, SchedCandidates *out) {
   memset(out, 0, sizeof(*out));
 
   Candidate candidates[MAX_TIMERS];
@@ -37,7 +65,7 @@ void sched_plan(const TimerStore *store, time_t now, SchedPlan *out) {
 
     time_t at = timer_deadline(t);
     if (at < min_lead_boundary) {
-      out->unschedulable[out->unschedulable_count++] = t->cookie;
+      out->excluded[out->excluded_count++] = t->cookie;
       continue;
     }
     candidates[n_candidates].cookie = t->cookie;
@@ -47,26 +75,13 @@ void sched_plan(const TimerStore *store, time_t now, SchedPlan *out) {
 
   sort_candidates(candidates, n_candidates);
 
-  bool has_last_accepted = false;
-  time_t last_accepted_at = 0;
+  // No cap here at all -- every lead-eligible candidate is
+  // preserved, up to MAX_TIMERS. Only the adapter, watching REAL
+  // accepted-entry counts as it attempts them in this same deadline order,
+  // can correctly decide when the firmware's 8-entry cap is genuinely full.
   for (int i = 0; i < n_candidates; i++) {
-    bool spacing_ok = !has_last_accepted || candidates[i].at >= last_accepted_at + SCHED_MIN_SPACING_S;
-    bool cap_ok = out->request_count < SCHED_MAX_WAKEUPS;
-    if (spacing_ok && cap_ok) {
-      out->requests[out->request_count].cookie = candidates[i].cookie;
-      out->requests[out->request_count].at = candidates[i].at;
-      out->request_count++;
-      last_accepted_at = candidates[i].at;
-      has_last_accepted = true;
-    } else {
-      out->unschedulable[out->unschedulable_count++] = candidates[i].cookie;
-    }
+    out->candidates[out->candidate_count].cookie = candidates[i].cookie;
+    out->candidates[out->candidate_count].at = candidates[i].at;
+    out->candidate_count++;
   }
-}
-
-bool sched_is_unschedulable(const SchedPlan *plan, int32_t cookie) {
-  for (int i = 0; i < plan->unschedulable_count; i++) {
-    if (plan->unschedulable[i] == cookie) return true;
-  }
-  return false;
 }

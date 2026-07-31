@@ -6,6 +6,12 @@
 #include <stdio.h>
 
 #include "fonts_adapter.h"
+// Unconditional include -- gallery.h is self-guarded (its declarations and
+// body are `#ifdef GALLERY_MODE`-gated internally), so this compiles to
+// nothing in a normal release build. Still a real (if compiled-out) coupling
+// from this generic render layer to a test-fixture module: render_build_menu_
+// screen() below calls gallery_click_config_provider() under GALLERY_MODE.
+#include "gallery.h"
 #include "lib/format.h"
 
 #define CLOCK_PAD_X 13
@@ -1453,4 +1459,69 @@ void render_alarm_header_band(GContext *ctx, GRect bounds, GColor band_color,
   graphics_context_set_text_color(ctx, GColorWhite);
   graphics_draw_text(ctx, title, title_font, title_rect, GTextOverflowModeTrailingEllipsis,
                       GTextAlignmentLeft, NULL);
+}
+
+// --- shared MenuLayer-window builder -----------------------------------------
+// See render.h's own doc comment on RenderMenuScreenSpec for what this does
+// and does not factor.
+
+RenderMenuScreen render_build_menu_screen(const RenderMenuScreenSpec *spec) {
+  RenderMenuScreen screen = {0};
+
+  screen.window = window_create();
+  window_set_background_color(screen.window, spec->window_bg);
+#ifdef GALLERY_MODE
+  // Screen gallery (inner loop, src/c/gallery.c) -- every converted screen
+  // used to repeat this exact #ifdef at its own create() call site. Never
+  // compiled into a release build.
+  window_set_click_config_provider(screen.window, gallery_click_config_provider);
+#else
+  window_set_click_config_provider(screen.window, spec->click_config_provider);
+#endif
+  window_set_window_handlers(screen.window, spec->window_handlers);
+
+  Layer *root = window_get_root_layer(screen.window);
+  GRect bounds = layer_get_bounds(root);
+  int16_t header_h = spec->header_height;
+
+  if (header_h > 0) {
+    screen.header = layer_create(GRect(0, 0, bounds.size.w, header_h));
+    layer_set_update_proc(screen.header, spec->header_update_proc);
+    layer_add_child(root, screen.header);
+  }
+
+  screen.menu = menu_layer_create(GRect(0, header_h, bounds.size.w, bounds.size.h - header_h));
+  if (spec->pad_bottom_disable) {
+    menu_layer_pad_bottom_enable(screen.menu, false);
+  }
+  if (spec->set_normal_colors) {
+    menu_layer_set_normal_colors(screen.menu, spec->normal_bg, spec->normal_fg);
+  }
+  // Every converted screen set this to the same pair -- see RenderMenuScreenSpec's
+  // own doc comment (render.h).
+  menu_layer_set_highlight_colors(screen.menu, RENDER_COLOR_PAPER, GColorBlack);
+  menu_layer_set_callbacks(screen.menu, NULL,
+                            (MenuLayerCallbacks){
+                                .get_num_rows = spec->get_num_rows,
+                                .get_cell_height = spec->get_cell_height,
+                                .draw_row = spec->draw_row,
+                            });
+  layer_add_child(root, menu_layer_get_layer(screen.menu));
+
+  if (spec->with_scroll_indicator) {
+    screen.scroll_indicator = layer_create(
+        GRect(bounds.size.w - RENDER_SCROLL_INDICATOR_WIDTH - RENDER_SCROLL_INDICATOR_MARGIN,
+              header_h, RENDER_SCROLL_INDICATOR_WIDTH, bounds.size.h - header_h));
+    layer_set_update_proc(screen.scroll_indicator, spec->scroll_indicator_update_proc);
+    layer_add_child(root, screen.scroll_indicator);
+  }
+
+  return screen;
+}
+
+void render_destroy_menu_screen(const RenderMenuScreen *screen) {
+  if (screen->scroll_indicator != NULL) layer_destroy(screen->scroll_indicator);
+  menu_layer_destroy(screen->menu);
+  if (screen->header != NULL) layer_destroy(screen->header);
+  window_destroy(screen->window);
 }

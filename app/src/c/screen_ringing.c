@@ -15,9 +15,6 @@
 #include "nav.h"
 #include "render.h"
 #include "testlog_am.h"
-#ifdef GALLERY_MODE
-#include "gallery.h"
-#endif
 
 // ASCII "~" substitutes "≈" -- this codebase's established
 // avoid-untested-glyph convention (vector-drawn "+" for HOME's "New timer"
@@ -203,66 +200,49 @@ static void window_appear(Window *window) {
 }
 
 Window *screen_ringing_create(void) {
-  s_window = window_create();
-  // Use PAPER, not alarm-red -- only the header strip
-  // (HEADER_HEIGHT) is red; the body is a normal paper list with a red
-  // header strip only.
-  window_set_background_color(s_window, RENDER_COLOR_PAPER);
-#ifdef GALLERY_MODE
-  // Screen gallery (inner loop, src/c/gallery.c) -- see screen_set.c's
-  // matching comment. Never compiled into a release build.
-  window_set_click_config_provider(s_window, gallery_click_config_provider);
-#else
-  window_set_click_config_provider(s_window, click_config_provider);
-#endif
-  window_set_window_handlers(s_window, (WindowHandlers){.appear = window_appear});
-
-  Layer *root = window_get_root_layer(s_window);
-  GRect bounds = layer_get_bounds(root);
-
-  s_header = layer_create(GRect(0, 0, bounds.size.w, HEADER_HEIGHT));
-  layer_set_update_proc(s_header, header_update_proc);
-  layer_add_child(root, s_header);
-
-  s_menu = menu_layer_create(
-      GRect(0, HEADER_HEIGHT, bounds.size.w, bounds.size.h - HEADER_HEIGHT));
-  // Root-caused via pebble.h's own doc comment on menu_layer_set_normal_colors
-  // ("if this function is not explicitly called ... defaults to white
-  // background") -- an un-called MenuLayer paints WHITE for any viewport
-  // space beyond its actual row content AND for its default bottom padding
-  // (menu_layer_pad_bottom_enable's doc). Now explicitly PAPER (was
-  // alarm-red, the other half of the red-flood bug) -- render_row() draws
-  // its own cursor-pill/hairline per row, same as HOME, so the menu's own
-  // background just needs to be the paper the hairlines sit on.
-  menu_layer_set_normal_colors(s_menu, RENDER_COLOR_PAPER, RENDER_COLOR_INK);
-  // Complementary fix: menu_layer_set_normal_colors above only fixes the
-  // UNSELECTED-row/red-flood bug; menu_layer_set_highlight_colors (still SDK-defaulted
-  // to {GColorBlack, GColorWhite}) fills the CURSOR row's full cell bounds black before
-  // render_row()'s own smaller inset pill runs. Same fix as screen_home.c/screen_actions.c/
-  // screen_alarm.c/screen_laps.c.
-  menu_layer_set_highlight_colors(s_menu, RENDER_COLOR_PAPER, GColorBlack);
-  menu_layer_set_callbacks(s_menu, NULL,
-                            (MenuLayerCallbacks){
-                                .get_num_rows = get_num_rows,
-                                .get_cell_height = get_cell_height,
-                                .draw_row = draw_row,
-                                // Not wired via menu_layer_set_click_config_onto_window (see
-                                // click_config_provider above) -- select_click_handler calls
-                                // select_click() directly instead. Left unset: a registered
-                                // but never-invoked .select_click reads as live and has caused
-                                // bugs (screen_actions.c/screen_alarm.c).
-                            });
-  layer_add_child(root, menu_layer_get_layer(s_menu));
-
+  // Not wired via menu_layer_set_click_config_onto_window (see
+  // click_config_provider above) -- select_click_handler calls
+  // select_click() directly instead. No .select_click callback below: a
+  // registered but never-invoked .select_click reads as live and has caused
+  // bugs (screen_actions.c/screen_alarm.c).
+  RenderMenuScreen screen = render_build_menu_screen(&(RenderMenuScreenSpec){
+      // Use PAPER, not alarm-red -- only the header strip (HEADER_HEIGHT) is
+      // red; the body is a normal paper list with a red header strip only.
+      .window_bg = RENDER_COLOR_PAPER,
+      .click_config_provider = click_config_provider,
+      .window_handlers = (WindowHandlers){.appear = window_appear},
+      .header_height = HEADER_HEIGHT,
+      .header_update_proc = header_update_proc,
+      // Root-caused via pebble.h's own doc comment on
+      // menu_layer_set_normal_colors ("if this function is not explicitly
+      // called ... defaults to white background") -- an un-called MenuLayer
+      // paints WHITE for any viewport space beyond its actual row content
+      // AND for its default bottom padding (menu_layer_pad_bottom_enable's
+      // doc). Now explicitly PAPER (was alarm-red, the other half of the
+      // red-flood bug) -- render_row() draws its own cursor-pill/hairline
+      // per row, same as HOME, so the menu's own background just needs to
+      // be the paper the hairlines sit on.
+      .set_normal_colors = true,
+      .normal_bg = RENDER_COLOR_PAPER,
+      .normal_fg = RENDER_COLOR_INK,
+      .get_num_rows = get_num_rows,
+      .get_cell_height = get_cell_height,
+      .draw_row = draw_row,
+      // RINGING is the one converted screen with no scroll indicator overlay
+      // (its list is bounded by the live ringing set, not MAX_TIMERS).
+      .with_scroll_indicator = false,
+  });
+  s_window = screen.window;
+  s_header = screen.header;
+  s_menu = screen.menu;
   return s_window;
 }
 
 void screen_ringing_destroy(void) {
-  menu_layer_destroy(s_menu);
+  render_destroy_menu_screen(
+      &(RenderMenuScreen){.window = s_window, .header = s_header, .menu = s_menu});
   s_menu = NULL;
-  layer_destroy(s_header);
   s_header = NULL;
-  window_destroy(s_window);
   s_window = NULL;
 }
 
@@ -275,7 +255,8 @@ void screen_ringing_mark_dirty(void) {
     // list" branch) with no window-stack transition to hook a reload into
     // otherwise. Cheap at MAX_TIMERS<=16, matching this codebase's
     // established "recompute, don't cache" pattern elsewhere (e.g.
-    // screen_hero.c's sched_plan() every redraw).
+    // view_home_value_size()'s per-redraw recomputation from the current
+    // timer count -- see lib/view.c).
     menu_layer_reload_data(s_menu);
     layer_mark_dirty(menu_layer_get_layer(s_menu));
   }

@@ -267,6 +267,9 @@ static int build_rows(VoiceRow *rows) {
       rows[0] = (VoiceRow){"Set on dial", VOICE_ACTION_SET_DIAL};
       rows[1] = (VoiceRow){"Say again", VOICE_ACTION_SAY_AGAIN};
       return 2;
+    case VOICE_DATA_UNAVAILABLE:
+      rows[0] = (VoiceRow){"Use dial", VOICE_ACTION_USE_DIAL};
+      return 1;
     case VOICE_NO_PHONE:
     case VOICE_DISABLED:
       rows[0] = (VoiceRow){"Use dial", VOICE_ACTION_USE_DIAL};
@@ -289,6 +292,8 @@ static const char *voice_message_for_outcome(VoiceOutcome outcome) {
   switch (outcome) {
     case VOICE_PARSE_FAIL:
       return "Didn't catch a time";
+    case VOICE_DATA_UNAVAILABLE:
+      return "Voice data unavailable";
     case VOICE_NO_PHONE:
       return "Voice needs your phone";
     case VOICE_NO_SPEECH:

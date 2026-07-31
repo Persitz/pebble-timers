@@ -567,3 +567,71 @@ void render_composed_group(GContext *ctx, GRect cell_bounds, bool highlighted,
 // a hardcoded screen constant -- both HOME and LIBRARY are 200px wide, so
 // this generalizes without change). Extracted alongside render_composed_group above for reuse.
 void render_composed_seat_divider(GContext *ctx, GRect cell_bounds);
+
+// --- shared MenuLayer-window builder -----------------------------------------
+//
+// Factors the window/header/MenuLayer/scroll-indicator construction sequence
+// shared VERBATIM by every "header or floating strip + MenuLayer (+ optional
+// scroll indicator)" screen in this app -- HOME, ACTIONS, LAPS,
+// preset-actions, RINGING, LIBRARY, and the alarm hero's options window
+// (screen_voice.c's 3-layer window is a genuine structural outlier -- an
+// independently-invalidated info band alongside the header -- and is
+// deliberately NOT one of these). Each screen keeps its own row/height/draw
+// callbacks, click handlers, and window_appear logic; only the one-time
+// create/destroy sequence moves here. This consolidation prevents drift: a
+// MenuLayer highlight-color fix previously had to be copied into 8 files,
+// while menu_layer_pad_bottom_enable()/_set_normal_colors() appeared in only
+// some of the 8 with no way to tell deliberate differences from omissions.
+//
+// menu_layer_set_highlight_colors is NOT a spec field: every one of these
+// screens set it to the identical (RENDER_COLOR_PAPER, GColorBlack) pair (the
+// fix for the SDK's own full-cell-black highlight default) -- hardcoded once
+// here instead of an 8th copy-pasted call site.
+#define RENDER_SCROLL_INDICATOR_WIDTH 3
+#define RENDER_SCROLL_INDICATOR_MARGIN 3
+
+typedef struct {
+  GColor window_bg;
+  // The screen's OWN click_config_provider -- render_build_menu_screen swaps
+  // it for gallery_click_config_provider under GALLERY_MODE itself (the
+  // identical #ifdef every one of these screens used to repeat at its own
+  // create() call site).
+  ClickConfigProvider click_config_provider;
+  WindowHandlers window_handlers;  // every current caller passes only .appear
+
+  int16_t header_height;  // header/strip Layer height, from the window's top
+  LayerUpdateProc header_update_proc;
+
+  bool pad_bottom_disable;  // menu_layer_pad_bottom_enable(menu, false) if true
+  bool set_normal_colors;   // menu_layer_set_normal_colors(menu, normal_bg, normal_fg) if true
+  GColor normal_bg;
+  GColor normal_fg;
+
+  MenuLayerGetNumberOfRowsInSectionsCallback get_num_rows;
+  MenuLayerGetCellHeightCallback get_cell_height;
+  MenuLayerDrawRowCallback draw_row;
+
+  bool with_scroll_indicator;
+  LayerUpdateProc scroll_indicator_update_proc;
+} RenderMenuScreenSpec;
+
+typedef struct {
+  Window *window;
+  Layer *header;            // NULL if header_height == 0
+  MenuLayer *menu;
+  Layer *scroll_indicator;  // NULL if with_scroll_indicator == false
+} RenderMenuScreen;
+
+// Builds a window per `spec`, in the construction order every converted
+// screen already used (window -> header layer -> MenuLayer -> scroll
+// indicator, each added as a root-layer child in that order). Returns the
+// created parts so the caller keeps its own static pointers for its
+// (unmoved) click handlers / mark_dirty / window_appear logic.
+RenderMenuScreen render_build_menu_screen(const RenderMenuScreenSpec *spec);
+
+// Destroys everything render_build_menu_screen created, in the reverse
+// (scroll indicator -> menu -> header -> window) order every converted
+// screen's own destroy function already used. Does not clear the caller's
+// own static pointers -- the caller still does that itself, matching every
+// existing *_destroy's explicit `s_foo = NULL;` lines.
+void render_destroy_menu_screen(const RenderMenuScreen *screen);

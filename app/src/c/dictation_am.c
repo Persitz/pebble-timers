@@ -40,6 +40,7 @@ static const char *outcome_tag(VoiceOutcome outcome) {
   switch (outcome) {
     case VOICE_OK: return "success";
     case VOICE_PARSE_FAIL: return "parse_fail";
+    case VOICE_DATA_UNAVAILABLE: return "data_unavailable";
     case VOICE_NO_PHONE: return "no_phone";
     case VOICE_NO_SPEECH: return "no_speech";
     case VOICE_DISABLED: return "disabled";
@@ -112,6 +113,35 @@ static void deliver(int status, const char *transcript) {
     }
     return;
   }
+
+  // This guard looks inverted at first glance: GALLERY_MODE is exactly the
+  // build where nl_vocabulary_init() is never called (main.c's own init() is
+  // `#ifndef GALLERY_MODE`, so no real
+  // vocabulary is ever loaded there) -- so it looks like the one build that
+  // most needs this check is the one build where it's compiled out. It is
+  // NOT a soft-fail bug left in place, though: `#ifdef GALLERY_MODE`,
+  // wscript's build() drops lib/parse_nl.c from the source list entirely
+  // and links src/c/parse_nl_gallery_stub.c instead (see that file's own
+  // comment) -- a stub that supplies parse_nl()/nl_clock_target_to_duration()
+  // but deliberately NOT parse_nl_vocabulary_available()/_set()/_size(),
+  // since nothing in a gallery build ever calls them. Removing this
+  // `#ifndef` and calling parse_nl_vocabulary_available() unconditionally
+  // would therefore fail to LINK in gallery mode ("undefined reference"),
+  // not merely behave oddly -- confirmed by reading the stub, which has no
+  // such symbol. Safety in gallery mode instead comes from the stub's own
+  // parse_nl() always returning ok=false (fail-soft, gallery.c's own voice
+  // scenes never let a real delivery reach this far -- see
+  // parse_nl_gallery_stub.c's file comment), not from this guard or from
+  // lib/parse_nl.c's internal parse_nl_vocabulary_available() check inside
+  // parse_nl() (parse_nl.c:1917), which isn't even linked into this build.
+#ifndef GALLERY_MODE
+  if (!parse_nl_vocabulary_available()) {
+    VoiceOutcome outcome = VOICE_DATA_UNAVAILABLE;
+    testlog("dictation_outcome", outcome_tag(outcome));
+    screen_voice_show_parse(transcript, NULL, outcome);
+    return;
+  }
+#endif
 
   NlParse parse;
   bool ok = parse_nl(transcript, &parse);
