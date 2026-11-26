@@ -17,6 +17,9 @@ UNITY_DIR := vendor/unity
 LIB_DIR   := ../src/c/lib
 ADAPTER_DIR := ../src/c
 FAKES_DIR := fakes
+# Adapter tests exercise the TESTLOG_ENABLED build of the adapter tier (the
+# one the emulator harness runs; release builds compile testlog() to a no-op).
+ADAPTER_DEFS := -DTESTLOG_ENABLED
 INCLUDES  := -I$(UNITY_DIR) -I$(LIB_DIR) -Ivendor
 
 LIB_SRCS  := $(wildcard $(LIB_DIR)/*.c)
@@ -44,7 +47,7 @@ build/%_test: %_test.c $(LIB_SRCS) $(UNITY_SRC)
 # above for this one target.
 build/testlog_am_test: testlog_am_test.c $(ADAPTER_DIR)/testlog_am.c $(LIB_DIR)/testlog.c $(UNITY_SRC)
 	@mkdir -p build
-	$(CC) $(CFLAGS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
+	$(CC) $(CFLAGS) $(ADAPTER_DEFS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
 
 # The second adapter file (after testlog_am.c) let into the host test build,
 # to test hold.c's
@@ -52,14 +55,14 @@ build/testlog_am_test: testlog_am_test.c $(ADAPTER_DIR)/testlog_am.c $(LIB_DIR)/
 # surface it calls -- test/fakes/pebble.h.
 build/hold_test: hold_test.c $(ADAPTER_DIR)/hold.c $(LIB_DIR)/set_accel.c $(UNITY_SRC)
 	@mkdir -p build
-	$(CC) $(CFLAGS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
+	$(CC) $(CFLAGS) $(ADAPTER_DEFS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
 
 # The third adapter file (after testlog_am.c, hold.c) let into the host test
 # build, to test input_guard.c's AppTimer-gated boolean against FFF fakes of
 # the tiny AppTimer surface it calls -- test/fakes/pebble.h.
 build/input_guard_test: input_guard_test.c $(ADAPTER_DIR)/input_guard.c $(UNITY_SRC)
 	@mkdir -p build
-	$(CC) $(CFLAGS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
+	$(CC) $(CFLAGS) $(ADAPTER_DEFS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
 
 # The fourth adapter file let into the host test build, to test
 # dictation_am.c's session lifecycle against
@@ -69,7 +72,7 @@ build/input_guard_test: input_guard_test.c $(ADAPTER_DIR)/input_guard.c $(UNITY_
 # tests exercise the actual parser, not a stand-in.
 build/dictation_am_test: dictation_am_test.c $(ADAPTER_DIR)/dictation_am.c $(LIB_DIR)/parse_nl.c $(LIB_DIR)/voice_outcome.c $(UNITY_SRC)
 	@mkdir -p build
-	$(CC) $(CFLAGS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
+	$(CC) $(CFLAGS) $(ADAPTER_DEFS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
 
 # The fifth adapter file let into the host test build, to test
 # wakeup_adapter.c's two-pass, status-aware retry scheduling against FFF
@@ -89,7 +92,7 @@ build/dictation_am_test: dictation_am_test.c $(ADAPTER_DIR)/dictation_am.c $(LIB
 # on wakeup_adapter_test_reset_diag_dump()).
 build/wakeup_adapter_test: wakeup_adapter_test.c $(ADAPTER_DIR)/wakeup_adapter.c $(LIB_DIR)/sched.c $(LIB_DIR)/store.c $(LIB_DIR)/timer.c $(UNITY_SRC)
 	@mkdir -p build
-	$(CC) $(CFLAGS) -DWAKEUP_ADAPTER_TEST_HOOKS -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
+	$(CC) $(CFLAGS) $(ADAPTER_DEFS) -DWAKEUP_ADAPTER_TEST_HOOKS -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
 
 # The sixth adapter file let into the host test build (reuses
 # wakeup_adapter_test's rationale for linking wakeup_adapter.c +
@@ -100,7 +103,7 @@ build/wakeup_adapter_test: wakeup_adapter_test.c $(ADAPTER_DIR)/wakeup_adapter.c
 # hand-written per-scenario canned FFF return values.
 build/wakeup_property_test: wakeup_property_test.c $(ADAPTER_DIR)/wakeup_adapter.c $(LIB_DIR)/sched.c $(LIB_DIR)/store.c $(LIB_DIR)/timer.c $(FAKES_DIR)/wakeup_oracle.c $(UNITY_SRC)
 	@mkdir -p build
-	$(CC) $(CFLAGS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
+	$(CC) $(CFLAGS) $(ADAPTER_DEFS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
 
 # The seventh adapter file let into the host test build -- persist_adapter.c.
 # Its save/load round trip can silently lose data on a torn write with no
@@ -112,18 +115,18 @@ build/wakeup_property_test: wakeup_property_test.c $(ADAPTER_DIR)/wakeup_adapter
 # defined in the test file itself.
 build/persist_adapter_test: persist_adapter_test.c $(ADAPTER_DIR)/persist_adapter.c $(LIB_DIR)/serialize.c $(LIB_DIR)/store.c $(LIB_DIR)/timer.c $(LIB_DIR)/set_machine.c $(LIB_DIR)/format.c $(UNITY_SRC)
 	@mkdir -p build
-	$(CC) $(CFLAGS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
+	$(CC) $(CFLAGS) $(ADAPTER_DEFS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
 
 # Persistence-adapter seams: each writes Pebble storage directly, so their
 # checked-write behavior is tested against stateful fake flash rather than
 # treating a successful call as proof that a write landed.
 build/persist_preset_adapter_test: persist_preset_adapter_test.c $(ADAPTER_DIR)/persist_preset_adapter.c $(LIB_DIR)/preset_serialize.c $(LIB_DIR)/preset_store.c $(LIB_DIR)/timer.c $(UNITY_SRC)
 	@mkdir -p build
-	$(CC) $(CFLAGS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
+	$(CC) $(CFLAGS) $(ADAPTER_DEFS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
 
 build/persist_kind_adapter_test: persist_kind_adapter_test.c $(ADAPTER_DIR)/persist_kind_adapter.c $(UNITY_SRC)
 	@mkdir -p build
-	$(CC) $(CFLAGS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
+	$(CC) $(CFLAGS) $(ADAPTER_DEFS) -I$(FAKES_DIR) -I$(ADAPTER_DIR) $(INCLUDES) $^ -o $@
 
 test: $(BINS)
 	@status=0; \

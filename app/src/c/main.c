@@ -228,7 +228,13 @@ static void handle_wakeup(WakeupId id, int32_t cookie) {
 }
 
 static void init(void) {
+#ifdef TESTLOG_ENABLED
+  // AppMessage is used ONLY by the test-log channel. A release build must
+  // never open it: on a real phone, AppMessages from this pkjs-less app
+  // trigger the Pebble app's LegacyPebbleKit permission prompt (see
+  // testlog_am.h / wscript).
   app_message_open(app_message_inbox_size_maximum(), app_message_outbox_size_maximum());
+#endif
   testlog_init();
 
   app_context_init();

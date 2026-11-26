@@ -3,6 +3,8 @@
 
 #include "testlog_am.h"
 
+#ifdef TESTLOG_ENABLED
+
 #include <pebble.h>
 
 #include "lib/testlog.h"
@@ -137,3 +139,5 @@ void testlog(const char *tag, const char *data) {
     try_send_next();
   }
 }
+
+#endif  // TESTLOG_ENABLED
