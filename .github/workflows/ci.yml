@@ -99,7 +99,7 @@ jobs:
           if pebble sdk list 2>/dev/null | grep -q '(active)'; then
             echo "SDK already installed: $(pebble sdk list 2>/dev/null | grep '(active)')"
           else
-            pebble sdk install latest
+            pebble sdk install 4.17  # pinned: "latest" (4.44+) fails to install with pinned pebble-tool 5.0.39
           fi
 
       - name: pebble build
@@ -120,6 +120,20 @@ jobs:
       - name: Size gate (npm run size:c)
         working-directory: app
         run: npm run size:c
+
+      # The shipped (plain `pebble build`) app must not use AppMessage at all:
+      # the phone's Pebble app shows users a "legacy PebbleKit" permission
+      # prompt for any AppMessage from a pkjs-less app. The test-log channel is
+      # compiled in only under TESTLOG_ENABLED (see app/wscript).
+      - name: No-AppMessage gate (release ELF)
+        working-directory: app
+        run: |
+          NM="$HOME/.local/share/pebble-sdk/SDKs/current/toolchain/arm-none-eabi/bin/arm-none-eabi-nm"
+          if "$NM" build/emery/pebble-app.elf | grep -i 'app_message'; then
+            echo "::error::release build references AppMessage (would trigger the phone's LegacyPebbleKit prompt)"
+            exit 1
+          fi
+          echo "OK: no AppMessage symbols in the release ELF"
 
       - name: Upload PBW artifact
         uses: actions/upload-artifact@v4
@@ -170,7 +184,7 @@ jobs:
           if pebble sdk list 2>/dev/null | grep -q '(active)'; then
             echo "SDK already installed: $(pebble sdk list 2>/dev/null | grep '(active)')"
           else
-            pebble sdk install latest
+            pebble sdk install 4.17  # pinned: "latest" (4.44+) fails to install with pinned pebble-tool 5.0.39
           fi
 
       - name: npm run test:c (make -C test test)

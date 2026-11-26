@@ -90,10 +90,9 @@ static void wakeup_diag_save(int32_t status, time_t at) {
 // output from the settings->about menu... use the pebble logs command...
 // to activate logs" -- no companion phone app or PebbleKit JS relay needed,
 // just Developer Connection enabled in the Pebble/Rebble phone app. testlog()
-// is ALSO emitted here, on the emulator-oriented AppMessage test-log channel,
-// but that channel has no listener on an unpaired real watch, so it reaches
-// no user on a normal watch. It is not this record's production reader;
-// APP_LOG is.
+// is ALSO emitted here, but only in a TESTLOG_ENABLED (emulator test) build;
+// a release build compiles it out entirely. It is not this record's
+// production reader; APP_LOG is.
 static bool s_diag_dumped;
 
 static void wakeup_diag_dump_previous(void) {

@@ -97,11 +97,11 @@ if ! command -v pebble >/dev/null 2>&1; then
 fi
 
 # --- 4. Pebble SDK (toolchain + QEMU) ---------------------------------------
-step "pebble sdk install latest"
+step "pebble sdk install 4.17"
 if pebble sdk list 2>/dev/null | grep -q '(active)'; then
   echo "a Pebble SDK is already installed/active: $(pebble sdk list 2>/dev/null | grep '(active)')"
 else
-  pebble sdk install latest
+  pebble sdk install 4.17  # pinned: "latest" (4.44+) fails with pebble-tool 5.0.39
 fi
 
 # --- 5. npm install (keeps package-lock.json current; no devDependencies) ---

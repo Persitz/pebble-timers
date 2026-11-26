@@ -71,6 +71,22 @@ def build(ctx):
     if emu_test_hooks:
         app_defines.append('EMU_TEST_HOOKS=1')
 
+    # Test-log channel (testlog_am.c): watch->phone AppMessages on key 10000
+    # that the emulator harness captures as markers. OFF in a plain release
+    # build: on a real phone the Pebble app (mobile 2.0+ permission system)
+    # treats any AppMessage from a pkjs-less app as legacy PebbleKit Classic
+    # traffic and shows a "wants to broadcast messages to every app on your
+    # phone (legacy PebbleKit)" LegacyPebbleKit prompt -- for messages no one
+    # on the phone ever reads. Release builds therefore never call
+    # app_message_open() and testlog() compiles to a no-op. Enabled by
+    # PEBBLE_TESTLOG=1 (set it in the environment before `pebble build`) for emulator acceptance
+    # flows, and implied by GALLERY_MODE / EMU_TEST_HOOKS (both test-only
+    # builds whose scripts assert on testlog markers).
+    testlog_enabled = (os.environ.get('PEBBLE_TESTLOG') == '1'
+                       or gallery_mode or emu_test_hooks)
+    if testlog_enabled:
+        app_defines.append('TESTLOG_ENABLED=1')
+
     # Non-LTO build toggle: mirrors the same env-var-not-CLI-flag shape as
     # GALLERY_MODE/EMU_TEST_HOOKS above. LTO is ON by default (see the
     # per-platform loop below) -- this is the opt-OUT switch, not opt-in,
